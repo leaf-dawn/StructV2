@@ -54,10 +54,12 @@ export interface LinkOption {
 }
 
 
-export interface PointerOption extends ElementOption {
+export interface MarkerOption extends ElementOption {
     anchor: number;
     offset: number;
+    labelOffset: number;
 };
+
 
 
 export interface LayoutOptions {
@@ -74,7 +76,7 @@ export interface BehaviorOptions {
 export interface LayoutGroupOptions {
     element: { [key: string]: ElementOption };
     link?: { [key: string]: LinkOption }
-    pointer?: { [key: string]: PointerOption };
+    marker?: { [key: string]: MarkerOption }
     layout?: LayoutOptions;
     behavior?: BehaviorOptions;
 };

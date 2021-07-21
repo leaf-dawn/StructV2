@@ -1,15 +1,15 @@
 import { Util } from "../Common/util";
 import { Engine } from "../engine";
-import { ElementOption, Layouter, LayoutGroupOptions, LinkOption, PointerOption } from "../options";
+import { ElementOption, Layouter, LayoutGroupOptions, LinkOption, MarkerOption } from "../options";
 import { sourceLinkData, SourceElement, LinkTarget, Sources } from "../sources";
 import { SV } from "../StructV";
-import { Element, Link, Model, Pointer } from "./modelData";
+import { Element, Link, Marker, Model } from "./modelData";
 
 
 export type LayoutGroup = { 
     element: Element[];
     link: Link[];
-    pointer: Pointer[];
+    marker: Marker[];
     layouter: Layouter;
     layouterName: string;
     options: LayoutGroupOptions;
@@ -32,7 +32,7 @@ export class ModelConstructor {
     }
 
     /**
-     * 构建element，link和pointer
+     * 构建element，link和marker
      * @param sourceList 
      */
     public construct(sources: Sources): LayoutGroupTable {
@@ -52,7 +52,7 @@ export class ModelConstructor {
             let sourceDataString: string = JSON.stringify(sourceGroup.data),
                 prevString: string = this.prevSourcesStringMap[name],
                 elementList: Element[] = [],
-                pointerList: Pointer[] = [];
+                markerList: Marker[] = [];
 
             if(prevString === sourceDataString) {
                 return;
@@ -61,18 +61,18 @@ export class ModelConstructor {
             const options: LayoutGroupOptions = optionsTable[layouterName],
                   sourceData = layouter.sourcesPreprocess(sourceGroup.data, options),
                   elementOptions = options.element || { },
-                  pointerOptions = options.pointer || { };
+                  markerOptions = options.marker || { };
                 
             elementList = this.constructElements(elementOptions, name, sourceData, layouterName);
-            pointerList = this.constructPointers(pointerOptions, elementList);
+            markerList = this.constructMarkers(markerOptions, elementList);
             
             layoutGroupTable.set(name, {
                 element: elementList,
                 link: [],
-                pointer: pointerList,
+                marker: markerList,
                 options: options,
                 layouter: layouter,
-                modelList: [...elementList, ...pointerList],
+                modelList: [...elementList, ...markerList],
                 layouterName,
                 isHide: false
             });
@@ -179,31 +179,31 @@ export class ModelConstructor {
     }
 
     /**
-     * 从配置和 element 集构建 pointer 集
-     * @param pointerOptions 
+     * 从配置和 element 集构建 marker 集
+     * @param markerOptions 
      * @param elements
      * @returns 
      */
-    private constructPointers(pointerOptions: { [key: string]: PointerOption }, elements: Element[]): Pointer[] {
-        let pointerList: Pointer[] = [],
-            pointerNames = Object.keys(pointerOptions);
+    private constructMarkers(markerOptions: { [key: string]: MarkerOption }, elements: Element[]): Marker[] {
+        let markerList: Marker[] = [],
+            markerNames = Object.keys(markerOptions);
 
-        pointerNames.forEach(name => {
+        markerNames.forEach(name => {
             for(let i = 0; i < elements.length; i++) {
                 let element = elements[i],
-                    pointerData = element[name];
+                    markerData = element[name];
                 
                 // 若没有指针字段的结点则跳过
-                if(!pointerData) continue;
+                if(!markerData) continue;
 
-                let id = name + '.' + (Array.isArray(pointerData)? pointerData.join('-'): pointerData),
-                    pointer = this.createPointer(id, name, pointerData, element, pointerOptions[name]);
+                let id = name + '.' + (Array.isArray(markerData)? markerData.join('-'): markerData),
+                    marker = this.createMarker(id, name, markerData, element, markerOptions[name]);
 
-                pointerList.push(pointer);
+                markerList.push(marker);
             }
         });
 
-        return pointerList;
+        return markerList;
     }
 
     /**
@@ -249,20 +249,20 @@ export class ModelConstructor {
     }
 
     /**
-     * 外部指针工厂，创建Pointer
+     * 外部指针工厂，创建marker
      * @param id 
-     * @param pointerName 
+     * @param markerName 
      * @param label 
      * @param target 
      * @param options
      */
-    private createPointer(id: string, pointerName: string, pointerData: string | string[], target: Element, options: PointerOption): Pointer {
-        let pointer = undefined;
+    private createMarker(id: string, markerName: string, markerData: string | string[], target: Element, options: MarkerOption): Marker {
+        let marker = undefined;
 
-        pointer = new Pointer(id, pointerName, pointerData, target);
-        pointer.initProps(options);
+        marker = new Marker(id, markerName, markerData, target);
+        marker.initProps(options);
 
-        return pointer;
+        return marker;
     };
 
     /**

@@ -3,8 +3,8 @@ import { Group } from '../Common/group';
 import { Vector } from '../Common/vector';
 import { Engine } from '../engine';
 import { LayoutGroupTable } from '../Model/modelConstructor';
-import { Element, Model, Pointer } from '../Model/modelData';
-import { LayoutOptions, PointerOption, ViewOptions } from '../options';
+import { Element, Model, Marker } from '../Model/modelData';
+import { LayoutOptions, MarkerOption, ViewOptions } from '../options';
 import { Container } from './container/container';
 
 
@@ -21,10 +21,10 @@ export class Layouter {
     /**
      * 初始化布局参数
      * @param elements 
-     * @param pointers 
+     * @param markers 
      */
-    private initLayoutValue(elements: Element[], pointers: Pointer[]) {
-        [...elements, ...pointers].forEach(item => {
+    private initLayoutValue(elements: Element[], markers: Marker[]) {
+        [...elements, ...markers].forEach(item => {
             item.set('rotation', item.get('rotation'));
             item.set({ x: 0, y: 0 });
         });
@@ -32,21 +32,22 @@ export class Layouter {
 
     /**
      * 布局外部指针
-     * @param pointer 
-     * @param pointerOptions
+     * @param marker 
+     * @param markerOptions
      */
-    private layoutPointer(pointers: Pointer[], pointerOptions: { [key: string]: PointerOption }) {
-        pointers.forEach(item => {
-            const options: PointerOption = pointerOptions[item.getType()],
-                  offset = options.offset || 8,
-                  anchor = item.anchor || 0;
+    private layoutMarker(markers: Marker[], markerOptions: { [key: string]: MarkerOption }) {
+        markers.forEach(item => {
+            const options: MarkerOption = markerOptions[item.getType()],
+                  offset = options.offset ?? 8,
+                  anchor = item.anchor ?? 0,
+                  labelOffset = options.labelOffset ?? 2;
 
             let target = item.target,
                 targetBound: BoundingRect = target.getBound(),
                 anchorPosition = item.target.G6Item.getAnchorPoints()[anchor],
                 center: [number, number] = [targetBound.x + targetBound.width / 2, targetBound.y + targetBound.height / 2],
-                pointerPosition: [number, number],
-                pointerEndPosition: [number, number];
+                markerPosition: [number, number],
+                markerEndPosition: [number, number];
 
             anchorPosition = [anchorPosition.x, anchorPosition.y];
 
@@ -60,18 +61,19 @@ export class Layouter {
                 angle = Math.sign(anchorVector[0]) * (Math.PI / 2 - Math.atan(anchorVector[1] / anchorVector[0]));
             }
 
-            const pointerHeight = item.get('size')[1];
+            const markerHeight = item.get('size')[1],
+                  labelRadius = item.getLabelSizeRadius() / 2;
 
             anchorVector = Vector.normalize(anchorVector);
-            pointerPosition = Vector.location(center, anchorVector, len);
-            pointerEndPosition = Vector.location(center, anchorVector, pointerHeight + len);
-            pointerEndPosition = Vector.subtract(pointerEndPosition, pointerPosition);
+            markerPosition = Vector.location(center, anchorVector, len);
+            markerEndPosition = Vector.location(center, anchorVector, markerHeight + len + labelRadius + labelOffset);
+            markerEndPosition = Vector.subtract(markerEndPosition, markerPosition);
 
             item.set({
-                x: pointerPosition[0],
-                y: pointerPosition[1],
+                x: markerPosition[0],
+                y: markerPosition[1],
                 rotation: angle,
-                pointerEndPosition
+                markerEndPosition
             });
         });
     }   
@@ -110,13 +112,13 @@ export class Layouter {
                 modelGroup.add(item);
             });
             
-            this.initLayoutValue(group.element, group.pointer); // 初始化布局参数
+            this.initLayoutValue(group.element, group.marker); // 初始化布局参数
             group.layouter.layout(group.element, options);  // 布局节点
             modelGroupList.push(modelGroup);
         });
 
         layoutGroupTable.forEach(group => {
-            this.layoutPointer(group.pointer, group.options.pointer);  // 布局外部指针
+            this.layoutMarker(group.marker, group.options.marker);  // 布局外部指针
         });
 
         return modelGroupList;

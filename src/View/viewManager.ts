@@ -81,7 +81,7 @@ export class ViewManager {
         freedList.forEach(fItem => {
             removeModels.push(...freedGroup.element.splice(freedGroup.element.findIndex(item => item.id === fItem.id), 1));
             removeModels.push(...freedGroup.link.splice(freedGroup.link.findIndex(item => item.element.id === fItem.id || item.target.id === fItem.id)));
-            removeModels.push(...freedGroup.pointer.splice(freedGroup.pointer.findIndex(item => item.target.id === fItem.id)));
+            removeModels.push(...freedGroup.marker.splice(freedGroup.marker.findIndex(item => item.target.id === fItem.id)));
         });
 
         removeModels.map(model => {

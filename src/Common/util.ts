@@ -97,7 +97,7 @@ export const Util = {
      * @returns 
      */
     convertG6Data(layoutGroup: LayoutGroup): G6Data {
-        let nodes = [...layoutGroup.element, ...layoutGroup.pointer],
+        let nodes = [...layoutGroup.element, ...layoutGroup.marker],
             edges = layoutGroup.link;
 
         return { 

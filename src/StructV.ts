@@ -1,15 +1,15 @@
 import { Engine } from "./engine";
 import { Bound } from "./Common/boundingRect";
 import { Group } from "./Common/group";
-import externalPointer from "./RegisteredShape/externalPointer";
+import pointer from "./RegisteredShape/pointer";
 import * as G6 from "./Lib/g6.js";
 import linkListNode from "./RegisteredShape/linkListNode";
 import binaryTreeNode from "./RegisteredShape/binaryTreeNode";
 import twoCellNode from "./RegisteredShape/twoCellNode";
+import Cursor from "./RegisteredShape/cursor";
 import { Vector } from "./Common/vector";
 import indexedNode from "./RegisteredShape/indexedNode";
 import { EngineOptions, Layouter } from "./options";
-import { LayoutGroup } from "./Model/modelConstructor";
 import { SourceElement } from "./sources";
 import { Element } from "./Model/modelData";
 
@@ -49,11 +49,13 @@ SV.G6 = G6;
 
 SV.registeredLayouter = {};
 SV.registeredShape = [
-    externalPointer, 
+    pointer, 
     linkListNode, 
     binaryTreeNode, 
     twoCellNode,
-    indexedNode
+    indexedNode,
+    Cursor
+
 ];
 
 SV.registerShape = G6.registerNode;

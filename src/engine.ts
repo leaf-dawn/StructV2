@@ -1,4 +1,4 @@
-import { Element, Link, Pointer } from "./Model/modelData";
+import { Element, Link, Marker } from "./Model/modelData";
 import { Sources } from "./sources";
 import { LayoutGroupTable, ModelConstructor } from "./Model/modelConstructor";
 import { AnimationOptions, EngineOptions, InteractionOptions, LayoutGroupOptions, ViewOptions } from "./options";
@@ -139,22 +139,22 @@ export class Engine {
     }
 
     /**
-     * 获取所有 pointer
+     * 获取所有 marker
      * @param  group
      */
-    public getPointers(group?: string): Pointer[] {
+    public getMarkers(group?: string): Marker[] {
         const layoutGroupTable = this.modelConstructor.getLayoutGroupTable();
 
         if(group && layoutGroupTable.has('group')) {
-            return layoutGroupTable.get('group').pointer;
+            return layoutGroupTable.get('group').marker;
         }
 
-        const pointers: Pointer[] = [];
+        const markers: Marker[] = [];
         layoutGroupTable.forEach(item => {
-            pointers.push(...item.pointer);
+            markers.push(...item.marker);
         })
 
-        return pointers;
+        return markers;
     }
 
     /**

@@ -1,5 +1,5 @@
 import { Util } from "../Common/util";
-import { ElementLabelOption, ElementOption, LinkLabelOption, LinkOption, PointerOption, Style } from "../options";
+import { ElementLabelOption, ElementOption, LinkLabelOption, LinkOption, MarkerOption, Style } from "../options";
 import { SourceElement } from "../sources";
 import { BoundingRect } from "../Common/boundingRect";
 import { SV } from './../StructV';
@@ -16,7 +16,7 @@ export interface G6NodeModel {
     label: string | string[];
     style: Style;
     labelCfg: ElementLabelOption;
-    externalPointerId: string; 
+    markerId: string; 
     SVLayouter: string;
     SVModelType: string;
     SVModelName: string;
@@ -64,7 +64,7 @@ export class Model {
      * 定义 G6 model 的属性
      * @param option 
      */
-    protected defineProps(option: ElementOption | LinkOption | PointerOption) {
+    protected defineProps(option: ElementOption | LinkOption | MarkerOption) {
         return null;
     }
 
@@ -72,7 +72,7 @@ export class Model {
      * 初始化 G6 model 的属性
      * @param option 
      */
-    initProps(option: ElementOption | LinkOption | PointerOption) { 
+    initProps(option: ElementOption | LinkOption | MarkerOption) { 
         this.props = this.defineProps(option);
     }
 
@@ -169,7 +169,7 @@ export class Element extends Model {
     groupName: string;
     layouterName: string;
     freed: boolean;
-    pointers: { [key: string]: Pointer };
+    markers: { [key: string]: Marker };
 
     constructor(id: string, type: string, group: string, layouter: string, sourceElement: SourceElement) {
         super(id, type);
@@ -190,7 +190,7 @@ export class Element extends Model {
 
         this.sourceId = this.id.split('.')[1];
         this.sourceElement = sourceElement;
-        this.pointers = { };
+        this.markers = { };
     }
 
     protected defineProps(option: ElementOption): G6NodeModel {
@@ -206,7 +206,7 @@ export class Element extends Model {
             label: option.label,
             style: Util.objectClone<Style>(option.style),
             labelCfg: Util.objectClone<ElementLabelOption>(option.labelOptions),
-            externalPointerId: null,
+            markerId: null,
             SVLayouter: this.layouterName,
             SVModelType: 'element',
             SVModelName: this.type
@@ -260,7 +260,7 @@ export class Link extends Model {
 
 
 
-export class Pointer extends Model {
+export class Marker extends Model {
     target: Element;
     label: string | string[];
     anchor: number;
@@ -270,28 +270,38 @@ export class Pointer extends Model {
         this.target = target;
         this.label = label;
 
-        this.target.set('externalPointerId', id);
-        this.target.pointers[type] = this;
+        this.target.set('markerId', id);
+        this.target.markers[type] = this;
     }
 
-    protected defineProps(option: PointerOption): G6NodeModel {
+    getLabelSizeRadius(): number {
+        const { width, height } = this.G6Item.getContainer().getChildren()[2].getBBox();
+        return width > height? width: height;
+    }
+
+    protected defineProps(option: MarkerOption): G6NodeModel {
         this.anchor = option.anchor;
+
+        const type = option.type,
+              defaultSize: [number, number] =  type === 'pointer'? [8, 30]: [12, 12];
 
         return {
             id: this.id,
             x: 0,
             y: 0,
             rotation: 0,
-            type: option.type || 'external-pointer',
-            size: option.size || [8, 50],
+            type: option.type || 'marker',
+            size: option.size || defaultSize,
             anchorPoints: null,
             label: typeof this.label === 'string'? this.label: this.label.join(', '),
             style: Util.objectClone<Style>(option.style),
             labelCfg: Util.objectClone<ElementLabelOption>(option.labelOptions),
-            externalPointerId: null,
+            markerId: null,
             SVLayouter: null,
-            SVModelType: 'pointer',
+            SVModelType: 'marker',
             SVModelName: this.type
         };
     }
 };
+
+

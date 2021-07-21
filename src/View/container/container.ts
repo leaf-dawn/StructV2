@@ -1,5 +1,5 @@
 import { Engine } from "../../engine";
-import { Model, Pointer } from "../../Model/modelData";
+import { Model, Marker } from "../../Model/modelData";
 import { AnimationOptions, InteractionOptions, LayoutGroupOptions } from "../../options";
 import { SV } from "../../StructV";
 import { Animations } from "../animation";
@@ -95,13 +95,38 @@ export class Container {
      * @param list 
      * @returns 
      */
-    protected findReTargetPointer(list: Model[]): Pointer[] {
-        let prevPointers = this.prevModelList.filter(item => item instanceof Pointer),
-            pointers = list.filter(item => item instanceof Pointer);
+    protected findReTargetMarkers(list: Model[]): Marker[] {
+        let prevMarkers = this.prevModelList.filter(item => item instanceof Marker),
+            markers = list.filter(item => item instanceof Marker);
 
-        return <Pointer[]>pointers.filter(item => prevPointers.find(prevItem => {
-            return prevItem.id === item.id && (<Pointer>prevItem).target.id !== (<Pointer>item).target.id
+        return <Marker[]>markers.filter(item => prevMarkers.find(prevItem => {
+            return prevItem.id === item.id && (<Marker>prevItem).target.id !== (<Marker>item).target.id
         }));
+    }
+
+    /**
+     * 找出前后 label 发生变化的 model
+     * @param list 
+     */
+    protected findLabelChangeModels(list: Model[]): Model[] {
+        let labelChangeModels: Model[] = [];
+
+        list.forEach(item => {
+            const prevItem = this.prevModelList.find(prevItem => prevItem.id === item.id);
+
+            if(prevItem === undefined) {
+                return;
+            }
+
+            const prevLabel = prevItem.get('label'),
+                  label = item.get('label');
+
+            if(prevLabel !== label) {
+                labelChangeModels.push(item);
+            }
+        });
+
+        return labelChangeModels;
     }
 
     /**
@@ -184,7 +209,11 @@ export class Container {
     public render(modelList: Model[]) {
         const appendModels: Model[] = this.getAppendModels(this.prevModelList, modelList),
               removeModels: Model[] = this.getRemoveModels(this.prevModelList, modelList),
-              changeModels: Model[] = [...appendModels, ...this.findReTargetPointer(modelList)];
+              changeModels: Model[] = [
+                  ...appendModels, 
+                  ...this.findLabelChangeModels(modelList), 
+                  ...this.findReTargetMarkers(modelList)
+              ];
 
         // 渲染视图
         this.renderer.render(modelList, removeModels);

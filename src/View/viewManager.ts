@@ -68,11 +68,15 @@ export class ViewManager {
             removeModels: Model[] = [];
 
         layoutGroupTable.forEach((group, key) => {
-            let freedElements: Model[] = group.element.filter(item => item.freed);
+            let freedElements: Element[] = group.element.filter(item => item.freed);
 
             if(freedElements.length) {
                 freedGroupName = key;
                 freedList = freedElements;
+
+                freedElements.forEach(item => {
+                    // item.isolate()
+                });
             }
         });
 
@@ -107,6 +111,7 @@ export class ViewManager {
 
         elements.forEach(item => {
             elementIds.push(item.id);
+            
             item.set('style', {
                 fill: '#ccc'
             });
@@ -189,7 +194,7 @@ export class ViewManager {
     renderAll(layoutGroupTable: LayoutGroupTable) {
         this.shadowG6Instance.clear();
 
-        const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
+        let modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
 
         this.build(modelList);
 
@@ -209,6 +214,8 @@ export class ViewManager {
         // 进行布局（设置model的x，y）
         this.layouter.layoutAll(this.mainContainer, layoutGroupTable);
 
+        // 从新获取一次，因为第一次获取没有把freed节点筛选出去
+        modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
         this.mainContainer.render(modelList);
 
         if(this.leakContainer) {

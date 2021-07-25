@@ -170,6 +170,10 @@ export class Element extends Model {
     layouterName: string;
     freed: boolean;
     markers: { [key: string]: Marker };
+    links: {
+        inDegree: Link[];
+        outDegree: Link[];
+    };
 
     constructor(id: string, type: string, group: string, layouter: string, sourceElement: SourceElement) {
         super(id, type);
@@ -191,6 +195,30 @@ export class Element extends Model {
         this.sourceId = this.id.split('.')[1];
         this.sourceElement = sourceElement;
         this.markers = { };
+    }
+
+    /**
+     * 将与此 element 相关的 link 和 marker 全部断开
+     */
+     isolate() {
+        this.links.inDegree.forEach(item => {
+            item.target = null;
+        });
+
+        this.links.outDegree.forEach(item => {
+            item.element = null;
+        });
+
+        this.links.inDegree.length = 0;
+        this.links.outDegree.length = 0;
+
+        Object.keys(this.markers).forEach(item => {
+            let marker = this.markers[item];
+
+            marker.target = null;
+        });
+
+        this.markers = {};
     }
 
     protected defineProps(option: ElementOption): G6NodeModel {
@@ -226,6 +254,9 @@ export class Link extends Model {
         this.element = element;
         this.target = target;
         this.index = index;
+
+        // element.links.outDegree.push(this);
+        // target.links.inDegree.push(this);
     }
 
 

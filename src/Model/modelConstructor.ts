@@ -153,24 +153,26 @@ export class ModelConstructor {
                 if(Array.isArray(sourceLinkData)) {
                     element[name] = sourceLinkData.map((item, index) => {
                         targetElement = this.fetchTargetElements(layoutGroupTable, element, item);
+                        let isGeneralLink = this.isGeneralLink(sourceLinkData.toString());
 
                         if(targetElement) {
                             link = this.createLink(name, element, targetElement, index, linkOptions[name]);
                             linkList.push(link);
                         }
 
-                        return targetElement;
+                        return isGeneralLink? targetElement: null;
                     });
                 }
                 else {
                     targetElement = this.fetchTargetElements(layoutGroupTable, element, sourceLinkData);
+                    let isGeneralLink = this.isGeneralLink(sourceLinkData.toString());
 
                     if(targetElement) {
                         link = this.createLink(name, element, targetElement, null, linkOptions[name]);
                         linkList.push(link);
                     }
 
-                    element[name] = targetElement;
+                    element[name] = isGeneralLink? targetElement: null;
                 }
             }
         });
@@ -354,6 +356,14 @@ export class ModelConstructor {
         
         targetElement = elementList.find(item => item.sourceId === targetId);
         return targetElement || null;
+    }
+
+    /**
+     * 检测改指针是否为常规指针（指向另一个group）
+     * @param linkId 
+     */
+    private isGeneralLink(linkId: string): boolean {
+        return !linkId.includes('#');
     }
 
     /**

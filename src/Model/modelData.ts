@@ -170,6 +170,10 @@ export class Element extends Model {
     layouterName: string;
     freed: boolean;
     markers: { [key: string]: Marker };
+    links: {
+        inDegree: Link[];
+        outDegree: Link[];
+    };
 
     constructor(id: string, type: string, group: string, layouter: string, sourceElement: SourceElement) {
         super(id, type);
@@ -191,6 +195,7 @@ export class Element extends Model {
         this.sourceId = this.id.split('.')[1];
         this.sourceElement = sourceElement;
         this.markers = { };
+        this.links = { inDegree: [], outDegree: [] };
     }
 
     protected defineProps(option: ElementOption): G6NodeModel {
@@ -226,6 +231,9 @@ export class Link extends Model {
         this.element = element;
         this.target = target;
         this.index = index;
+
+        element.links.outDegree.push(this);
+        target.links.inDegree.push(this);
     }
 
 

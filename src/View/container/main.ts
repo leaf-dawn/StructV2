@@ -45,7 +45,7 @@ import { Container } from "./container";
                 return false;
             }
 
-            if(model.SVModelType === 'pointer') {
+            if(model.SVModelType === 'marker') {
                 return false;
             }
 
@@ -69,7 +69,7 @@ import { Container } from "./container";
                 return false;
             }
 
-            if(model.SVModelType === 'pointer') {
+            if(model.SVModelType === 'marker') {
                 return false;
             }
 
@@ -105,16 +105,16 @@ import { Container } from "./container";
      */
     protected afterInitRenderer() {
         let g6Instance = this.getG6Instance(),
-            pointer = null,
-            pointerX = null,
-            pointerY = null,
+            marker = null,
+            markerX = null,
+            markerY = null,
             dragStartX = null,
             dragStartY = null;
 
         g6Instance.on('node:dragstart', ev => {
             const model = ev.item.getModel();
 
-            if(model.SVModelType === 'pointer') {
+            if(model.SVModelType === 'marker') {
                 return;
             }
 
@@ -128,26 +128,26 @@ import { Container } from "./container";
                 return;
             }
 
-            pointer = g6Instance.findById(model.externalPointerId);
+            marker = g6Instance.findById(model.markerId);
             
-            if(pointer) {
-                pointerX = pointer.getModel().x,
-                pointerY = pointer.getModel().y;
+            if(marker) {
+                markerX = marker.getModel().x,
+                markerY = marker.getModel().y;
                 dragStartX = ev.canvasX;
                 dragStartY = ev.canvasY;
             }
         });
 
         g6Instance.on('node:dragend', ev => {
-            pointer = null;
-            pointerX = null,
-            pointerY = null,
+            marker = null;
+            markerX = null,
+            markerY = null,
             dragStartX = null,
             dragStartY = null;
         });
 
         g6Instance.on('node:drag', ev => {
-            if(!pointer) {
+            if(!marker) {
                 return;
             }
 
@@ -155,9 +155,9 @@ import { Container } from "./container";
                 dy = ev.canvasY - dragStartY,
                 zoom = g6Instance.getZoom();
 
-            pointer.updatePosition({
-                x: pointerX + dx / zoom,
-                y: pointerY + dy / zoom
+            marker.updatePosition({
+                x: markerX + dx / zoom,
+                y: markerY + dy / zoom
             });
         });
     }

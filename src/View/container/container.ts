@@ -19,7 +19,7 @@ export class Container {
     protected afterAppendModelsCallbacks: ((models: Model[]) => void)[] = [];
     protected afterRemoveModelsCallbacks: ((models: Model[]) => void)[] = [];
 
-    constructor(engine: Engine, DOMContainer: HTMLElement, g6Options: { [key: string]: any } = { }) {
+    constructor(engine: Engine, DOMContainer: HTMLElement, g6Options: { [key: string]: any } = {}) {
         this.engine = engine;
         this.DOMContainer = DOMContainer;
         this.animationsOptions = engine.animationOptions;
@@ -28,24 +28,14 @@ export class Container {
 
         const g6Plugins = [];
 
-        if(g6Options.tooltip) {
+        if (g6Options.tooltip) {
             const tooltip = new SV.G6.Tooltip({
                 offsetX: 10,
                 offsetY: 20,
                 shouldBegin(event) {
                     return event.item.getModel().SVModelType === 'element';
                 },
-                getContent(event) {
-                    const data = event.item.SVModel.data,
-                          wrapper = document.createElement('div');
-    
-                    wrapper.style.padding = '0 4px 0 4px';
-                    wrapper.innerHTML = `
-                        <h5>id: ${ event.item.SVModel.sourceId }</h5>
-                        <h5>data: ${ data? data: '' }</h5>
-                        `
-                    return wrapper;
-                },
+                getContent: event => this.getTooltipContent(event.item.SVModel, { address: 'sourceId', data: 'data' }),
                 itemTypes: ['node']
             });
 
@@ -61,6 +51,23 @@ export class Container {
         });
 
         this.afterInitRenderer();
+    }
+
+
+    private getTooltipContent(model: Model, items: { [key: string]: string }): HTMLElement {
+        const wrapper = document.createElement('div');
+       
+
+        Object.keys(items).map(key => {
+            let value = model[items[key]];
+            if (value !== undefined && value !== null) {
+                let item = document.createElement('div');
+                item.innerHTML = `${key}：${value}`;
+                wrapper.appendChild(item);
+            }
+        });
+
+        return wrapper;
     }
 
     /**
@@ -79,7 +86,7 @@ export class Container {
      */
     protected getAppendModels(prevList: Model[], list: Model[]): Model[] {
         return list.filter(item => !prevList.find(n => n.id === item.id));
-    }   
+    }
 
     /**
      * 对比上一次和该次 modelList 找出被删除的节点和边
@@ -88,7 +95,7 @@ export class Container {
      */
     protected getRemoveModels(prevList: Model[], list: Model[]): Model[] {
         return prevList.filter(item => !list.find(n => n.id === item.id));
-    }   
+    }
 
     /**
      * 找出重新指向的外部指针
@@ -114,14 +121,14 @@ export class Container {
         list.forEach(item => {
             const prevItem = this.prevModelList.find(prevItem => prevItem.id === item.id);
 
-            if(prevItem === undefined) {
+            if (prevItem === undefined) {
                 return;
             }
 
             const prevLabel = prevItem.get('label'),
-                  label = item.get('label');
+                label = item.get('label');
 
-            if(prevLabel !== label) {
+            if (prevLabel !== label) {
                 labelChangeModels.push(item);
             }
         });
@@ -142,8 +149,8 @@ export class Container {
                 timingFunction: this.animationsOptions.timingFunction,
                 callback: () => {
                     counter++;
-    
-                    if(counter === appendModels.length) {
+
+                    if (counter === appendModels.length) {
                         this.afterAppendModelsCallbacks.map(item => item(appendModels));
                     }
                 }
@@ -159,18 +166,18 @@ export class Container {
         let counter = 0;
 
         removeModels.forEach(item => {
-            Animations.animate_remove(item, { 
+            Animations.animate_remove(item, {
                 duration: this.animationsOptions.duration,
                 timingFunction: this.animationsOptions.timingFunction,
                 callback: () => {
-                    if(item.isLeak === false) {
+                    if (item.isLeak === false) {
                         this.renderer.removeModel(item);
                         item.renderG6Item = item.G6Item = null;
                     }
-                    
+
                     counter++;
-    
-                    if(counter === removeModels.length) {
+
+                    if (counter === removeModels.length) {
                         this.afterRemoveModelsCallbacks.map(item => item(removeModels));
                     }
                 }
@@ -208,12 +215,12 @@ export class Container {
      */
     public render(modelList: Model[]) {
         const appendModels: Model[] = this.getAppendModels(this.prevModelList, modelList),
-              removeModels: Model[] = this.getRemoveModels(this.prevModelList, modelList),
-              changeModels: Model[] = [
-                  ...appendModels, 
-                  ...this.findLabelChangeModels(modelList), 
-                  ...this.findReTargetMarkers(modelList)
-              ];
+            removeModels: Model[] = this.getRemoveModels(this.prevModelList, modelList),
+            changeModels: Model[] = [
+                ...appendModels,
+                ...this.findLabelChangeModels(modelList),
+                ...this.findReTargetMarkers(modelList)
+            ];
 
         // 渲染视图
         this.renderer.render(modelList, removeModels);
@@ -223,7 +230,7 @@ export class Container {
         this.handleRemoveModels(removeModels);
         this.handleChangeModels(changeModels);
 
-        if(this.renderer.getIsFirstRender()) {
+        if (this.renderer.getIsFirstRender()) {
             this.renderer.setIsFirstRender(false);
         }
 

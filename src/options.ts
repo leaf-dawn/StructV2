@@ -55,6 +55,7 @@ export interface LinkOption {
 
 
 export interface MarkerOption extends ElementOption {
+    type: 'pointer' | 'cursor';
     anchor: number;
     offset: number;
     labelOffset: number;

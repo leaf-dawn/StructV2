@@ -92,8 +92,11 @@ export class Renderer {
 
         modelList.forEach(item => {
             item.renderG6Item = this.g6Instance.findById(item.id);
-            item.G6Item = item.renderG6Item;
-            item.renderG6Item.SVModel = item;
+
+            if(item.renderG6Item) {
+                item.G6Item = item.renderG6Item;
+                item.renderG6Item.SVModel = item;
+            }
         });
 
         // 把所有连线置顶

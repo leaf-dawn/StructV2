@@ -79,14 +79,17 @@ export class ViewManager {
         freedGroup = layoutGroupTable.get(freedGroupName);
 
         freedList.forEach(fItem => {
-            removeModels.push(...freedGroup.element.splice(freedGroup.element.findIndex(item => item.id === fItem.id), 1));
-            removeModels.push(...freedGroup.link.splice(freedGroup.link.findIndex(item => item.element.id === fItem.id || item.target.id === fItem.id)));
-            removeModels.push(...freedGroup.marker.splice(freedGroup.marker.findIndex(item => item.target.id === fItem.id)));
+            removeModels.push(
+                ...Util.removeFromList(freedGroup.element, item => item.id === fItem.id),
+                ...Util.removeFromList(freedGroup.link, item => item.element.id === fItem.id || item.target.id === fItem.id),
+                ...Util.removeFromList(freedGroup.marker, item => item.target.id === fItem.id),
+            );
         });
 
+        console.log(removeModels);
+
         removeModels.map(model => {
-            const index = freedGroup.modelList.findIndex(item => item.id === model.id);
-            freedGroup.modelList.splice(index, 1);
+            Util.removeFromList(freedGroup.modelList, item => item.id === model.id);
         });
 
         return freedList;

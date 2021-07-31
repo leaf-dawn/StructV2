@@ -21,6 +21,8 @@ export const Animations = {
      * @param animationConfig
      */
     animate_append(model: Model, animationConfig: animationConfig) {
+        model.G6Item === null && console.log(model);
+
         const G6Item = model.G6Item,
               type = G6Item.getType(),
               group = G6Item.getContainer(),

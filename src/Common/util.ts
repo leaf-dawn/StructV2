@@ -32,10 +32,18 @@ export const Util = {
      * @param list 移除列表
      * @param fn 移除判断规则
      */
-    removeFromList<T>(list: T[], fn: (item: T) => boolean) {
+    removeFromList<T>(list: T[], fn: (item: T) => boolean): T[] {
+        const res: T[] = [];
+
         for(let i = 0; i < list.length; i++) {
-            fn(list[i]) && list.splice(i, 1) && i--;
+            if(fn(list[i])) {
+                let removeItem = list.splice(i, 1);
+                res.push(...removeItem);
+                i--;
+            }
         }
+
+        return res;
     },
 
     /**

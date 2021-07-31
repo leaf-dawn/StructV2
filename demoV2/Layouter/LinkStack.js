@@ -3,13 +3,24 @@
 /**
  * 单链表
  */
- class LinkStack extends Engine {
+ SV.registerLayouter('LinkStack', {
+    sourcesPreprocess(sources) {
+        const headNode = sources[0];
+
+        if(headNode.external) {
+            headNode.headExternal = headNode.external;
+            delete headNode.external;
+        }
+
+        return sources;
+    },
+
     defineOptions() {
         return {
             element: { 
                 default: {
                     type: 'link-list-node',
-                    label: '[id]',
+                    label: '[data]',
                     size: [60, 30],
                     style: {
                         stroke: '#333',
@@ -20,8 +31,8 @@
             link: {
                 next: { 
                     type: 'line',
-                    sourceAnchor: 1,
-                    targetAnchor: 2,
+                    sourceAnchor: 2,
+                    targetAnchor: 4,
                     style: {
                         stroke: '#333',
                         endArrow: {
@@ -35,8 +46,18 @@
                     }
                 }
             },
-            pointer: {
+            marker: {
+                headExternal: {
+                    anchor: 5,
+                    type: 'pointer',
+                    offset: 8,
+                    style: {
+                        fill: '#f08a5d'
+                    }
+                },
                 external: {
+                    anchor: 3,
+                    type: 'pointer',
                     offset: 8,
                     style: {
                         fill: '#f08a5d'
@@ -44,11 +65,10 @@
                 }
             },
             layout: {
-                xInterval: 50,
                 yInterval: 30
             }
         };
-    }
+    },
 
 
     /**
@@ -65,64 +85,21 @@
 
         if(prev) {
             node.set('x', prev.get('x'));
-            node.set('y', prev.get('y') + layoutOptions.yInterval + height);
+            node.set('y', prev.get('y') - layoutOptions.yInterval - height);
         }
 
         if(node.next) {
             this.layoutItem(node.next, node, layoutOptions);
         }
-    }   
+    },
 
 
     layout(elements, layoutOptions) {
-        let nodes = elements.default,
-            rootNodes = [],
-            node,
-            i;
-
-        for(i = 0; i < nodes.length; i++) {
-            node = nodes[i];
-            
-            if(node.root) {
-                rootNodes.push(node);
-            }
-        }
-
-        for(i = 0; i < rootNodes.length; i++) {
-            let root = rootNodes[i],
-                width = root.get('size')[0];
-
-            root.set('x', root.get('x') + i * (layoutOptions.xInterval + width));
-            this.layoutItem(root, null, layoutOptions);
-        }
+        this.layoutItem(elements[0], null, layoutOptions);
     }
-}
+}) 
 
 
-const LStack = function(container) {
-    return{
-        engine: new LinkStack(container),
-        data: [[
-            { id: 1, root: true, next: 2 },
-            { id: 2, next: 3 },
-            { id: 3, next: 4 },
-            { id: 4, next: 5 },
-            { id: 5 },
-            { id: 6, root: true, next: 7 },
-            { id: 7, next: 8 }, 
-            { id: 8, next: 4 }, 
-            { id: 9, root: true, next: 10 },
-            { id: 10 }
-        ],
-        [
-            { id: 1, root: true, next: 2 },
-            { id: 2, next: 3 },
-            { id: 3, next: 6 },
-            { id: 6, next: 7 },
-            { id: 7, next: 8 }, 
-            { id: 8 }
-        ]]
-    } 
-};
+
 
 

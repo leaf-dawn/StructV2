@@ -1,9 +1,18 @@
 
 
-/**
- * 单链表
- */
-class LinkList extends Engine {
+SV.registerLayouter('LinkList', {
+    
+    sourcesPreprocess(sources) {
+        let root = sources[0];
+
+        if(root.external) {
+            root.rootExternal = root.external;
+            delete root.external;
+        }
+
+        return sources;
+    },
+
     defineOptions() {
         return {
             element: { 
@@ -13,15 +22,16 @@ class LinkList extends Engine {
                     size: [60, 30],
                     style: {
                         stroke: '#333',
-                        fill: '#eaffd0'
+                        fill: '#eaffd0',
+                        cursor: 'pointer'
                     }
                 }
             },
             link: {
                 next: { 
                     type: 'line',
-                    sourceAnchor: 1,
-                    targetAnchor: 0,
+                    sourceAnchor: 2,
+                    targetAnchor: 6,
                     style: {
                         stroke: '#333',
                         endArrow: 'default',
@@ -34,8 +44,8 @@ class LinkList extends Engine {
                 loopNext: {
                     type: 'arc',
                     curveOffset: 50,
-                    sourceAnchor: 1,
-                    targetAnchor: 3,
+                    sourceAnchor: 2,
+                    targetAnchor: 4,
                     style: {
                         stroke: '#333',
                         endArrow: 'default',
@@ -46,8 +56,18 @@ class LinkList extends Engine {
                     }
                 }
             },
-            pointer: {
+            marker: {
+                rootExternal: {
+                    type: 'cursor',
+                    anchor: 6,
+                    offset: 8,
+                    style: {
+                        fill: '#f08a5d'
+                    }
+                },
                 external: {
+                    type: 'cursor',
+                    anchor: 0,
                     offset: 8,
                     style: {
                         fill: '#f08a5d'
@@ -59,7 +79,7 @@ class LinkList extends Engine {
                 yInterval: 50
             }
         };
-    }
+    },
 
 
     /**
@@ -82,62 +102,33 @@ class LinkList extends Engine {
         if(node.next) {
             this.layoutItem(node.next, node, layoutOptions);
         }
-    }   
+    },   
 
 
     layout(elements, layoutOptions) {
-        let nodes = elements,
-            rootNodes = [],
-            node,
-            i;
+        let root = elements[0];
 
-        for(i = 0; i < nodes.length; i++) {
-            node = nodes[i];
-            
-            if(node.root) {
-                rootNodes.push(node);
-            }
-        }
-
-        for(i = 0; i < rootNodes.length; i++) {
-            let root = rootNodes[i],
-                height = root.get('size')[1];
-
-            root.set('y', root.get('y') + i * (layoutOptions.yInterval + height));
-            this.layoutItem(root, null, layoutOptions);
-        }
+        this.layoutItem(root, null, layoutOptions);
     }
-}
+});
 
 
-const LList = function(container, options) {
-    return{
-        engine: new LinkList(container, options),
-        data: [[
-            { id: 1, root: true, next: 2, external: ['gg'] },
-            { id: 2, next: 3 },
-            { id: 3, next: 4 },
-            { id: 4, next: 5 },
-            { id: 5, loopNext: 6 },
-            { id: 6, root: true, next: 7 },
-            { id: 7, next: 8 }, 
-            { id: 8, next: 4 }, 
-            { id: 9, root: true, next: 10 },
-            { id: 10, free: true }
-        ],
-        [
-            { id: 1, root: true, next: 2 },
-            { id: 2, next: 3 },
-            { id: 3, next: 8, external: ['gg'] },
-            { id: 8, next: 12 },
-            { id: 12, next: 13 },
-            { id: 13 } 
-        ],
-        [
-            { id: 1, root: true, next: 2 },
-            { id: 2 }
-        ]]
-    } 
-};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -1,9 +1,6 @@
 
 
-/**
- * 二叉树
- */
-class BinaryTree extends Engine {
+SV.registerLayouter('BinaryTree', {
     defineOptions() {
         return {
             element: { 
@@ -21,7 +18,7 @@ class BinaryTree extends Engine {
             link: {
                 child: { 
                     type: 'line',
-                    sourceAnchor: index => index + 1,
+                    sourceAnchor: index => index === 0? 3: 1,
                     targetAnchor: 0,
                     style: {
                         stroke: '#333',
@@ -37,6 +34,7 @@ class BinaryTree extends Engine {
             },
             pointer: {
                 external: {
+                    anchor: 0,
                     offset: 14,
                     style: {
                         fill: '#f08a5d'
@@ -50,16 +48,13 @@ class BinaryTree extends Engine {
             },
             layout: {
                 xInterval: 40,
-                yInterval: 40,
-                fitCenter: true
+                yInterval: 40
             },
-            animation: {
-                enable: true,
-                duration: 750,
-                timingFunction: 'easePolyOut'
+            behavior: {
+                // dragNode: false
             }
         };
-    }
+    },
 
     /**
      * 对子树进行递归布局
@@ -119,7 +114,7 @@ class BinaryTree extends Engine {
         }
        
         return group;
-    }   
+    },
 
     /**
      * 布局函数
@@ -127,71 +122,25 @@ class BinaryTree extends Engine {
      * @param {*} layoutOptions 
      */
     layout(elements, layoutOptions) {
-        let nodes = elements,
-            rootNodes = [],
-            node,
-            root,
-            lastRoot,
-            treeGroup = new Group(),
-            i;
-
-        for(i = 0; i < nodes.length; i++) {
-            node = nodes[i];
-            
-            if(node.root) {
-                rootNodes.push(node);
-            }
-        }
-        
-        for(i = 0; i < rootNodes.length; i++) {
-            root = rootNodes[i];
-
-            root.subTreeGroup = this.layoutItem(root, null, i, layoutOptions);
-
-            if(lastRoot) {
-                let curBound = root.subTreeGroup.getBound(),
-                    lastBound = lastRoot.subTreeGroup.getBound();
-               
-                let move = lastBound.x + lastBound.width + layoutOptions.xInterval - curBound.x;
-                root.subTreeGroup.translate(move, 0);
-            }
-
-            lastRoot = root;
-            treeGroup.add(root);
-        }
+        let root = elements[0];
+        this.layoutItem(root, null, -1, layoutOptions);
     }
-};
-
-
-const BTree = function(container) {
-    return{
-        engine: new BinaryTree(container),
-        data: [
-            [
-                { id: 1, child: [2, 3], root: true, external: ['treeA', 'gear'] }, 
-                { id: 2, child: [null, 6] }, 
-                { id: 3, child: [5, 4] },
-                { id: 4, external: 'foo', child: [5, null] },
-                { id: 5 },
-                { id: 6, external: 'bar', child: [null, 7] },
-                { id: 7 },
-                { id: 8, child: [9, 10], root: true },
-                { id: 9, child: [11, null] },
-                { id: 10 },
-                { id: 11 }
-            ],
-            [
-                { id: 1, child: [2, 3], root: true, external: 'treeA' }, 
-                { id: 2, external: 'gear' }, 
-                { id: 3, child: [5, 4] },
-                { id: 4, external: 'foo' },
-                { id: 5, child: [12, 13] },
-                { id: 12 }, { id: 13 }
-            ]
-        ]
-    } 
-};
+});
 
 
 
+
+
+[
+    {
+        "id": 6385328,
+        "data": "",
+        "external": [
+            "L"
+        ],
+        "root": true,
+        "after": null,
+        "next": null
+    }
+]
 

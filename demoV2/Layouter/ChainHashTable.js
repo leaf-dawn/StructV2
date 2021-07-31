@@ -6,7 +6,7 @@
 /**
  * 连地址哈希表
  */
- class ChainHashTable extends Engine {
+SV.registerLayouter('ChainHashTable', {
 
     defineOptions() {
         return {
@@ -34,7 +34,7 @@
                 start: { 
                     type: 'line',
                     sourceAnchor: 1,
-                    targetAnchor: 0,
+                    targetAnchor: 5,
                     style: {
                         stroke: '#333',
                         endArrow: {
@@ -49,8 +49,8 @@
                 },
                 next: {
                     type: 'line',
-                    sourceAnchor: 1,
-                    targetAnchor: 0,
+                    sourceAnchor: 2,
+                    targetAnchor: 6,
                     style: {
                         stroke: '#333',
                         endArrow: {
@@ -66,6 +66,7 @@
             },
             pointer: {
                 external: {
+                    anchor: 3,
                     offset: 8,
                     style: {
                         fill: '#f08a5d'
@@ -80,7 +81,7 @@
                 dragNode: ['node']
             }
         };
-    }
+    },
 
 
     /**
@@ -103,7 +104,7 @@
         if(node.next) {
             this.layoutItem(node.next, node, layoutOptions);
         }
-    }   
+    },   
 
 
     layout(elements, layoutOptions) {
@@ -124,58 +125,9 @@
             }
         }
     }
+});
 
-}
 
 
-const CHT = function(container, options) {
-    return{
-        engine: new ChainHashTable(container, options),
-        data: [
-            {
-                head: [{
-                    id: 0,
-                    start: 'node#0'
-                }, {
-                    id: 2,
-                    start: 'node#2'
-                }],
-                node: [{
-                    id: 0,
-                    next: 1
-                }, {
-                    id: 1
-                },{
-                    id: 2,
-                    next: 3
-                }, {
-                    id: 3
-                }]
-            },
-            {
-                head: [{
-                    id: 0,
-                    start: 'node#0'
-                }, {
-                    id: 2,
-                    start: 'node#2'
-                }, {
-                    id: 3,
-                    start: 'node#4'
-                }],
-                node: [{
-                    id: 0,
-                    next: 1
-                }, {
-                    id: 1
-                },{
-                    id: 2
-                },{
-                    id: 4
-                }]
-            }
-        ]
-    } 
-};
 
 

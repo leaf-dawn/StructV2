@@ -68,33 +68,35 @@ SV.registerShape('three-cell-node', {
 
     getAnchorPoints() {
         return [
-            [0, 0.5],
-            [0.5, 0.5],
+            [1 / 6, 0],
             [0.5, 0],
-            [5 / 6, 0.5]
+            [0.5, 0.5],
+            [5 / 6, 0.5],
+            [0.5, 1],
+            [0, 0.5]
         ];
     }
 });
 
 
 
-class GeneralizedList extends Engine {
+SV.registerLayouter('GeneralizedList', {
 
     defineOptions() {
         return {
             element: { 
-                tableNode: {
+                table: {
                     type: 'three-cell-node',
-                    label: '[tag]',
+                    label: '[id]',
                     size: [90, 30],
                     style: {
                         stroke: '#333',
                         fill: '#b83b5e'
                     }
                 },
-                atomNode: {
+                atom: {
                     type: 'two-cell-node',
-                    label: '[tag]',
+                    label: ['[id]', 'dcd'],
                     size: [60, 30],
                     style: {
                         stroke: '#333',
@@ -105,8 +107,8 @@ class GeneralizedList extends Engine {
             link: {
                 sub: {
                     type: 'line',
-                    sourceAnchor: 1,
-                    targetAnchor: 2,
+                    sourceAnchor: 2,
+                    targetAnchor: 0,
                     style: {
                         stroke: '#333',
                         endArrow: {
@@ -122,7 +124,7 @@ class GeneralizedList extends Engine {
                 next: { 
                     type: 'line',
                     sourceAnchor: 3,
-                    targetAnchor: 0,
+                    targetAnchor: 5,
                     style: {
                         stroke: '#333',
                         endArrow: {
@@ -141,7 +143,7 @@ class GeneralizedList extends Engine {
                 yInterval: 20,
             }
         };
-    }
+    },
 
     /**
      * 对子树进行递归布局
@@ -149,6 +151,10 @@ class GeneralizedList extends Engine {
      * @param parent 
      */
     layoutItem(node, prev, layoutOptions) {
+        if(!node) {
+            return;
+        }
+
         let [width, height] = node.get('size');
 
         if(prev) {
@@ -166,7 +172,7 @@ class GeneralizedList extends Engine {
             
             // 子结点还是广义表
             if(node.sub.tag === 1) {
-                node.sub.set('x', node.get('x'));
+                node.sub.set('x', node.get('x') + width / 3);
                 this.layoutItem(node.sub, null, layoutOptions);
             }
             else {
@@ -174,42 +180,12 @@ class GeneralizedList extends Engine {
                 node.sub.set('x', node.get('x') + width - subWidth);
             }
         }
-    }   
+    },   
 
     layout(elements, layoutOptions) {
-        let tableNodes = elements.tableNode,
-            tableRootNode = null;
-
-        for(let i = 0; i < tableNodes.length; i++) {
-            if(tableNodes[i].root) {
-                tableRootNode = tableNodes[i];
-                break;
-            }
-        }
-
-        if(tableRootNode) {
-            this.layoutItem(tableRootNode, null, layoutOptions);
-        }
+        let tableNodes = elements.filter(item => item.type === 'table'),
+            tableRootNode = tableNodes.filter(item => item.root)[0];
+            
+        this.layoutItem(tableRootNode, null, layoutOptions);
     }
-}
-
-
-
-const GL = function(container) {
-    return{
-        engine: new GeneralizedList(container),
-        data: [{
-            "atomNode": [],
-            "tableNode": [
-                {
-                    "id": 6385328,
-                    "tag": 1,
-                    "root": true,
-                    "external": [
-                        "gl"
-                    ]
-                }
-            ]
-        }]
-    } 
-};
+}) 

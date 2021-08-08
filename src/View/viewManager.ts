@@ -86,8 +86,6 @@ export class ViewManager {
             );
         });
 
-        console.log(removeModels);
-
         removeModels.map(model => {
             Util.removeFromList(freedGroup.modelList, item => item.id === model.id);
         });

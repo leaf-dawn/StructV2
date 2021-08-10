@@ -32,7 +32,7 @@ export class ViewManager {
         const options: EngineOptions = this.engine.engineOptions;
 
         if(options.freedContainer) {
-            this.freedContainer = new FreedContainer(engine, options.freedContainer, { fitCenter: true, tooltip: false });
+            this.freedContainer = new FreedContainer(engine, options.freedContainer, { fitCenter: true, tooltip: true });
         }
 
         if(options.leakContainer) {

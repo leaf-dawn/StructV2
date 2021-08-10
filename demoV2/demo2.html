@@ -13,10 +13,9 @@
         }
 
         .container {
-            width: 100%;
-            height: 400px;
             background-color: #fafafa;
             border: 1px solid #ccc;
+            position: relative;
         }
 
         .down {
@@ -24,19 +23,20 @@
             margin-top: 20px;
         }
 
+        #container {
+            width: 100%;
+            height: 400px;
+        }
+
         #freed {
             width: 200px;
             height: 300px;
-            border: 1px solid #ccc;
-            background-color: #fafafa;
             margin-right: 30px;
         }
 
         #leak {
             width: 400px;
             height: 300px;
-            border: 1px solid #ccc;
-            background-color: #fafafa;
         }
     </style>
 </head>
@@ -51,8 +51,8 @@
     <span id="pos"></span>
 
     <div class="down">
-        <div id="freed"></div>
-        <div id="leak"></div>
+        <div id="freed" class="container"></div>
+        <div id="leak" class="container"></div>
     </div>
 
 
@@ -82,6 +82,92 @@
             freedContainer: document.getElementById('freed'),
             leakContainer: document.getElementById('leak')
         });
+
+
+        let data = [{
+            "LinkQueue": {
+                "data": [
+                    {
+                        "type": "head",
+                        "name": "Qptr",
+                        "id": "0x616eb0",
+                        "label": "front",
+                        "front": "node#0x616ed0",
+                        "external": [
+                            "lq"
+                        ]
+                    },
+                    {
+                        "type": "head",
+                        "name": "Qptr",
+                        "id": "0x616eb1",
+                        "label": "rear",
+                        "rear": "node#0x616ed0",
+                        "external": null
+                    },
+                    {
+                        "type": "node",
+                        "id": "0x616ed0",
+                        "data": "",
+                        "next": null,
+                        "root": true
+                    },
+                    {
+                        "type": "node",
+                        "id": "0x616ef0",
+                        "data": "D",
+                        "next": null,
+                        "root": true,
+                        "external": [
+                            "p"
+                        ]
+                    }
+                ],
+                "layouter": "LinkQueue"
+            }
+        },{
+            "LinkQueue": {
+                "data": [
+                    {
+                        "type": "head",
+                        "name": "Qptr",
+                        "id": "0x616eb0",
+                        "label": "front",
+                        "front": "node#0x616ed0",
+                        "external": [
+                            "lq"
+                        ]
+                    },
+                    {
+                        "type": "head",
+                        "name": "Qptr",
+                        "id": "0x616eb1",
+                        "label": "rear",
+                        "rear": "node#0x616ed0",
+                        "external": null
+                    },
+                    {
+                        "type": "node",
+                        "id": "0x616ed0",
+                        "data": "",
+                        "next": null,
+                        "root": true
+                    },
+                    {
+                        "type": "node",
+                        "id": "0x616ef0",
+                        "data": "",
+                        "next": null,
+                        "root": true,
+                        "external": [
+                            "p"
+                        ],
+                        "freed": true
+                    }
+                ],
+                "layouter": "LinkQueue"
+            }
+        }];
 
 
         let dataIndex = 0,

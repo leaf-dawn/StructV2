@@ -80,92 +80,30 @@
 
         let cur = SV(document.getElementById('container'), {
             freedContainer: document.getElementById('freed'),
-            leakContainer: document.getElementById('leak')
+            leakContainer: document.getElementById('leak'),
+            view: {
+                groupPadding: 40,
+            },
         });
 
 
         let data = [{
-            "LinkQueue": {
+            "LinkStack0": {
                 "data": [
-                    {
-                        "type": "head",
-                        "name": "Qptr",
-                        "id": "0x616eb0",
-                        "label": "front",
-                        "front": "node#0x616ed0",
-                        "external": [
-                            "lq"
-                        ]
-                    },
-                    {
-                        "type": "head",
-                        "name": "Qptr",
-                        "id": "0x616eb1",
-                        "label": "rear",
-                        "rear": "node#0x616ed0",
-                        "external": null
-                    },
-                    {
-                        "type": "node",
-                        "id": "0x616ed0",
-                        "data": "",
-                        "next": null,
-                        "root": true
-                    },
-                    {
-                        "type": "node",
-                        "id": "0x616ef0",
-                        "data": "D",
-                        "next": null,
-                        "root": true,
-                        "external": [
-                            "p"
-                        ]
-                    }
+                    { id: 6, next: 7 },
+                    { id: 7, next: 8 },
+                    { id: 8, external: 'h', data: '66' }
                 ],
-                "layouter": "LinkQueue"
+                "layouter": "LinkList"
             }
-        },{
-            "LinkQueue": {
+        }, {
+            "LinkStack0": {
                 "data": [
-                    {
-                        "type": "head",
-                        "name": "Qptr",
-                        "id": "0x616eb0",
-                        "label": "front",
-                        "front": "node#0x616ed0",
-                        "external": [
-                            "lq"
-                        ]
-                    },
-                    {
-                        "type": "head",
-                        "name": "Qptr",
-                        "id": "0x616eb1",
-                        "label": "rear",
-                        "rear": "node#0x616ed0",
-                        "external": null
-                    },
-                    {
-                        "type": "node",
-                        "id": "0x616ed0",
-                        "data": "",
-                        "next": null,
-                        "root": true
-                    },
-                    {
-                        "type": "node",
-                        "id": "0x616ef0",
-                        "data": "",
-                        "next": null,
-                        "root": true,
-                        "external": [
-                            "p"
-                        ],
-                        "freed": true
-                    }
+                    { id: 6, next: 7 },
+                    { id: 7, next: 8 },
+                    { id: 8, freed: true, external: 'h' }
                 ],
-                "layouter": "LinkQueue"
+                "layouter": "LinkList"
             }
         }];
 

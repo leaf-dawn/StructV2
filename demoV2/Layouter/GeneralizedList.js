@@ -105,6 +105,8 @@ SV.registerLayouter('GeneralizedList', {
                 }
             },
             link: {
+                loopSub: {},
+                loopNext: {},
                 sub: {
                     type: 'line',
                     sourceAnchor: 2,

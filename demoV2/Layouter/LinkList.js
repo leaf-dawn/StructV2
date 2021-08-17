@@ -18,7 +18,7 @@ SV.registerLayouter('LinkList', {
             element: { 
                 default: {
                     type: 'link-list-node',
-                    label: '[id]',
+                    label: '[data]',
                     size: [60, 30],
                     style: {
                         stroke: '#333',

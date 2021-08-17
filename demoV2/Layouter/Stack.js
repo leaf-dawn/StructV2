@@ -32,15 +32,24 @@ SV.registerLayouter('Stack', {
                     }
                 }
             },
-            pointer: {
+            marker: {
                 external: {
+                    type: 'pointer',
                     anchor: 1,
                     style: {
                         fill: '#f08a5d'
                     }
                 },
                 bottomExternal: {
+                    type: 'pointer',
                     anchor: 2,
+                    style: {
+                        fill: '#f08a5d'
+                    }
+                },
+                cursor: {
+                    type: 'cursor',
+                    anchor: 1,
                     style: {
                         fill: '#f08a5d'
                     }

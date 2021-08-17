@@ -7,6 +7,7 @@ import { Element, Link, Marker, Model } from "./modelData";
 
 
 export type LayoutGroup = { 
+    name: string;
     element: Element[];
     link: Link[];
     marker: Marker[];
@@ -64,9 +65,10 @@ export class ModelConstructor {
                   markerOptions = options.marker || { };
                 
             elementList = this.constructElements(elementOptions, name, sourceData, layouterName);
-            markerList = this.constructMarkers(markerOptions, elementList);
+            markerList = this.constructMarkers(name, markerOptions, elementList);
             
             layoutGroupTable.set(name, {
+                name,
                 element: elementList,
                 link: [],
                 marker: markerList,
@@ -186,7 +188,7 @@ export class ModelConstructor {
      * @param elements
      * @returns 
      */
-    private constructMarkers(markerOptions: { [key: string]: MarkerOption }, elements: Element[]): Marker[] {
+    private constructMarkers(groupName: string, markerOptions: { [key: string]: MarkerOption }, elements: Element[]): Marker[] {
         let markerList: Marker[] = [],
             markerNames = Object.keys(markerOptions);
 
@@ -198,7 +200,7 @@ export class ModelConstructor {
                 // 若没有指针字段的结点则跳过
                 if(!markerData) continue;
 
-                let id = name + '.' + (Array.isArray(markerData)? markerData.join('-'): markerData),
+                let id = `${groupName}.${name}.${Array.isArray(markerData)? markerData.join('-'): markerData}`,
                     marker = this.createMarker(id, name, markerData, element, markerOptions[name]);
 
                 markerList.push(marker);

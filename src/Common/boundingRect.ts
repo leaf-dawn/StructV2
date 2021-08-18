@@ -86,7 +86,8 @@ export const Bound = {
 
         if(b1.x < b2.x + b2.width && b1.x + b1.width > b2.x) {
             x = b1.x < b2.x? b2.x: b1.x;
-            maxX = b1.x + b1.width < b2.x + b2.width? b1.x + b1.width: b2.x + b2.width;
+            // maxX = b1.x + b1.width < b2.x + b2.width? b1.x + b1.width: b2.x + b2.width;
+            maxX = b1.x + b1.width;
             overlapsX = maxX - x;
         }
         

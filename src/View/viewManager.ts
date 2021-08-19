@@ -12,15 +12,17 @@ import { Util } from "../Common/util";
 import { EventBus } from "../Common/eventBus";
 
 
+
 export class ViewManager {
     private engine: Engine;
     private layouter: Layouter;
     private mainContainer: Container;
-    private freedContainer: Container;
-    private leakContainer: Container;
+    private freedContainer: FreedContainer;
+    private leakContainer: LeakContainer;
 
     private prevLayoutGroupTable: LayoutGroupTable;
     private prevModelList: Model[];
+    private prevFreedElements: Element[];
 
     private shadowG6Instance;
 
@@ -29,6 +31,7 @@ export class ViewManager {
         this.layouter = new Layouter(engine);
         this.mainContainer = new MainContainer(engine, DOMContainer, { tooltip: true });
         this.prevLayoutGroupTable = new Map();
+        this.prevFreedElements = [];
         this.prevModelList = [];
 
         const options: EngineOptions = this.engine.engineOptions;
@@ -64,7 +67,7 @@ export class ViewManager {
      * @param prevLayoutGroup 
      */
     private handleFreedLabel(freedElement: Element[], prevLayoutGroup: LayoutGroup) {
-        if(prevLayoutGroup === undefined) {
+        if (prevLayoutGroup === undefined) {
             return;
         }
 
@@ -91,13 +94,23 @@ export class ViewManager {
             removeModels: Model[] = [];
 
         layoutGroupTable.forEach((group, key) => {
-            let targetElements: Element[] = group.element.filter(item => item.freed);
+            let targetElements: Element[] = group.element.filter(item => item.freed),
+                newFreedNode = null;
+
+            // 找出最新的freed节点（防止上一次的freed节点被遗留在该次渲染，此时会出现大于一个freed节点）
+            targetElements.forEach(item => {
+                if (this.prevFreedElements.find(prevEle => prevEle.id === item.id) === undefined) {
+                    newFreedNode = item;
+                }
+            });
 
             if (targetElements.length) {
                 freedGroupName = key;
-                freedElements = targetElements;
+                freedElements = [newFreedNode];
             }
         });
+
+
 
         freedGroup = layoutGroupTable.get(freedGroupName);
 
@@ -119,6 +132,7 @@ export class ViewManager {
         });
 
         this.handleFreedLabel(freedElements, prevLayoutGroupTable.get(freedGroupName));
+        this.prevFreedElements = freedElements;
 
         return [...freedElements, ...freedMarkers];
     }
@@ -223,7 +237,7 @@ export class ViewManager {
 
         let modelList = Util.convertGroupTable2ModelList(layoutGroupTable),
             leakModelList = [],
-            freedList = [];
+            freedModelList = [];
 
         this.build(modelList);
 
@@ -235,24 +249,21 @@ export class ViewManager {
         // 进行布局（设置model的x，y）
         this.layouter.layoutAll(this.mainContainer, layoutGroupTable);
 
-        freedList = this.getFreedModelList(this.prevLayoutGroupTable, layoutGroupTable);
+        freedModelList = this.getFreedModelList(this.prevLayoutGroupTable, layoutGroupTable);
 
-        if (this.freedContainer && freedList.length) {
-            EventBus.emit('onFreed', freedList);
-            this.freedContainer.render(freedList);
+        if (this.freedContainer && freedModelList.length) {
+            this.freedContainer.fitCenter(freedModelList);
+            this.freedContainer.render(freedModelList); 
+            EventBus.emit('onFreed', freedModelList);
         }
 
         // 从新获取一次，因为第一次获取没有把freed节点筛选出去
         modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
         this.mainContainer.render(modelList);
 
-        if (this.leakContainer) {
-            this.mainContainer.afterRemoveModels(() => {});
+        if (this.leakContainer && leakModelList.length) {
             this.leakContainer.render(leakModelList);
-
-            if (leakModelList.length) {
-                EventBus.emit('onLeak', leakModelList);
-            }
+            EventBus.emit('onLeak', leakModelList);
         }
 
         this.prevLayoutGroupTable = layoutGroupTable;

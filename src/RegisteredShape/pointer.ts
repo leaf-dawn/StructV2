@@ -20,7 +20,7 @@ export default G6.registerNode('pointer', {
                     x: 0, 
                     y: 0,
                     text: cfg.label,
-                    fill: style.fill || '#fafafa',
+                    fill: null,
                     radius: 2
                 },
                 name: 'bgRect'

@@ -20,7 +20,7 @@
             element: { 
                 default: {
                     type: 'link-list-node',
-                    label: '[data]',
+                    label: '[id]',
                     size: [60, 30],
                     style: {
                         stroke: '#333',

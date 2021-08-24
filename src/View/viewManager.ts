@@ -89,41 +89,31 @@ export class ViewManager {
     private getFreedModelList(prevLayoutGroupTable: LayoutGroupTable, layoutGroupTable: LayoutGroupTable): Model[] {
         let freedElements: Element[] = [],
             freedMarkers: Marker[] = [],
-            freedGroup: LayoutGroup = null,
-            freedGroupName: string = null,
-            removeModels: Model[] = [];
+            removeModels: Model[] = [],
+            freedGroupName: string;
 
         layoutGroupTable.forEach((group, key) => {
-            let targetElements: Element[] = group.element.filter(item => item.freed),
-                newFreedNode = null;
+            let targetElements: Element[] = group.element.filter(item => item.freed);
+
+            targetElements.forEach(fItem => {
+                removeModels.push(
+                    ...Util.removeFromList(group.element, item => item.id === fItem.id),
+                    ...Util.removeFromList(group.link, item => item.element.id === fItem.id || item.target.id === fItem.id),
+                    ...Util.removeFromList(group.marker, item => item.target.id === fItem.id),
+                );
+            });
+
+            removeModels.map(model => {
+                Util.removeFromList(group.modelList, item => item.id === model.id);
+            });
 
             // 找出最新的freed节点（防止上一次的freed节点被遗留在该次渲染，此时会出现大于一个freed节点）
             targetElements.forEach(item => {
                 if (this.prevFreedElements.find(prevEle => prevEle.id === item.id) === undefined) {
-                    newFreedNode = item;
+                    freedGroupName = key;
+                    freedElements.push(item);
                 }
             });
-
-            if (targetElements.length) {
-                freedGroupName = key;
-                freedElements = [newFreedNode];
-            }
-        });
-
-
-
-        freedGroup = layoutGroupTable.get(freedGroupName);
-
-        freedElements.forEach(fItem => {
-            removeModels.push(
-                ...Util.removeFromList(freedGroup.element, item => item.id === fItem.id),
-                ...Util.removeFromList(freedGroup.link, item => item.element.id === fItem.id || item.target.id === fItem.id),
-                ...Util.removeFromList(freedGroup.marker, item => item.target.id === fItem.id),
-            );
-        });
-
-        removeModels.map(model => {
-            Util.removeFromList(freedGroup.modelList, item => item.id === model.id);
         });
 
         freedElements.map(item => {
@@ -253,7 +243,7 @@ export class ViewManager {
 
         if (this.freedContainer && freedModelList.length) {
             this.freedContainer.fitCenter(freedModelList);
-            this.freedContainer.render(freedModelList); 
+            this.freedContainer.render(freedModelList);
             EventBus.emit('onFreed', freedModelList);
         }
 

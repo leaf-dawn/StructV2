@@ -88,22 +88,31 @@
 
 
         let data = [{
-            "LinkStack0": {
+            "LinkStack1": {
                 "data": [
-                    { id: 6, next: 7 },
-                    { id: 7, next: 8, freed: true },
-                    { id: 8, external: 'h', data: '66' }
+                    {
+                        "id": 0,
+                        external: 'gg'
+                    }
                 ],
-                "layouter": "LinkList"
+                "layouter": "LinkStack"
             }
         }, {
-            "LinkStack0": {
+            "LinkStack1": {
                 "data": [
-                    { id: 6, next: 7 },
-                    { id: 7, next: 8, freed: true },
-                    { id: 8, freed: true, external: 'h' }
+                    {
+                        "id": 0
+                    },
+                    {
+                        "id": 1,
+                        "freed": true,
+                    },
+                    {
+                        "freed": true,
+                        "id": 2
+                    }
                 ],
-                "layouter": "LinkList"
+                "layouter": "LinkStack"
             }
         }];
 

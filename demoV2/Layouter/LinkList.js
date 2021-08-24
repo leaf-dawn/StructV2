@@ -58,7 +58,7 @@ SV.registerLayouter('LinkList', {
             },
             marker: {
                 rootExternal: {
-                    type: 'cursor',
+                    type: 'pointer',
                     anchor: 6,
                     offset: 8,
                     style: {
@@ -66,7 +66,7 @@ SV.registerLayouter('LinkList', {
                     }
                 },
                 external: {
-                    type: 'cursor',
+                    type: 'pointer',
                     anchor: 0,
                     offset: 8,
                     style: {

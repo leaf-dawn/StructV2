@@ -279,7 +279,7 @@ export class ModelConstructor {
      */
     private createLink(linkName: string, element: Element, target: Element, index: number, options: LinkOption): Link {
         let link = undefined,
-            id = `${element.id}-${target.id}`;
+            id = `${linkName}(${element.id}-${target.id})`;
         
         link = new Link(id, linkName, element, target, index);
         link.initProps(options);

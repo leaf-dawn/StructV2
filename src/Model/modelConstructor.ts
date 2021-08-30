@@ -1,12 +1,12 @@
 import { Util } from "../Common/util";
 import { Engine } from "../engine";
-import { ElementOption, Layouter, LayoutGroupOptions, LinkOption, MarkerOption } from "../options";
+import { ElementIndexOption, ElementOption, Layouter, LayoutGroupOptions, LinkOption, MarkerOption } from "../options";
 import { sourceLinkData, SourceElement, LinkTarget, Sources } from "../sources";
 import { SV } from "../StructV";
 import { Element, Link, Marker, Model } from "./modelData";
 
 
-export type LayoutGroup = { 
+export type LayoutGroup = {
     name: string;
     element: Element[];
     link: Link[];
@@ -29,7 +29,7 @@ export class ModelConstructor {
 
     constructor(engine: Engine) {
         this.engine = engine;
-        this.prevSourcesStringMap = { };
+        this.prevSourcesStringMap = {};
     }
 
     /**
@@ -38,15 +38,15 @@ export class ModelConstructor {
      */
     public construct(sources: Sources): LayoutGroupTable {
         const layoutGroupTable = new Map<string, LayoutGroup>(),
-              layouterMap: { [key: string]: Layouter } = SV.registeredLayouter,
-              optionsTable = this.engine.optionsTable;
+            layouterMap: { [key: string]: Layouter } = SV.registeredLayouter,
+            optionsTable = this.engine.optionsTable;
 
         Object.keys(sources).forEach(name => {
             let sourceGroup = sources[name],
                 layouterName = sourceGroup.layouter,
                 layouter: Layouter = layouterMap[sourceGroup.layouter];
 
-            if(!layouterName || !layouter) {
+            if (!layouterName || !layouter) {
                 return;
             }
 
@@ -55,18 +55,18 @@ export class ModelConstructor {
                 elementList: Element[] = [],
                 markerList: Marker[] = [];
 
-            if(prevString === sourceDataString) {
+            if (prevString === sourceDataString) {
                 return;
             }
-        
+
             const options: LayoutGroupOptions = optionsTable[layouterName],
-                  sourceData = layouter.sourcesPreprocess(sourceGroup.data, options),
-                  elementOptions = options.element || { },
-                  markerOptions = options.marker || { };
-                
+                sourceData = layouter.sourcesPreprocess(sourceGroup.data, options),
+                elementOptions = options.element || {},
+                markerOptions = options.marker || {};
+
             elementList = this.constructElements(elementOptions, name, sourceData, layouterName);
             markerList = this.constructMarkers(name, markerOptions, elementList);
-            
+
             layoutGroupTable.set(name, {
                 name,
                 element: elementList,
@@ -79,10 +79,10 @@ export class ModelConstructor {
                 isHide: false
             });
         });
-        
+
         layoutGroupTable.forEach((layoutGroup: LayoutGroup) => {
-            const linkOptions = layoutGroup.options.link || { },
-                  linkList: Link[] = this.constructLinks(linkOptions, layoutGroup.element, layoutGroupTable);
+            const linkOptions = layoutGroup.options.link || {},
+                linkList: Link[] = this.constructLinks(linkOptions, layoutGroup.element, layoutGroupTable);
 
             layoutGroup.link = linkList;
             layoutGroup.modelList.push(...linkList);
@@ -114,11 +114,11 @@ export class ModelConstructor {
             elementList: Element[] = [];
 
         sourceList.forEach(item => {
-            if(item === null) {
+            if (item === null) {
                 return;
             }
 
-            if(item.type === undefined || item.type === null) {
+            if (item.type === undefined || item.type === null) {
                 item.type = defaultElementType;
             }
 
@@ -140,41 +140,41 @@ export class ModelConstructor {
             linkNames = Object.keys(linkOptions);
 
         linkNames.forEach(name => {
-            for(let i = 0; i < elements.length; i++) {
+            for (let i = 0; i < elements.length; i++) {
                 let element: Element = elements[i],
                     sourceLinkData: sourceLinkData = element.sourceElement[name],
                     targetElement: Element | Element[] = null,
                     link: Link = null;
 
-                if(sourceLinkData === undefined || sourceLinkData === null) {
+                if (sourceLinkData === undefined || sourceLinkData === null) {
                     element[name] = null;
                     continue;
                 }
 
                 //  ------------------- 将连接声明字段 sourceLinkData 从 id 变为 Element -------------------
-                if(Array.isArray(sourceLinkData)) {
+                if (Array.isArray(sourceLinkData)) {
                     element[name] = sourceLinkData.map((item, index) => {
                         targetElement = this.fetchTargetElements(layoutGroupTable, element, item);
                         let isGeneralLink = this.isGeneralLink(sourceLinkData.toString());
 
-                        if(targetElement) {
+                        if (targetElement) {
                             link = this.createLink(name, element, targetElement, index, linkOptions[name]);
                             linkList.push(link);
                         }
 
-                        return isGeneralLink? targetElement: null;
+                        return isGeneralLink ? targetElement : null;
                     });
                 }
                 else {
                     targetElement = this.fetchTargetElements(layoutGroupTable, element, sourceLinkData);
                     let isGeneralLink = this.isGeneralLink(sourceLinkData.toString());
 
-                    if(targetElement) {
+                    if (targetElement) {
                         link = this.createLink(name, element, targetElement, null, linkOptions[name]);
                         linkList.push(link);
                     }
 
-                    element[name] = isGeneralLink? targetElement: null;
+                    element[name] = isGeneralLink ? targetElement : null;
                 }
             }
         });
@@ -193,14 +193,14 @@ export class ModelConstructor {
             markerNames = Object.keys(markerOptions);
 
         markerNames.forEach(name => {
-            for(let i = 0; i < elements.length; i++) {
+            for (let i = 0; i < elements.length; i++) {
                 let element = elements[i],
                     markerData = element[name];
-                
-                // 若没有指针字段的结点则跳过
-                if(!markerData) continue;
 
-                let id = `${groupName}.${name}.${Array.isArray(markerData)? markerData.join('-'): markerData}`,
+                // 若没有指针字段的结点则跳过
+                if (!markerData) continue;
+
+                let id = `${groupName}.${name}.${Array.isArray(markerData) ? markerData.join('-') : markerData}`,
                     marker = this.createMarker(id, name, markerData, element, markerOptions[name]);
 
                 markerList.push(marker);
@@ -208,6 +208,44 @@ export class ModelConstructor {
         });
 
         return markerList;
+    }
+
+    /**
+     * 求解label文本
+     * @param label 
+     * @param sourceElement 
+     */
+    private resolveElementLabel(label: string | string[], sourceElement: SourceElement): string {
+        let targetLabel: any = '';
+
+        if (Array.isArray(label)) {
+            targetLabel = label.map(item => this.parserElementContent(sourceElement, item) ?? '');
+        }
+        else {
+            targetLabel = this.parserElementContent(sourceElement, label);
+        }
+
+        if(targetLabel === 'undefined') {
+            targetLabel = '';
+        }
+
+        return targetLabel ?? '';
+    }
+
+    /**
+     * 求解index文本
+     * @param indexOptions 
+     * @param sourceElement 
+     */
+    private resolveElementIndex(indexOptions: ElementIndexOption, sourceElement: SourceElement) {
+        if(indexOptions === undefined || indexOptions === null) {
+            return;
+        }
+
+        Object.keys(indexOptions).map(key => {
+            let indexOptionItem = indexOptions[key];
+            indexOptionItem.value = sourceElement[key] ?? '';
+        });
     }
 
     /**
@@ -220,34 +258,17 @@ export class ModelConstructor {
      */
     private createElement(sourceElement: SourceElement, elementName: string, groupName: string, layouterName: string, options: ElementOption): Element {
         let element: Element = undefined,
-            label: string | string[] = '',
-            id =  elementName + '.' + sourceElement.id.toString();
+            label: string | string[] = this.resolveElementLabel(options.label, sourceElement),
+            id = elementName + '.' + sourceElement.id.toString();
 
-        if(options.label) {
-            if(Array.isArray(options.label)) {
-                label = options.label.map(item => {
-                    let res = this.parserElementContent(sourceElement, item);
-
-                    if(res === null || label === 'undefined') {
-                        return '';
-                    }
-
-                    return res;
-                });
-            }
-            else {
-                label = this.parserElementContent(sourceElement, options.label);
-
-                if(label === null || label === 'undefined') {
-                    label = '';
-                }
-            }
-        }
 
         element = new Element(id, elementName, groupName, layouterName, sourceElement);
         element.initProps(options);
         element.set('label', label);
         element.sourceElement = sourceElement;
+        // 处理element的index文本
+        this.resolveElementIndex(element.get('indexCfg'), sourceElement);
+        console.log(element.get('indexCfg'));
 
         return element;
     }
@@ -294,8 +315,8 @@ export class ModelConstructor {
      */
     private parserElementContent(sourceElement: SourceElement, formatLabel: string): string {
         let fields = Util.textParser(formatLabel);
-        
-        if(Array.isArray(fields)) {
+
+        if (Array.isArray(fields)) {
             let values = fields.map(item => sourceElement[item]);
 
             values.map((item, index) => {
@@ -315,16 +336,16 @@ export class ModelConstructor {
     private fetchTargetElements(layoutGroupTable: LayoutGroupTable, element: Element, linkTarget: LinkTarget): Element {
         let groupName: string = element.groupName,
             elementName = element.type,
-            elementList: Element[], 
+            elementList: Element[],
             targetId = linkTarget,
             targetGroupName = groupName,
             targetElement = null;
 
-        if(linkTarget === null || linkTarget === undefined) {
+        if (linkTarget === null || linkTarget === undefined) {
             return null;
         }
 
-        if(typeof linkTarget === 'number' || (typeof linkTarget === 'string' && !linkTarget.includes('#'))) {
+        if (typeof linkTarget === 'number' || (typeof linkTarget === 'string' && !linkTarget.includes('#'))) {
             linkTarget = 'default#' + linkTarget;
         }
 
@@ -332,30 +353,30 @@ export class ModelConstructor {
 
         targetId = info.pop();
 
-        if(info.length > 1) {
+        if (info.length > 1) {
             elementName = info.pop();
             targetGroupName = info.pop();
         }
         else {
             let field = info.pop();
-            if(layoutGroupTable.get(targetGroupName).element.find(item => item.type === field)) {
+            if (layoutGroupTable.get(targetGroupName).element.find(item => item.type === field)) {
                 elementName = field;
             }
-            else if(layoutGroupTable.has(field)) {
+            else if (layoutGroupTable.has(field)) {
                 targetGroupName = field;
             }
             else {
                 return null;
             }
         }
-        
+
         elementList = layoutGroupTable.get(targetGroupName).element.filter(item => item.type === elementName);
 
         // 若目标element不存在，返回null
-        if(elementList === undefined) {
+        if (elementList === undefined) {
             return null;
         }
-        
+
         targetElement = elementList.find(item => item.sourceId === targetId);
         return targetElement || null;
     }
@@ -367,8 +388,8 @@ export class ModelConstructor {
     private isGeneralLink(linkId: string): boolean {
         let counter = 0;
 
-        for(let i = 0; i < linkId.length; i++) {
-            if(linkId[i] === '#') {
+        for (let i = 0; i < linkId.length; i++) {
+            if (linkId[i] === '#') {
                 counter++;
             }
         }

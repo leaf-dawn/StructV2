@@ -6,8 +6,8 @@ export default G6.registerNode('indexed-node', {
         cfg.size = cfg.size || [30, 10];
 
         const width = cfg.size[0],
-              height = cfg.size[1],
-              disable = cfg.disable === undefined? false: cfg.disable;
+            height = cfg.size[1],
+            disable = cfg.disable === undefined ? false : cfg.disable;
 
         const rect = group.addShape('rect', {
             attrs: {
@@ -16,8 +16,8 @@ export default G6.registerNode('indexed-node', {
                 width: width,
                 height: height,
                 stroke: cfg.style.stroke || '#333',
-                fill: disable? '#ccc': cfg.style.fill,
-                cursor: cfg.style.cursor, 
+                fill: disable ? '#ccc' : cfg.style.fill,
+                cursor: cfg.style.cursor,
             },
             name: 'wrapper'
         });
@@ -26,7 +26,7 @@ export default G6.registerNode('indexed-node', {
             const style = (cfg.labelCfg && cfg.labelCfg.style) || {};
             group.addShape('text', {
                 attrs: {
-                    x: width, 
+                    x: width,
                     y: height,
                     textAlign: 'center',
                     textBaseline: 'middle',
@@ -38,31 +38,35 @@ export default G6.registerNode('indexed-node', {
             });
         }
 
-        if(cfg.index !== undefined) {
-            const offset = 20,
-                  indexPosition = cfg.indexPosition || 'bottom',
-                  indexPositionMap: { [key: string]: (width: number, height: number) => { x: number, y: number } } = {
-                    top: (width: number, height: number) => ({ x: width, y: height / 2 - offset }),
-                    right: (width: number, height: number) => ({ x: width * 1.5 + offset, y: height }),
-                    bottom: (width: number, height: number) => ({ x: width, y: height * 1.5 + offset }),
-                    left: (width: number, height: number) => ({ x: width / 2 - offset, y: height })
-                  };
+        const indexCfg = cfg.indexCfg;
+        const offset = 20;
+        const indexPositionMap: { [key: string]: (width: number, height: number) => { x: number, y: number } } = {
+            top: (width: number, height: number) => ({ x: width, y: height / 2 - offset }),
+            right: (width: number, height: number) => ({ x: width * 1.5 + offset, y: height }),
+            bottom: (width: number, height: number) => ({ x: width, y: height * 1.5 + offset }),
+            left: (width: number, height: number) => ({ x: width / 2 - offset, y: height })
+        };
 
-            const { x: indexX, y: indexY } = indexPositionMap[indexPosition](width, height);
+        if (indexCfg !== undefined) {
+            Object.keys(indexCfg).map(key => {
+                let indexCfgItem = indexCfg[key];
+                let position = indexCfgItem.position || 'bottom';
+                let { x: indexX, y: indexY } = indexPositionMap[position](width, height);
 
-            
-            group.addShape('text', {
-                attrs: {
-                    x: indexX, 
-                    y: indexY,
-                    textAlign: 'center',
-                    textBaseline: 'middle',
-                    text: cfg.index.toString(),
-                    fill: '#bbb',
-                    fontSize: 14,
-                    fontStyle: 'italic'
-                },
-                name: 'index-text'
+                group.addShape('text', {
+                    attrs: {
+                        x: indexX,
+                        y: indexY,
+                        textAlign: 'center',
+                        textBaseline: 'middle',
+                        text: indexCfgItem.value.toString(),
+                        fill: '#bbb',
+                        fontSize: 14,
+                        fontStyle: 'italic',
+                        ...indexCfgItem.style
+                    },
+                    name: 'index-text'
+                });
             });
         }
 

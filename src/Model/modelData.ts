@@ -1,5 +1,5 @@
 import { Util } from "../Common/util";
-import { ElementLabelOption, ElementOption, LinkLabelOption, LinkOption, MarkerOption, Style } from "../options";
+import { ElementIndexOption, ElementLabelOption, ElementOption, LinkLabelOption, LinkOption, MarkerOption, Style } from "../options";
 import { SourceElement } from "../sources";
 import { BoundingRect } from "../Common/boundingRect";
 import { SV } from './../StructV';
@@ -16,6 +16,7 @@ export interface G6NodeModel {
     label: string | string[];
     style: Style;
     labelCfg: ElementLabelOption;
+    indexCfg?: ElementIndexOption;
     markerId: string; 
     SVLayouter: string;
     SVModelType: string;
@@ -211,6 +212,7 @@ export class Element extends Model {
             label: option.label,
             style: Util.objectClone<Style>(option.style),
             labelCfg: Util.objectClone<ElementLabelOption>(option.labelOptions),
+            indexCfg: Util.objectClone<ElementIndexOption>(option.indexOptions),
             markerId: null,
             SVLayouter: this.layouterName,
             SVModelType: 'element',

@@ -22,6 +22,13 @@ export interface ElementLabelOption {
 };
 
 
+export interface ElementIndexOption extends ElementLabelOption {
+    position: 'top' | 'right' | 'bottom' | 'left';
+    value: string;
+    style: Style;
+}
+
+
 export interface LinkLabelOption {
     refX: number;
     refY: number;
@@ -39,6 +46,7 @@ export interface ElementOption {
     anchorPoints: [number, number];
     label: string | string[];
     labelOptions: ElementLabelOption;
+    indexOptions: ElementIndexOption;
     style: Style;
 }
 

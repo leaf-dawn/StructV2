@@ -75,6 +75,8 @@
     <script src="./Layouter/Array.js"></script>
     <script src="./Layouter/HashTable.js"></script>
     <script src="./Layouter/LinkStack.js"></script>
+    <script src="./Layouter/AdjoinMatrixGraph.js"></script>
+    <script src="./Layouter/AdjoinTableGraph.js"></script>
     <script>
 
 
@@ -88,33 +90,18 @@
 
 
         let data = [{
-            "LinkStack1": {
+            "g1": {
                 "data": [
-                    {
-                        "id": 0,
-                        external: 'gg'
-                    }
+                    { id: 0, neighbor: [4, 3] }, { id: 1, neighbor: [0, 3] }, { id: 2, neighbor: [4, 0] },
+                    { id: 3, neighbor: [5, 2] }, { id: 4 },
+                    { id: 5, neighbor: [0, 1] }
                 ],
-                "layouter": "LinkStack"
-            }
-        }, {
-            "LinkStack1": {
-                "data": [
-                    {
-                        "id": 0
-                    },
-                    {
-                        "id": 1,
-                        "freed": true,
-                    },
-                    {
-                        "freed": true,
-                        "id": 2
-                    }
-                ],
-                "layouter": "LinkStack"
+                // "layouter": "AdjoinTableGraph"
+                "layouter": "AdjoinMatrixGraph"
             }
         }];
+
+        
 
 
         let dataIndex = 0,

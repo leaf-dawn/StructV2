@@ -10,12 +10,6 @@ SV.registerLayouter('Stack', {
             delete stackBottomNode.external;
         }
 
-        if(options.layout.indexPosition) {
-            sources.forEach(item => {
-                item.indexPosition = options.layout.indexPosition;
-            });
-        }
-
         return sources;
     },
 
@@ -54,9 +48,6 @@ SV.registerLayouter('Stack', {
                         fill: '#f08a5d'
                     }
                 }
-            },
-            layout: {
-                indexPosition: 'left'
             },
             behavior: {
                 dragNode: false

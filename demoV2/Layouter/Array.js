@@ -19,11 +19,15 @@ SV.registerLayouter('Array', {
             element: { 
                 default: {
                     type: 'indexed-node',
-                    label: '[data]',
+                    label: '[id]',
                     size: [60, 30],
                     style: {
                         stroke: '#333',
                         fill: '#95e1d3'
+                    },
+                    indexOptions: {
+                        index: { position: 'bottom' },
+                        indexTop: { position: 'top' }
                     }
                 }
             },

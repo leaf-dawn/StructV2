@@ -268,7 +268,6 @@ export class ModelConstructor {
         element.sourceElement = sourceElement;
         // 处理element的index文本
         this.resolveElementIndex(element.get('indexCfg'), sourceElement);
-        console.log(element.get('indexCfg'));
 
         return element;
     }

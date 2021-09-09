@@ -106,7 +106,20 @@ SV.registerLayouter('GeneralizedList', {
             },
             link: {
                 loopSub: {},
-                loopNext: {},
+                loopNext: {
+                    type: 'quadratic',
+                    curveOffset: -50,
+                    sourceAnchor: 2,
+                    targetAnchor: 4,
+                    style: {
+                        stroke: '#333',
+                        endArrow: 'default',
+                        startArrow: {
+                            path: G6.Arrow.circle(2, -1), 
+                            fill: '#333'
+                        }
+                    }
+                },
                 sub: {
                     type: 'line',
                     sourceAnchor: 2,

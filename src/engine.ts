@@ -200,6 +200,21 @@ export class Engine {
     }
 
     /**
+     * 使用id选中某个节点
+     * @param id 
+     * @param callback 
+     */
+    public selectElement(id: string, callback?: (element: Element) => void) {
+        const elements = this.getElements();
+        const stringId = id.toString();
+        const targetElement = elements.find(item => item.sourceId === stringId);
+
+        if(targetElement) {
+            callback && callback(targetElement);
+        }
+    }
+
+    /**
      * 调整容器尺寸
      * @param containerName
      * @param width 

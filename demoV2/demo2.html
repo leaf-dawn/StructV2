@@ -90,18 +90,42 @@
 
 
         let data = [{
-            "g1": {
-                "data": [
-                    { id: 0, neighbor: [4, 3] }, { id: 1, neighbor: [0, 3] }, { id: 2, neighbor: [4, 0] },
-                    { id: 3, neighbor: [5, 2] }, { id: 4 },
-                    { id: 5, neighbor: [0, 1] }
+            GeneralizedList: {
+                data: [
+                    {
+                        "type": "table",
+                        "id": 1000,
+                        "next": "table#1001",
+                        "tag": 1,
+                        "sub": "atom#1002",
+                        root: true,
+                        "external": [
+                            "gl"
+                        ]
+                    },
+                    {
+                        "type": "table",
+                        "id": 1001,
+                        "tag": 1,
+                        "external": [
+                            "gl1"
+                        ],
+                        loopNext: 'table#1000'
+                    },
+                    {
+                        "type": "atom",
+                        "id": 1002,
+                        "tag": 0,
+                        "data": "e",
+                        "external": [
+                            "p4"
+                        ]
+                    },
                 ],
-                // "layouter": "AdjoinTableGraph"
-                "layouter": "AdjoinMatrixGraph"
+                layouter: "GeneralizedList"
             }
         }];
 
-        
 
 
         let dataIndex = 0,
@@ -125,12 +149,6 @@
             cur.render(curData);
         });
 
-
-
-        cur.on('onLeak', () => { });
-
-
-
         const container = document.getElementById('container'),
             pos = document.getElementById('pos');
 
@@ -140,7 +158,11 @@
         });
 
 
-
+        document.getElementById('hide').addEventListener('click', () => {
+            cur.selectElement(1000, ele => {
+                ele.set('label', '6666');
+            });
+        });
 
 
     </script>

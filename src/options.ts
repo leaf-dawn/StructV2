@@ -63,7 +63,7 @@ export interface LinkOption {
 
 
 export interface MarkerOption extends ElementOption {
-    type: 'pointer' | 'cursor';
+    type: 'pointer' | 'cursor' | 'clen-queue-pointer';
     anchor: number;
     offset: number;
     labelOffset: number;

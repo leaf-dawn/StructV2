@@ -5,6 +5,7 @@ import pointer from "./RegisteredShape/pointer";
 import * as G6 from "./Lib/g6.js";
 import linkListNode from "./RegisteredShape/linkListNode";
 import binaryTreeNode from "./RegisteredShape/binaryTreeNode";
+import CLenQueuePointer from "./RegisteredShape/clenQueuePointer";
 import twoCellNode from "./RegisteredShape/twoCellNode";
 import Cursor from "./RegisteredShape/cursor";
 import { Vector } from "./Common/vector";
@@ -54,8 +55,8 @@ SV.registeredShape = [
     binaryTreeNode, 
     twoCellNode,
     indexedNode,
-    Cursor
-
+    Cursor,
+    CLenQueuePointer,
 ];
 
 SV.registerShape = G6.registerNode;

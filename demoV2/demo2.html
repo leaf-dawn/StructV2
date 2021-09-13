@@ -79,6 +79,7 @@
     <script src="./Layouter/AdjoinTableGraph.js"></script>
     <script>
 
+        const curSelectData = { element: null, style: null };
 
         let cur = SV(document.getElementById('container'), {
             freedContainer: document.getElementById('freed'),
@@ -90,39 +91,58 @@
 
 
         let data = [{
-            GeneralizedList: {
-                data: [
+            "LinkList0": {
+                "data": [
                     {
-                        "type": "table",
-                        "id": 1000,
-                        "next": "table#1001",
-                        "tag": 1,
-                        "sub": "atom#1002",
-                        root: true,
-                        "external": [
-                            "gl"
-                        ]
-                    },
-                    {
-                        "type": "table",
-                        "id": 1001,
-                        "tag": 1,
-                        "external": [
-                            "gl1"
+                        "id": "0x617fb0",
+                        "data": "N",
+                        "next": "0x617ff0",
+                        "rootExternal": [
+                            "before"
                         ],
-                        loopNext: 'table#1000'
+                        "type": "default"
                     },
                     {
-                        "type": "atom",
-                        "id": 1002,
-                        "tag": 0,
-                        "data": "e",
-                        "external": [
-                            "p4"
-                        ]
+                        "id": "0x617ff0",
+                        "data": "A",
+                        "next": "0x618010",
+                        "type": "default"
                     },
+                    {
+                        "id": "0x618010",
+                        "data": "A",
+                        "next": "0x618030",
+                        "type": "default"
+                    },
+                    {
+                        "id": "0x618030",
+                        "data": "B",
+                        "next": "0x618050",
+                        "type": "default"
+                    },
+                    {
+                        "id": "0x618050",
+                        "data": "N",
+                        "next": null,
+                        "type": "default"
+                    }
                 ],
-                layouter: "GeneralizedList"
+                "layouter": "LinkList"
+            },
+            "LinkList1": {
+                "data": [
+                    {
+                        "freed": true,
+                        "id": "0x617fd0",
+                        "data": "",
+                        "next": "0x605010",
+                        "rootExternal": [
+                            "tmpNode"
+                        ],
+                        "type": "default"
+                    }
+                ],
+                "layouter": "LinkList"
             }
         }];
 
@@ -142,10 +162,12 @@
         document.getElementById('btn-next').addEventListener('click', e => {
             curData = data[++dataIndex];
             cur.render(curData);
+            // curSelectData.element = null;
+            // curSelectData.style = null;
         });
 
         document.getElementById('btn-prev').addEventListener('click', e => {
-            curData = data[--dataIndex]
+            curData = data[--dataIndex];
             cur.render(curData);
         });
 
@@ -164,6 +186,41 @@
             });
         });
 
+        // -------------------------------------------------------------------------------------------------------
+
+
+
+
+        /**
+         * 选中一个element
+         */
+        function selectElement(element) {
+            if (element === curSelectData.element) {
+                return;
+            }
+
+            if (curSelectData.element) {
+                const style = curSelectData.style;
+                curSelectData.element.set("style", style);
+            }
+
+            curSelectData.element = element;
+            curSelectData.style = { ...element.get("style") };
+            this.setSelectElementStyle(element);
+        }
+
+        /**
+         * 设置选中的节点的颜色
+         */
+        function setSelectElementStyle(element) {
+            element.set("style", {
+                fill: "#e23e57",
+            });
+        }
+
+        cur.on('node:click', ele => {
+            selectElement(ele);
+        });
 
     </script>
 </body>

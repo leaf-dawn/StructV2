@@ -200,18 +200,15 @@ export class Engine {
     }
 
     /**
-     * 使用id选中某个节点
+     * 使用id查找某个节点
      * @param id 
-     * @param callback 
      */
-    public selectElement(id: string, callback?: (element: Element) => void) {
+    public findElement(id: string) {
         const elements = this.getElements();
         const stringId = id.toString();
         const targetElement = elements.find(item => item.sourceId === stringId);
 
-        if(targetElement) {
-            callback && callback(targetElement);
-        }
+        return targetElement;
     }
 
     /**
@@ -239,7 +236,9 @@ export class Engine {
             return;
         }
 
-        this.viewManager.getG6Instance().on(eventName, callback);
+        this.viewManager.getG6Instance().on(eventName, event => {
+            callback(event.item.SVModel);
+        });
     }
 
     /**

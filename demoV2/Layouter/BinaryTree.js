@@ -7,7 +7,7 @@ SV.registerLayouter('BinaryTree', {
                 default: {
                     type: 'binary-tree-node',
                     size: [60, 30],
-                    label: '[id]',
+                    label: '[data]',
                     style: {
                         fill: '#b83b5e',
                         stroke: "#333",

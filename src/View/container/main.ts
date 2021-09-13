@@ -106,13 +106,15 @@ import { Container } from "./container";
     protected afterInitRenderer() {
         let g6Instance = this.getG6Instance(),
             marker = null,
-            markerX = null,
-            markerY = null,
-            dragStartX = null,
-            dragStartY = null;
+            markerX = 0,
+            markerY = 0,
+            dragStartX = 0,
+            dragStartY = 0,
+            element = null;
 
         g6Instance.on('node:dragstart', ev => {
             const model = ev.item.getModel();
+            element = ev.item.SVModel;
 
             if(model.SVModelType === 'marker') {
                 return;
@@ -128,22 +130,33 @@ import { Container } from "./container";
                 return;
             }
 
+            dragStartX = ev.canvasX;
+            dragStartY = ev.canvasY;
             marker = g6Instance.findById(model.markerId);
             
             if(marker) {
                 markerX = marker.getModel().x,
                 markerY = marker.getModel().y;
-                dragStartX = ev.canvasX;
-                dragStartY = ev.canvasY;
             }
         });
 
         g6Instance.on('node:dragend', ev => {
+            let distanceX = ev.canvasX - dragStartX,
+                distanceY = ev.canvasY - dragStartY,
+                elementX = element.get('x'),
+                elementY = element.get('y');
+
+            element.set({ 
+                x: elementX + distanceX,
+                y: elementY + distanceY 
+            });
+
             marker = null;
-            markerX = null,
-            markerY = null,
-            dragStartX = null,
-            dragStartY = null;
+            markerX = 0,
+            markerY = 0,
+            dragStartX = 0,
+            dragStartY = 0;
+            element = null;
         });
 
         g6Instance.on('node:drag', ev => {

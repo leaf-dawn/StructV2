@@ -124,7 +124,15 @@ export class ViewManager {
         this.handleFreedLabel(freedElements, prevLayoutGroupTable.get(freedGroupName));
         this.prevFreedElements = freedElements;
 
-        return [...freedElements, ...freedMarkers];
+        const freedItems = [...freedElements, ...freedMarkers];
+        freedItems.forEach(item => {
+            item.set('style', {
+                fill: '#ccc'
+            });
+        });
+
+
+        return freedItems;
     }
 
     /**

@@ -21,6 +21,7 @@ export class Renderer {
     private DOMContainer: HTMLElement; // 主可视化视图容器
     private g6Instance; // g6 实例
 
+    private prevRenderModelList: Model[] = null;
     private isFirstRender: boolean; // 是否为第一次渲染
 
     constructor(engine: Engine, DOMContainer: HTMLElement, g6Options: { [key: string]: any }) {
@@ -72,12 +73,8 @@ export class Renderer {
      * @param modelList
      */
     public render(modelList: Model[], removeModels: Model[]) {
-        let data: G6Data = Util.convertModelList2G6Data(modelList),
-            removeData: G6Data = Util.convertModelList2G6Data(removeModels),
-            renderData: G6Data = {
-                nodes: [...data.nodes, ...removeData.nodes],
-                edges: [...data.edges, ...removeData.edges]
-            };
+        const renderModelList = [...modelList, ...removeModels],
+              renderData: G6Data = Util.convertModelList2G6Data(renderModelList);
 
         if(this.isFirstRender) {
             this.g6Instance.read(renderData);
@@ -98,6 +95,13 @@ export class Renderer {
                 item.renderG6Item.SVModel = item;
             }
         });
+
+        // 将上一次的model全部标记为已销毁
+        if(this.prevRenderModelList) {
+            this.prevRenderModelList.forEach(item => { item.isDestroy = true; });
+        }
+
+        this.prevRenderModelList = renderModelList;
 
         // 把所有连线置顶
         if(this.isFirstRender) {

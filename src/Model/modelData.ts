@@ -44,6 +44,8 @@ export class Model {
     id: string;
     type: string;
     isLeak: boolean;
+    isDestroy: boolean;
+    modelType: string;
     
     props: G6NodeModel | G6EdgeModel;
     shadowG6Item;
@@ -58,6 +60,7 @@ export class Model {
         this.G6Item = null;
         this.props = <G6NodeModel | G6EdgeModel>{ };
         this.isLeak = false;
+        this.isDestroy = false;
     }
 
     /**
@@ -100,6 +103,10 @@ export class Model {
      * @returns 
      */
     set(attr: string | object, value?: any) {
+        if(this.isDestroy) {
+            return;
+        }
+
         if(typeof attr === 'object') {
             Object.keys(attr).map(item => {
                 this.set(item, attr[item]);
@@ -158,6 +165,10 @@ export class Model {
         return this.type;
     }
 
+    getModelType(): string {
+        return this.modelType;
+    }
+
     getId(): string {
         return this.id;
     }
@@ -178,6 +189,7 @@ export class Element extends Model {
 
     constructor(id: string, type: string, group: string, layouter: string, sourceElement: SourceElement) {
         super(id, type);
+        this.modelType = 'element';
 
         if(type === null) {
             return;
@@ -219,6 +231,10 @@ export class Element extends Model {
             SVModelName: this.type
         };
     }
+
+    getSourceId(): string {
+        return this.sourceId;
+    }
 };
 
 
@@ -230,6 +246,8 @@ export class Link extends Model {
 
     constructor(id: string, type: string, element: Element, target: Element, index: number) { 
         super(id, type);
+        this.modelType = 'link';
+
         this.element = element;
         this.target = target;
         this.index = index;
@@ -277,6 +295,8 @@ export class Marker extends Model {
 
     constructor(id: string, type: string, label: string | string[], target: Element) {
         super(id, type);
+        this.modelType = 'marker';
+
         this.target = target;
         this.label = label;
 

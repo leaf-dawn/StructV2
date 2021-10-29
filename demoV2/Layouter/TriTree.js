@@ -1,7 +1,7 @@
 /**
  * 三叉树
  */
- SV.registerLayouter('TriTree', {
+ SV.registerLayout('TriTree', {
     defineOptions() {
         return {
             /**

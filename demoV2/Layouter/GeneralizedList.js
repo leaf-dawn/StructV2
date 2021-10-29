@@ -80,7 +80,7 @@ SV.registerShape('three-cell-node', {
 
 
 
-SV.registerLayouter('GeneralizedList', {
+SV.registerLayout('GeneralizedList', {
 
     defineOptions() {
         return {

@@ -1,5 +1,5 @@
-import { Element } from "./Model/modelData";
-import { SourceElement } from "./sources";
+import { SVNode } from "./Model/SVNode";
+import { SourceNode } from "./sources";
 
 
 export interface Style {
@@ -15,14 +15,14 @@ export interface Style {
 };
 
 
-export interface ElementLabelOption {
+export interface NodeLabelOption {
     position: string;
     offset: number;
     style: Style;
 };
 
 
-export interface ElementIndexOption extends ElementLabelOption {
+export interface NodeIndexOption extends NodeLabelOption {
     position: 'top' | 'right' | 'bottom' | 'left';
     value: string;
     style: Style;
@@ -38,31 +38,32 @@ export interface LinkLabelOption {
 };
 
 
-
-export interface ElementOption {
+export interface ModelOption {
     type: string;
-    size: number | [number, number];
-    rotation: number;
-    anchorPoints: [number, number];
-    label: string | string[];
-    labelOptions: ElementLabelOption;
-    indexOptions: ElementIndexOption;
     style: Style;
 }
 
 
-export interface LinkOption {
-    type: string;
+export interface NodeOption extends ModelOption {
+    size: number | [number, number];
+    rotation: number;
+    label: string | string[];
+    anchorPoints: number[][];
+    indexOptions: NodeIndexOption;
+    labelOptions: NodeLabelOption;
+}
+
+
+export interface LinkOption extends ModelOption {
     sourceAnchor: number | ((index: number) => number);
     targetAnchor: number | ((index: number) => number);
     label: string;
     curveOffset: number;
     labelOptions: LinkLabelOption;
-    style: Style;
 }
 
 
-export interface MarkerOption extends ElementOption {
+export interface MarkerOption extends NodeOption {
     type: 'pointer' | 'cursor' | 'clen-queue-pointer';
     anchor: number;
     offset: number;
@@ -83,7 +84,7 @@ export interface BehaviorOptions {
 
 
 export interface LayoutGroupOptions {
-    element: { [key: string]: ElementOption };
+    node: { [key: string]: NodeOption };
     link?: { [key: string]: LinkOption }
     marker?: { [key: string]: MarkerOption }
     layout?: LayoutOptions;
@@ -99,8 +100,9 @@ export interface LayoutGroupOptions {
 
 export interface ViewOptions {
     fitCenter: boolean;
-    fitView: boolean;
     groupPadding: number;
+    updateHighlight: string;
+    leakAreaHeight: number;
 }
 
 
@@ -112,25 +114,22 @@ export interface AnimationOptions {
 
 
 export interface InteractionOptions {
-    changeHighlight: string;
     drag: boolean;
     zoom: boolean;
 }
 
 export interface EngineOptions {
-    freedContainer?: HTMLElement;
-    leakContainer?: HTMLElement;
     view?: ViewOptions;
     animation?: AnimationOptions;
     interaction?: InteractionOptions;
 };
 
 
-export interface Layouter {
+export interface LayoutCreator {
     defineOptions(): LayoutGroupOptions;
-    sourcesPreprocess?(sources: SourceElement[], options: LayoutGroupOptions): SourceElement[];
-    defineLeakRule?(elements: Element[]): Element[];
-    layout(elements: Element[], layoutOptions: LayoutOptions);
+    sourcesPreprocess?(sources: SourceNode[], options: LayoutGroupOptions): SourceNode[];
+    defineLeakRule?(nodes: SVNode[]): SVNode[];
+    layout(nodes: SVNode[], layoutOptions: LayoutOptions);
     [key: string]: any;
 }
 

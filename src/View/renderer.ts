@@ -1,15 +1,16 @@
 import { Engine } from '../engine';
-import { G6EdgeModel, G6NodeModel } from '../Model/modelData';
+import { SVModel } from '../Model/SVModel';
 import { Util } from '../Common/util';
-import { SV } from '../StructV';
-import { Model } from './../Model/modelData';
+import G6 from '@antv/g6';
+import { InitViewBehaviors } from '../BehaviorHelper/initViewBehaviors';
+import { Graph, GraphData, IGroup } from '@antv/g6-pc';
 
 
 
-export interface G6Data {
-    nodes: G6NodeModel[];
-    edges: G6EdgeModel[];
-};
+export interface RenderModelPack {
+    leaKModels: SVModel[];
+    generalModel: SVModel[];
+}
 
 
 export type g6Behavior = string | { type: string; shouldBegin?: Function; shouldUpdate?: Function; shouldEnd?: Function; };
@@ -17,26 +18,34 @@ export type g6Behavior = string | { type: string; shouldBegin?: Function; should
 
 export class Renderer {
     private engine: Engine;
+    private g6Instance: Graph; // g6 实例
+    private shadowG6Instance: Graph;
 
-    private DOMContainer: HTMLElement; // 主可视化视图容器
-    private g6Instance; // g6 实例
-
-    private prevRenderModelList: Model[] = null;
-    private isFirstRender: boolean; // 是否为第一次渲染
-
-    constructor(engine: Engine, DOMContainer: HTMLElement, g6Options: { [key: string]: any }) {
+    constructor(engine: Engine, DOMContainer: HTMLElement) {
         this.engine = engine;
-        this.DOMContainer = DOMContainer;
-        this.isFirstRender = true;
 
         const enable: boolean = this.engine.animationOptions.enable,
-              duration: number = this.engine.animationOptions.duration,
-              timingFunction: string = this.engine.animationOptions.timingFunction;
+            duration: number = this.engine.animationOptions.duration,
+            timingFunction: string = this.engine.animationOptions.timingFunction;
+
+        const tooltip = new G6.Tooltip({
+            offsetX: 10,
+            offsetY: 20,
+            shouldBegin(event) {
+                return event.item['SVModel'].isNode();
+            },
+            getContent: event => this.getTooltipContent(event.item['SVModel'], { address: 'sourceId', data: 'data' }),
+            itemTypes: ['node']
+        });
+
+        this.shadowG6Instance = new G6.Graph({
+            container: DOMContainer.cloneNode() as HTMLElement
+        });
 
         // 初始化g6实例
-        this.g6Instance = new SV.G6.Graph({
+        this.g6Instance = new G6.Graph({
             container: DOMContainer,
-            width: DOMContainer.offsetWidth, 
+            width: DOMContainer.offsetWidth,
             height: DOMContainer.offsetHeight,
             groupByTypes: false,
             animate: enable,
@@ -46,68 +55,74 @@ export class Renderer {
             },
             fitView: false,
             modes: {
-                default: []
+                default: InitViewBehaviors(this.engine.optionsTable)
             },
-            ...g6Options
+            plugins: [tooltip]
         });
     }
 
-    public getIsFirstRender(): boolean {
-        return this.isFirstRender;
+    /**
+     * 创造tooltip元素
+     * @param model 
+     * @param items 
+     * @returns 
+     */
+    private getTooltipContent(model: SVModel, items: { [key: string]: string }): HTMLDivElement {
+        const wrapper = document.createElement('div');
+
+        if(model === null || model === undefined) {
+            return wrapper;
+        }
+
+        Object.keys(items).map(key => {
+            let value = model[items[key]];
+            if (value !== undefined && value !== null) {
+                let item = document.createElement('div');
+                item.innerHTML = `${key}：${value}`;
+                wrapper.appendChild(item);
+            }
+        });
+
+        return wrapper;
     }
 
-    public setIsFirstRender(value: boolean) {
-        this.isFirstRender = value;
+    /**
+     * 对每一个 model 在离屏 Canvas 上构建 G6 item，用作布局
+     * @param renderModelList
+     */
+    public build(renderModelList: SVModel[]) {
+        const g6Data: GraphData = Util.convertModelList2G6Data(renderModelList);
+
+        this.shadowG6Instance.clear();
+        this.shadowG6Instance.read(g6Data);
+        renderModelList.forEach(item => {
+            item.shadowG6Item = this.shadowG6Instance.findById(item.id);
+        });
+    }
+
+    /**
+     * 渲染函数
+     * @param renderModelList 
+     * @param isFirstRender 
+     */
+    public render(renderModelList: SVModel[]) {
+        const renderData: GraphData = Util.convertModelList2G6Data(renderModelList);
+
+        this.g6Instance.changeData(renderData);
+
+        renderModelList.forEach(item => {
+            item.G6Item = this.g6Instance.findById(item.id);
+            item.G6Item['SVModel'] = item;
+        });
     }
 
     /**
      * 从视图中移除一个 Model
      * @param model 
      */
-    public removeModel(model: Model) {
-        this.g6Instance.removeItem(model.renderG6Item);
-    }
-
-    /**
-     * 渲染函数
-     * @param modelList
-     */
-    public render(modelList: Model[], removeModels: Model[]) {
-        const renderModelList = [...modelList, ...removeModels],
-              renderData: G6Data = Util.convertModelList2G6Data(renderModelList);
-
-        if(this.isFirstRender) {
-            this.g6Instance.read(renderData);
-        }
-        else {
-            this.g6Instance.changeData(renderData);
-        }
-
-        if(this.engine.viewOptions.fitView) {
-            this.g6Instance.fitView();
-        }
-
-        modelList.forEach(item => {
-            item.renderG6Item = this.g6Instance.findById(item.id);
-
-            if(item.renderG6Item) {
-                item.G6Item = item.renderG6Item;
-                item.renderG6Item.SVModel = item;
-            }
-        });
-
-        // 将上一次的model全部标记为已销毁
-        if(this.prevRenderModelList) {
-            this.prevRenderModelList.forEach(item => { item.isDestroy = true; });
-        }
-
-        this.prevRenderModelList = renderModelList;
-
-        // 把所有连线置顶
-        if(this.isFirstRender) {
-            this.g6Instance.getEdges().forEach(item => item.toFront());
-            this.g6Instance.paint();
-        }
+    public removeModel(model: SVModel) {
+        this.g6Instance.removeItem(model.G6Item);
+        this.shadowG6Instance.removeItem(model.shadowG6Item);
     }
 
     /**
@@ -121,7 +136,7 @@ export class Renderer {
      * 销毁
      */
     public destroy() {
+        this.shadowG6Instance.destroy();
         this.g6Instance.destroy();
-        this.DOMContainer = null;
     }
 }

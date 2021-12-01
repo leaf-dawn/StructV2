@@ -2,7 +2,7 @@ import { Engine } from "./engine";
 import { Bound } from "./Common/boundingRect";
 import { Group } from "./Common/group";
 import pointer from "./RegisteredShape/pointer";
-import * as G6 from "./Lib/g6.js";
+import G6, { Util } from '@antv/g6';
 import linkListNode from "./RegisteredShape/linkListNode";
 import binaryTreeNode from "./RegisteredShape/binaryTreeNode";
 import CLenQueuePointer from "./RegisteredShape/clenQueuePointer";
@@ -10,9 +10,10 @@ import twoCellNode from "./RegisteredShape/twoCellNode";
 import Cursor from "./RegisteredShape/cursor";
 import { Vector } from "./Common/vector";
 import indexedNode from "./RegisteredShape/indexedNode";
-import { EngineOptions, Layouter } from "./options";
-import { SourceElement } from "./sources";
-import { Element } from "./Model/modelData";
+import { EngineOptions, LayoutCreator } from "./options";
+import { SVNode } from "./Model/SVNode";
+import { SourceNode } from "./sources";
+
 
 
 export interface StructV {
@@ -25,16 +26,16 @@ export interface StructV {
 
     registeredShape: any[];
 
-    registeredLayouter: { [key: string]: Layouter },
+    registeredLayout: { [key: string]: LayoutCreator },
 
     registerShape: Function,
 
     /**
      * 注册一个布局器
      * @param name 
-     * @param layouter 
+     * @param layout
      */
-    registerLayouter(name: string, layouter);
+    registerLayout(name: string, layoutCreator: LayoutCreator);
 }
 
 
@@ -45,10 +46,10 @@ export const SV: StructV = function(DOMContainer: HTMLElement, engineOptions: En
 SV.Group = Group;
 SV.Bound = Bound;
 SV.Vector = Vector;
-SV.Mat3 = G6.Util.mat3;
+SV.Mat3 = Util.mat3;
 SV.G6 = G6;
 
-SV.registeredLayouter = {};
+SV.registeredLayout = {};
 SV.registeredShape = [
     pointer, 
     linkListNode, 
@@ -60,25 +61,25 @@ SV.registeredShape = [
 ];
 
 SV.registerShape = G6.registerNode;
-SV.registerLayouter = function(name: string, layouter: Layouter) {
+SV.registerLayout = function(name: string, layoutCreator: LayoutCreator) {
 
-    if(typeof layouter.sourcesPreprocess !== 'function') {
-        layouter.sourcesPreprocess = function(data: SourceElement[]): SourceElement[] {
+    if(typeof layoutCreator.sourcesPreprocess !== 'function') {
+        layoutCreator.sourcesPreprocess = function(data: SourceNode[]): SourceNode[] {
             return data;
         }
     }
 
-    if(typeof layouter.defineLeakRule !== 'function') {
-        layouter.defineLeakRule = function(elements: Element[]): Element[] {
-            return elements;
+    if(typeof layoutCreator.defineLeakRule !== 'function') {
+        layoutCreator.defineLeakRule = function(nodes: SVNode[]): SVNode[] {
+            return nodes;
         }
     }
 
-    if(typeof layouter.defineOptions !== 'function' || typeof layouter.layout !== 'function') {
+    if(typeof layoutCreator.defineOptions !== 'function' || typeof layoutCreator.layout !== 'function') {
         return;
     }
     
-    SV.registeredLayouter[name] = layouter;
+    SV.registeredLayout[name] = layoutCreator;
 };
 
 

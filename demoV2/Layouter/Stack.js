@@ -1,6 +1,6 @@
 
 
-SV.registerLayouter('Stack', {
+SV.registerLayout('Stack', {
 
     sourcesPreprocess(sources, options) {
         const stackBottomNode = sources[sources.length - 1];

@@ -6,7 +6,7 @@
 /**
  * 连地址哈希表
  */
-SV.registerLayouter('ChainHashTable', {
+SV.registerLayout('ChainHashTable', {
 
     defineOptions() {
         return {

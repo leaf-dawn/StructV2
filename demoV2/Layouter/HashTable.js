@@ -1,7 +1,7 @@
 
 
 
-SV.registerLayout('HashTable', {
+SV.registerLayouter('HashTable', {
 
     sourcesPreprocess(sources) {
         const firstElement = sources[0];

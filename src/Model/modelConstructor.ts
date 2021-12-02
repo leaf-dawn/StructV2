@@ -1,25 +1,20 @@
 import { Util } from "../Common/util";
 import { Engine } from "../engine";
-import { LayoutCreator, LayoutGroupOptions, LinkOption, MarkerOption, NodeOption } from "../options";
-import { sourceLinkData, LinkTarget, Sources, SourceNode } from "../sources";
+import { ElementIndexOption, ElementOption, Layouter, LayoutGroupOptions, LinkOption, MarkerOption } from "../options";
+import { sourceLinkData, SourceElement, LinkTarget, Sources } from "../sources";
 import { SV } from "../StructV";
-import { SVLink } from "./SVLink";
-import { SVMarker } from "./SVMarker";
-import { SVModel } from "./SVModel";
-import { SVFreedLabel, SVLeakAddress, SVNode } from "./SVNode";
+import { Element, Link, Marker, Model } from "./modelData";
 
 
 export type LayoutGroup = {
     name: string;
-    node: SVNode[];
-    freedLabel: SVFreedLabel[];
-    leakAddress: SVLeakAddress[];
-    link: SVLink[];
-    marker: SVMarker[];
-    layoutCreator: LayoutCreator;
-    layout: string;
+    element: Element[];
+    link: Link[];
+    marker: Marker[];
+    layouter: Layouter;
+    layouterName: string;
     options: LayoutGroupOptions;
-    modelList: SVModel[];
+    modelList: Model[];
     isHide: boolean;
 };
 
@@ -38,66 +33,56 @@ export class ModelConstructor {
     }
 
     /**
-     * 构建svnode，svlink 和 svmarker
+     * 构建element，link和marker
      * @param sourceList 
      */
     public construct(sources: Sources): LayoutGroupTable {
         const layoutGroupTable = new Map<string, LayoutGroup>(),
-            layoutMap: { [key: string]: LayoutCreator } = SV.registeredLayout,
+            layouterMap: { [key: string]: Layouter } = SV.registeredLayouter,
             optionsTable = this.engine.optionsTable;
 
-        Object.keys(sources).forEach(group => {
-            let sourceGroup = sources[group],
-                layout = sourceGroup.layouter,
-                layoutCreator: LayoutCreator = layoutMap[layout];
+        Object.keys(sources).forEach(name => {
+            let sourceGroup = sources[name],
+                layouterName = sourceGroup.layouter,
+                layouter: Layouter = layouterMap[sourceGroup.layouter];
 
-            if (!layout || !layoutCreator) {
+            if (!layouterName || !layouter) {
                 return;
             }
 
             let sourceDataString: string = JSON.stringify(sourceGroup.data),
-                prevString: string = this.prevSourcesStringMap[group],
-                nodeList: SVNode[] = [],
-                freedLabelList: SVFreedLabel[] = [],
-                leakAddress: SVLeakAddress[] = [],
-                markerList: SVMarker[] = [];
+                prevString: string = this.prevSourcesStringMap[name],
+                elementList: Element[] = [],
+                markerList: Marker[] = [];
 
             if (prevString === sourceDataString) {
                 return;
             }
 
-            const options: LayoutGroupOptions = optionsTable[layout],
-                sourceData = layoutCreator.sourcesPreprocess(sourceGroup.data, options),
-                nodeOptions = options.node || options['element'] || {},
+            const options: LayoutGroupOptions = optionsTable[layouterName],
+                sourceData = layouter.sourcesPreprocess(sourceGroup.data, options),
+                elementOptions = options.element || {},
                 markerOptions = options.marker || {};
 
-            nodeList = this.constructNodes(nodeOptions, group, sourceData, layout);
-            leakAddress = nodeList.map(item => item.leakAddress);
-            markerList = this.constructMarkers(group, layout, markerOptions, nodeList);
-            nodeList.forEach(item => {
-                if(item.freedLabel) {
-                    freedLabelList.push(item.freedLabel);
-                }
-            });
+            elementList = this.constructElements(elementOptions, name, sourceData, layouterName);
+            markerList = this.constructMarkers(name, markerOptions, elementList);
 
-            layoutGroupTable.set(group, {
-                name: group,
-                node: nodeList,
-                freedLabel: freedLabelList, 
-                leakAddress: leakAddress,
+            layoutGroupTable.set(name, {
+                name,
+                element: elementList,
                 link: [],
                 marker: markerList,
                 options: options,
-                layoutCreator,
-                modelList: [...nodeList, ...markerList, ...freedLabelList, ...leakAddress],
-                layout,
+                layouter: layouter,
+                modelList: [...elementList, ...markerList],
+                layouterName,
                 isHide: false
             });
         });
 
-        layoutGroupTable.forEach((layoutGroup: LayoutGroup, group: string) => {
+        layoutGroupTable.forEach((layoutGroup: LayoutGroup) => {
             const linkOptions = layoutGroup.options.link || {},
-                linkList: SVLink[] = this.constructLinks(linkOptions, layoutGroup.node, layoutGroupTable, group, layoutGroup.layout, );
+                linkList: Link[] = this.constructLinks(linkOptions, layoutGroup.element, layoutGroupTable);
 
             layoutGroup.link = linkList;
             layoutGroup.modelList.push(...linkList);
@@ -117,16 +102,16 @@ export class ModelConstructor {
     }
 
     /**
-     * 从源数据构建 node 集
-     * @param nodeOptions 
-     * @param group
+     * 从源数据构建 element 集
+     * @param elementOptions 
+     * @param groupName 
      * @param sourceList 
-     * @param layout
+     * @param layouterName
      * @returns 
      */
-    private constructNodes(nodeOptions: { [key: string]: NodeOption }, group: string, sourceList: SourceNode[], layout: string): SVNode[] {
-        let defaultSourceNodeType: string = 'default',
-            nodeList: SVNode[] = [];
+    private constructElements(elementOptions: { [key: string]: ElementOption }, groupName: string, sourceList: SourceElement[], layouterName: string): Element[] {
+        let defaultElementType: string = 'default',
+            elementList: Element[] = [];
 
         sourceList.forEach(item => {
             if (item === null) {
@@ -134,62 +119,62 @@ export class ModelConstructor {
             }
 
             if (item.type === undefined || item.type === null) {
-                item.type = defaultSourceNodeType;
+                item.type = defaultElementType;
             }
 
-            nodeList.push(this.createNode(item, item.type, group, layout, nodeOptions[item.type]));
+            elementList.push(this.createElement(item, item.type, groupName, layouterName, elementOptions[item.type]));
         });
 
-        return nodeList;
+        return elementList;
     }
 
     /**
-     * 从配置和 node 集构建 link 集
+     * 从配置和 element 集构建 link 集
      * @param linkOptions 
-     * @param nodes 
+     * @param elements 
      * @param layoutGroupTable
      * @returns 
      */
-    private constructLinks(linkOptions: { [key: string]: LinkOption }, nodes: SVNode[], layoutGroupTable: LayoutGroupTable, group: string, layout: string): SVLink[] {
-        let linkList: SVLink[] = [],
+    private constructLinks(linkOptions: { [key: string]: LinkOption }, elements: Element[], layoutGroupTable: LayoutGroupTable): Link[] {
+        let linkList: Link[] = [],
             linkNames = Object.keys(linkOptions);
 
         linkNames.forEach(name => {
-            for (let i = 0; i < nodes.length; i++) {
-                let node: SVNode = nodes[i],
-                    sourceLinkData: sourceLinkData = node.sourceNode[name],
-                    targetNode: SVNode | SVNode[] = null,
-                    link: SVLink = null;
+            for (let i = 0; i < elements.length; i++) {
+                let element: Element = elements[i],
+                    sourceLinkData: sourceLinkData = element.sourceElement[name],
+                    targetElement: Element | Element[] = null,
+                    link: Link = null;
 
                 if (sourceLinkData === undefined || sourceLinkData === null) {
-                    node[name] = null;
+                    element[name] = null;
                     continue;
                 }
 
-                //  ------------------- 将连接声明字段 sourceLinkData 从 id 变为 SVNode -------------------
+                //  ------------------- 将连接声明字段 sourceLinkData 从 id 变为 Element -------------------
                 if (Array.isArray(sourceLinkData)) {
-                    node[name] = sourceLinkData.map((item, index) => {
-                        targetNode = this.fetchTargetNodes(layoutGroupTable, node, item);
+                    element[name] = sourceLinkData.map((item, index) => {
+                        targetElement = this.fetchTargetElements(layoutGroupTable, element, item);
                         let isGeneralLink = this.isGeneralLink(sourceLinkData.toString());
 
-                        if (targetNode) {
-                            link = this.createLink(name, group, layout, node, targetNode, index, linkOptions[name]);
+                        if (targetElement) {
+                            link = this.createLink(name, element, targetElement, index, linkOptions[name]);
                             linkList.push(link);
                         }
 
-                        return isGeneralLink ? targetNode : null;
+                        return isGeneralLink ? targetElement : null;
                     });
                 }
                 else {
-                    targetNode = this.fetchTargetNodes(layoutGroupTable, node, sourceLinkData);
+                    targetElement = this.fetchTargetElements(layoutGroupTable, element, sourceLinkData);
                     let isGeneralLink = this.isGeneralLink(sourceLinkData.toString());
 
-                    if (targetNode) {
-                        link = this.createLink(name, group, layout, node, targetNode, null, linkOptions[name]);
+                    if (targetElement) {
+                        link = this.createLink(name, element, targetElement, null, linkOptions[name]);
                         linkList.push(link);
                     }
 
-                    node[name] = isGeneralLink ? targetNode : null;
+                    element[name] = isGeneralLink ? targetElement : null;
                 }
             }
         });
@@ -198,25 +183,25 @@ export class ModelConstructor {
     }
 
     /**
-     * 从配置和 node 集构建 marker 集
+     * 从配置和 element 集构建 marker 集
      * @param markerOptions 
-     * @param nodes
+     * @param elements
      * @returns 
      */
-    private constructMarkers(group: string, layout: string, markerOptions: { [key: string]: MarkerOption }, nodes: SVNode[]): SVMarker[] {
-        let markerList: SVMarker[] = [],
+    private constructMarkers(groupName: string, markerOptions: { [key: string]: MarkerOption }, elements: Element[]): Marker[] {
+        let markerList: Marker[] = [],
             markerNames = Object.keys(markerOptions);
 
         markerNames.forEach(name => {
-            for (let i = 0; i < nodes.length; i++) {
-                let node = nodes[i],
-                    markerData = node[name];
+            for (let i = 0; i < elements.length; i++) {
+                let element = elements[i],
+                    markerData = element[name];
 
                 // 若没有指针字段的结点则跳过
                 if (!markerData) continue;
 
-                let id = `${group}.${name}.${Array.isArray(markerData) ? markerData.join('-') : markerData}`,
-                    marker = this.createMarker(id, name, markerData, group, layout, node, markerOptions[name]);
+                let id = `${groupName}.${name}.${Array.isArray(markerData) ? markerData.join('-') : markerData}`,
+                    marker = this.createMarker(id, name, markerData, element, markerOptions[name]);
 
                 markerList.push(marker);
             }
@@ -228,19 +213,19 @@ export class ModelConstructor {
     /**
      * 求解label文本
      * @param label 
-     * @param sourceNode 
+     * @param sourceElement 
      */
-    private resolveNodeLabel(label: string | string[], sourceNode: SourceNode): string {
+    private resolveElementLabel(label: string | string[], sourceElement: SourceElement): string {
         let targetLabel: any = '';
 
         if (Array.isArray(label)) {
-            targetLabel = label.map(item => this.parserNodeContent(sourceNode, item) ?? '');
+            targetLabel = label.map(item => this.parserElementContent(sourceElement, item) ?? '');
         }
         else {
-            targetLabel = this.parserNodeContent(sourceNode, label);
+            targetLabel = this.parserElementContent(sourceElement, label);
         }
 
-        if (targetLabel === 'undefined') {
+        if(targetLabel === 'undefined') {
             targetLabel = '';
         }
 
@@ -248,67 +233,90 @@ export class ModelConstructor {
     }
 
     /**
-     * 元素工厂，创建 Node
-     * @param sourceNode
-     * @param sourceNodeType
-     * @param group
-     * @param layout
-     * @param options
+     * 求解index文本
+     * @param indexOptions 
+     * @param sourceElement 
      */
-    private createNode(sourceNode: SourceNode, sourceNodeType: string, group: string, layout: string, options: NodeOption): SVNode {
-        let label: string | string[] = this.resolveNodeLabel(options.label, sourceNode),
-            id = sourceNodeType + '.' + sourceNode.id.toString(),
-            node = new SVNode(id, sourceNodeType, group, layout, sourceNode, label, options);
-            node.leakAddress = new SVLeakAddress(`${id}-leak-adress`, sourceNodeType, group, layout, node);
-        
-        if(node.freed) {
-            node.freedLabel = new SVFreedLabel(`${id}-freed-label`, sourceNodeType, group, layout, node);
+    private resolveElementIndex(indexOptions: ElementIndexOption, sourceElement: SourceElement) {
+        if(indexOptions === undefined || indexOptions === null) {
+            return;
         }
 
-        return node;
+        Object.keys(indexOptions).map(key => {
+            let indexOptionItem = indexOptions[key];
+            indexOptionItem.value = sourceElement[key] ?? '';
+        });
+    }
+
+    /**
+     * 元素工厂，创建Element
+     * @param sourceElement
+     * @param elementName
+     * @param groupName
+     * @param layouterName
+     * @param options
+     */
+    private createElement(sourceElement: SourceElement, elementName: string, groupName: string, layouterName: string, options: ElementOption): Element {
+        let element: Element = undefined,
+            label: string | string[] = this.resolveElementLabel(options.label, sourceElement),
+            id = elementName + '.' + sourceElement.id.toString();
+
+
+        element = new Element(id, elementName, groupName, layouterName, sourceElement);
+        element.initProps(options);
+        element.set('label', label);
+        element.sourceElement = sourceElement;
+        // 处理element的index文本
+        this.resolveElementIndex(element.get('indexCfg'), sourceElement);
+
+        return element;
     }
 
     /**
      * 外部指针工厂，创建marker
      * @param id 
      * @param markerName 
-     * @param markerData 
-     * @param group 
-     * @param layout 
+     * @param label 
      * @param target 
-     * @param options 
-     * @returns 
+     * @param options
      */
-    private createMarker(id: string, markerName: string, markerData: string | string[], group: string, layout: string, target: SVNode, options: MarkerOption): SVMarker {
-        return new SVMarker(id, markerName, group, layout, markerData, target, options);;
+    private createMarker(id: string, markerName: string, markerData: string | string[], target: Element, options: MarkerOption): Marker {
+        let marker = undefined;
+
+        marker = new Marker(id, markerName, markerData, target);
+        marker.initProps(options);
+
+        return marker;
     };
 
     /**
      * 连线工厂，创建Link
      * @param linkName 
-     * @param group 
-     * @param layout 
-     * @param node 
+     * @param element 
      * @param target 
      * @param index 
-     * @param options 
-     * @returns 
+     * @param options
      */
-    private createLink(linkName: string, group: string, layout: string, node: SVNode, target: SVNode, index: number, options: LinkOption): SVLink {
-        let id = `${linkName}(${node.id}-${target.id})`;
-        return new SVLink(id, linkName, group, layout, node, target, index, options);
+    private createLink(linkName: string, element: Element, target: Element, index: number, options: LinkOption): Link {
+        let link = undefined,
+            id = `${linkName}(${element.id}-${target.id})`;
+        
+        link = new Link(id, linkName, element, target, index);
+        link.initProps(options);
+
+        return link;
     }
 
     /**
      * 解析元素文本内容
-     * @param sourceNode
+     * @param sourceElement
      * @param formatLabel
      */
-    private parserNodeContent(sourceNode: SourceNode, formatLabel: string): string {
+    private parserElementContent(sourceElement: SourceElement, formatLabel: string): string {
         let fields = Util.textParser(formatLabel);
 
         if (Array.isArray(fields)) {
-            let values = fields.map(item => sourceNode[item]);
+            let values = fields.map(item => sourceElement[item]);
 
             values.map((item, index) => {
                 formatLabel = formatLabel.replace('[' + fields[index] + ']', item);
@@ -320,17 +328,17 @@ export class ModelConstructor {
 
     /**
      * 由source中的连接字段获取真实的连接目标元素
-     * @param nodeContainer
-     * @param node
+     * @param elementContainer
+     * @param element
      * @param linkTarget 
      */
-    private fetchTargetNodes(layoutGroupTable: LayoutGroupTable, node: SVNode, linkTarget: LinkTarget): SVNode {
-        let group: string = node.group,
-            sourceNodeType = node.sourceType,
-            nodeList: SVNode[],
+    private fetchTargetElements(layoutGroupTable: LayoutGroupTable, element: Element, linkTarget: LinkTarget): Element {
+        let groupName: string = element.groupName,
+            elementName = element.type,
+            elementList: Element[],
             targetId = linkTarget,
-            targetGroupName = group,
-            targetNode = null;
+            targetGroupName = groupName,
+            targetElement = null;
 
         if (linkTarget === null || linkTarget === undefined) {
             return null;
@@ -345,13 +353,13 @@ export class ModelConstructor {
         targetId = info.pop();
 
         if (info.length > 1) {
-            sourceNodeType = info.pop();
+            elementName = info.pop();
             targetGroupName = info.pop();
         }
         else {
             let field = info.pop();
-            if (layoutGroupTable.get(targetGroupName).node.find(item => item.sourceType === field)) {
-                sourceNodeType = field;
+            if (layoutGroupTable.get(targetGroupName).element.find(item => item.type === field)) {
+                elementName = field;
             }
             else if (layoutGroupTable.has(field)) {
                 targetGroupName = field;
@@ -361,15 +369,15 @@ export class ModelConstructor {
             }
         }
 
-        nodeList = layoutGroupTable.get(targetGroupName).node.filter(item => item.sourceType === sourceNodeType);
+        elementList = layoutGroupTable.get(targetGroupName).element.filter(item => item.type === elementName);
 
-        // 若目标node不存在，返回null
-        if (nodeList === undefined) {
+        // 若目标element不存在，返回null
+        if (elementList === undefined) {
             return null;
         }
 
-        targetNode = nodeList.find(item => item.sourceId === targetId);
-        return targetNode || null;
+        targetElement = elementList.find(item => item.sourceId === targetId);
+        return targetElement || null;
     }
 
     /**

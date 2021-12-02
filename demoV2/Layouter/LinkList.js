@@ -1,6 +1,6 @@
 
 
-SV.registerLayout('LinkList', {
+SV.registerLayouter('LinkList', {
     
     sourcesPreprocess(sources) {
         let root = sources[0];
@@ -15,7 +15,7 @@ SV.registerLayout('LinkList', {
 
     defineOptions() {
         return {
-            node: { 
+            element: { 
                 default: {
                     type: 'link-list-node',
                     label: '[data]',
@@ -107,6 +107,7 @@ SV.registerLayout('LinkList', {
 
     layout(elements, layoutOptions) {
         let root = elements[0];
+
         this.layoutItem(root, null, layoutOptions);
     }
 });

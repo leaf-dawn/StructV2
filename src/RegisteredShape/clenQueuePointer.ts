@@ -1,12 +1,11 @@
-import G6 from '@antv/g6';
+import * as G6 from "../Lib/g6.js";
 
 
 export default G6.registerNode('clen-queue-pointer', {
     draw(cfg, group) {
-        let id = cfg.id as string;
-
-        const index = parseInt(id.split('-')[1]);
-        const len = parseInt(id.split('-')[2]);
+        // console.log(cfg);
+        const index = cfg.id.split('-')[1];
+        const len = cfg.id.split('-')[2];
         const keyShape = group.addShape('path', {
             attrs: {
                 x: 0,
@@ -17,7 +16,6 @@ export default G6.registerNode('clen-queue-pointer', {
             },
             name: 'pointer-path'
         });
-
         const angle = index *  Math.PI * 2 / len;
         if (cfg.label) {
             const style = (cfg.labelCfg && cfg.labelCfg.style) || {};
@@ -34,10 +32,7 @@ export default G6.registerNode('clen-queue-pointer', {
                 },
                 name: 'bgRect'
             });
-
-            let label = cfg.label as string;
-
-            let pointerText = label.split('-')[0];
+            let pointerText = cfg.label.split('-')[0];
             let y = pointerText=="front"?30:15;
             const text = group.addShape('text', {
                 attrs: {

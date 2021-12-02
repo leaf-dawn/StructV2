@@ -1,8 +1,7 @@
-import { EdgeConfig, GraphData, NodeConfig } from "@antv/g6-core";
 import { LayoutGroup, LayoutGroupTable } from "../Model/modelConstructor";
-import { SVLink } from "../Model/SVLink";
-import { SVModel } from "../Model/SVModel";
+import { G6EdgeModel, G6NodeModel, Link, Model } from "../Model/modelData";
 import { SV } from "../StructV";
+import { G6Data } from "../View/renderer";
 
 
 /**
@@ -90,8 +89,8 @@ export const Util = {
      * @param groupTable 
      * @returns 
      */
-    convertGroupTable2ModelList(groupTable: LayoutGroupTable): SVModel[] {
-        const list: SVModel[] = [];
+    convertGroupTable2ModelList(groupTable: LayoutGroupTable): Model[] {
+        const list: Model[] = [];
 
         groupTable.forEach(item => {
             list.push(...item.modelList);
@@ -105,13 +104,13 @@ export const Util = {
      * @param layoutGroup 
      * @returns 
      */
-    convertG6Data(layoutGroup: LayoutGroup): GraphData {
-        let nodes = [...layoutGroup.node, ...layoutGroup.marker],
+    convertG6Data(layoutGroup: LayoutGroup): G6Data {
+        let nodes = [...layoutGroup.element, ...layoutGroup.marker],
             edges = layoutGroup.link;
 
         return { 
-            nodes: nodes.map(item => item.getG6ModelProps()) as NodeConfig[], 
-            edges: edges.map(item => item.getG6ModelProps()) as EdgeConfig[]
+            nodes: nodes.map(item => item.cloneProps()) as G6NodeModel[], 
+            edges: edges.map(item => item.cloneProps()) as G6EdgeModel[]
         };
     },
 
@@ -119,10 +118,10 @@ export const Util = {
      * 将 modelList 转换到 G6Data
      * @param modelList
      */
-    convertModelList2G6Data(modelList: SVModel[]): GraphData {
+    convertModelList2G6Data(modelList: Model[]): G6Data {
         return {
-            nodes: <NodeConfig[]>(modelList.filter(item => !(item instanceof SVLink)).map(item => item.getG6ModelProps())),
-            edges: <EdgeConfig[]>(modelList.filter(item => item instanceof SVLink).map(item => item.getG6ModelProps()))
+            nodes: <G6NodeModel[]>(modelList.filter(item => !(item instanceof Link)).map(item => item.cloneProps())),
+            edges: <G6EdgeModel[]>(modelList.filter(item => item instanceof Link).map(item => item.cloneProps()))
         }
     },
 
@@ -137,5 +136,4 @@ export const Util = {
         return matrix;
     }
 };
-
 

@@ -3,7 +3,7 @@
 /**
  * 单链表
  */
- SV.registerLayout('LinkStack', {
+ SV.registerLayouter('LinkStack', {
     sourcesPreprocess(sources) {
         const headNode = sources[0];
 

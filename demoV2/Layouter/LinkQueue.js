@@ -2,7 +2,7 @@
 
 
 
-SV.registerLayout('LinkQueue', {
+SV.registerLayouter('LinkQueue', {
 
     defineOptions() {
         return {

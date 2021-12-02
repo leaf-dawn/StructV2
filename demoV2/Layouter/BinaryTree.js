@@ -1,6 +1,6 @@
 
 
-SV.registerLayout('BinaryTree', {
+SV.registerLayouter('BinaryTree', {
     defineOptions() {
         return {
             element: { 

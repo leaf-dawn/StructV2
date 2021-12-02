@@ -1,4 +1,4 @@
-import G6 from '@antv/g6';
+import * as G6 from "./../Lib/g6.js";
 
 
 export default G6.registerNode('binary-tree-node', {

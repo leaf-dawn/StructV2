@@ -1,7 +1,7 @@
 
 
 
-SV.registerLayout('Array', {
+SV.registerLayouter('Array', {
 
     sourcesPreprocess(sources) {
         const firstElement = sources[0];

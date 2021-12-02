@@ -1,7 +1,7 @@
 
 
 
-SV.registerLayout('AdjoinTableGraph', {
+SV.registerLayouter('AdjoinTableGraph', {
 
     sourcesPreprocess(sources, options) {
         let dataLength = sources.length;

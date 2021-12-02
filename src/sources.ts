@@ -6,17 +6,17 @@ export type LinkTarget = number | string;
 export type sourceLinkData = LinkTarget | LinkTarget[];
 
 // 结点指针声明
-export type sourcePointerData = string | string[];
+export type sourceMarkerData = string | string[];
 
 // 源数据单元
-export interface SourceElement {
+export interface SourceNode {
     id: string | number;
-    [key: string]: any | sourceLinkData | sourcePointerData;
+    [key: string]: any | sourceLinkData | sourceMarkerData;
 }
 
 
 export type Sources = {
-    [key: string]: { data: SourceElement[]; layouter: string; }
+    [key: string]: { data: SourceNode[]; layouter: string; }
 };
     
 

@@ -1,10 +1,9 @@
 {
   "dependencies": {
-    "@antv/g6": "^4.2.1",
+    "@antv/g6": "^4.4.1",
     "awesome-typescript-loader": "^5.2.1",
     "typescript": "^3.2.2",
-    "webpack": "^4.28.2",
-    "zrender": "^5.0.3"
+    "webpack": "^4.28.2"
   },
   "devDependencies": {
     "webpack-cli": "^3.2.3"

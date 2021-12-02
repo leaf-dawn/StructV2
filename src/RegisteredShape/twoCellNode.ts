@@ -1,4 +1,4 @@
-import * as G6 from "./../Lib/g6.js";
+import G6 from '@antv/g6';
 
 
 

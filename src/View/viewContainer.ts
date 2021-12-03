@@ -6,7 +6,7 @@ import { SVModel } from "../Model/SVModel";
 import { Renderer } from "./renderer";
 import { Reconcile } from "./reconcile";
 import { FixNodeMarkerDrag } from "../BehaviorHelper/fixNodeMarkerDrag";
-import { InitDragCanvasWithLeak } from "../BehaviorHelper/dragCanavsWithLeak";
+import { InitDragCanvasWithLeak } from "../BehaviorHelper/dragCanvasWithLeak";
 import { EventBus } from "../Common/eventBus";
 import { Group } from "../Common/group";
 
@@ -144,6 +144,10 @@ export class ViewContainer {
 
         this.prevLayoutGroupTable = layoutGroupTable;
         this.prevModelList = modelList;
+
+        // modelList.forEach(item => {
+        //     console.log(item.getModelType(), item.getBound());
+        // });
     }
 
     /**

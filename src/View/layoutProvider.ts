@@ -186,8 +186,8 @@ export class LayoutProvider {
 
         // 左往右布局
         for (let i = 0; i < modelGroupList.length; i++) {
-            group = modelGroupList[i],
-                bound = group.getPaddingBound(this.viewOptions.groupPadding);
+            group = modelGroupList[i];
+            bound = group.getPaddingBound(this.viewOptions.groupPadding);
 
             if (prevBound) {
                 dx = prevBound.x + prevBound.width - bound.x;
@@ -231,7 +231,7 @@ export class LayoutProvider {
             height = this.viewContainer.getG6Instance().getHeight(),
             leakAreaHeightRatio = this.engine.viewOptions.leakAreaHeight;
 
-        if(this.viewContainer.hasLeak) {
+        if (this.viewContainer.hasLeak) {
             height = height * (1 - leakAreaHeightRatio);
         }
 

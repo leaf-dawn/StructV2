@@ -10,7 +10,7 @@ import { SVMarker } from "./Model/SVMarker";
 
 
 export class Engine { 
-    private modelConstructor: ModelConstructor = null;
+    private modelConstructor: ModelConstructor;
     private viewContainer: ViewContainer
     private prevStringSourceData: string;
     
@@ -50,12 +50,6 @@ export class Engine {
         Object.keys(SV.registeredLayout).forEach(layout => {
             if(this.optionsTable[layout] === undefined) {
                  const options: LayoutGroupOptions = SV.registeredLayout[layout].defineOptions();
-
-                 options.behavior = Object.assign({
-                     dragNode: true,
-                     selectNode: true
-                 }, options.behavior);
-
                  this.optionsTable[layout] = options;
             }
         });

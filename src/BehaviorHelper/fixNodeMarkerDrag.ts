@@ -7,7 +7,7 @@ import { LayoutGroupOptions } from "../options";
  * 在初始化渲染器之后，修正节点拖拽时，外部指针没有跟着动的问题
  * 
  */
-export function FixNodeMarkerDrag(g6Instance: Graph, optionsTable: { [key: string]: LayoutGroupOptions }) {
+export function FixNodeMarkerDrag(g6Instance: Graph) {
     let dragActive: boolean = false;
 
     const nodeData = {
@@ -34,16 +34,6 @@ export function FixNodeMarkerDrag(g6Instance: Graph, optionsTable: { [key: strin
 
         if (node.isNode() === false || node.leaked) {
             return false;
-        }
-
-        const dragNode = optionsTable[node.layout].behavior.dragNode;
-
-        if (dragNode === false) {
-            return;
-        }
-
-        if (Array.isArray(dragNode) && dragNode.find(item => item === node.sourceType) === undefined) {
-            return;
         }
 
         dragActive = true;

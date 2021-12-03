@@ -50,7 +50,7 @@ export class ViewContainer {
             // InitZoomCanvas(g6Instance, g6GeneralGroup);
         }
 
-        FixNodeMarkerDrag(g6Instance, this.engine.optionsTable);
+        FixNodeMarkerDrag(g6Instance);
     }
 
 
@@ -144,10 +144,6 @@ export class ViewContainer {
 
         this.prevLayoutGroupTable = layoutGroupTable;
         this.prevModelList = modelList;
-
-        // modelList.forEach(item => {
-        //     console.log(item.getModelType(), item.getBound());
-        // });
     }
 
     /**

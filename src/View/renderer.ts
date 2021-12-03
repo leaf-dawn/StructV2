@@ -55,7 +55,7 @@ export class Renderer {
             },
             fitView: false,
             modes: {
-                default: InitViewBehaviors(this.engine.optionsTable)
+                default: InitViewBehaviors()
             },
             plugins: [tooltip]
         });

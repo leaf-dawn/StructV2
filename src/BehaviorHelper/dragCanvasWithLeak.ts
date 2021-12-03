@@ -5,7 +5,7 @@ import { ViewContainer } from "../View/viewContainer";
 
 
 /**
- * 初始化视图拖拽功能
+ * 
  * @param g6Instance 
  * @param hasLeak 
  */

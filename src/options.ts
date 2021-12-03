@@ -71,15 +71,8 @@ export interface MarkerOption extends NodeOption {
 };
 
 
-
 export interface LayoutOptions {
     [key: string]: any;
-};
-
-
-export interface BehaviorOptions {
-    dragNode: boolean | string[];
-    selectNode: boolean | string[];
 };
 
 
@@ -88,7 +81,6 @@ export interface LayoutGroupOptions {
     link?: { [key: string]: LinkOption }
     marker?: { [key: string]: MarkerOption }
     layout?: LayoutOptions;
-    behavior?: BehaviorOptions;
 };
 
 

@@ -1,10 +1,10 @@
-import { Util } from '@antv/g6';
+import { Util, Item } from '@antv/g6';
 
 
 export type animationConfig = {
     duration: number;
     timingFunction: string;
-    callback?: Function;
+    callback?: () => void;
     [key: string]: any;
 }
 
@@ -19,7 +19,7 @@ export const Animations = {
      * @param G6Item 
      * @param animationConfig
      */
-    APPEND(G6Item: any, animationConfig: animationConfig) {
+    APPEND(G6Item: Item, animationConfig: animationConfig) {
         const type = G6Item.getType(),
             group = G6Item.getContainer(),
             Mat3 = Util.mat3,
@@ -54,7 +54,7 @@ export const Animations = {
      * @param G6Item 
      * @param animationConfig
      */
-    REMOVE(G6Item: any, animationConfig: animationConfig) {
+    REMOVE(G6Item: Item, animationConfig: animationConfig) {
         const type = G6Item.getType(),
             group = G6Item.getContainer(),
             Mat3 = Util.mat3,
@@ -84,7 +84,7 @@ export const Animations = {
      * @param G6Item 
      * @param animationConfig 
      */
-    FADE_IN(G6Item: any, animationConfig: animationConfig) {
+    FADE_IN(G6Item: Item, animationConfig: animationConfig) {
         const group = G6Item.getContainer(),
             animateCfg = {
                 duration: animationConfig.duration,

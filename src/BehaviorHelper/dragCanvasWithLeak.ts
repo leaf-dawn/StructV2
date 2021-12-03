@@ -11,15 +11,21 @@ import { ViewContainer } from "../View/viewContainer";
  */
 export function InitDragCanvasWithLeak(viewContainer: ViewContainer) {
     let g6Instance = viewContainer.getG6Instance(),
+        isDragStart = false,
         startPositionY = 0,
         currentLeakAreaY = 0;
 
     g6Instance.on('canvas:dragstart', event => {
+        isDragStart = true;
         startPositionY = event.canvasY;
         currentLeakAreaY = viewContainer.leakAreaY;
     });
 
     g6Instance.on('canvas:drag', event => {
+        if(!isDragStart) {
+            return false;
+        }
+
         let zoom = g6Instance.getZoom(),
             dy = (event.canvasY - startPositionY) / zoom,
             leakAreaY = currentLeakAreaY + dy;
@@ -34,6 +40,7 @@ export function InitDragCanvasWithLeak(viewContainer: ViewContainer) {
     });
 
     g6Instance.on('canvas:dragend', event => {
+        isDragStart = false;
         startPositionY = 0;
     })
 }

@@ -10,7 +10,7 @@ import { SVMarker } from "./Model/SVMarker";
 
 
 export class Engine { 
-    private modelConstructor: ModelConstructor = null;
+    private modelConstructor: ModelConstructor;
     private viewContainer: ViewContainer
     private prevStringSourceData: string;
     
@@ -50,12 +50,6 @@ export class Engine {
         Object.keys(SV.registeredLayout).forEach(layout => {
             if(this.optionsTable[layout] === undefined) {
                  const options: LayoutGroupOptions = SV.registeredLayout[layout].defineOptions();
-
-                 options.behavior = Object.assign({
-                     dragNode: true,
-                     selectNode: true
-                 }, options.behavior);
-
                  this.optionsTable[layout] = options;
             }
         });
@@ -70,10 +64,6 @@ export class Engine {
      */
     public render(sourceData: Sources) {
         if(sourceData === undefined || sourceData === null) {
-            return;
-        }
-
-        if(this.viewContainer.getG6Instance().isAnimating()) {
             return;
         }
 
@@ -202,12 +192,12 @@ export class Engine {
      * 使用id查找某个节点
      * @param id 
      */
-    public findElement(id: string) {
-        const elements = this.getNodes();
+    public findNode(id: string): SVNode {
+        const nodes = this.getNodes();
         const stringId = id.toString();
-        const targetElement = elements.find(item => item.sourceId === stringId);
+        const targetNode = nodes.find(item => item.sourceId === stringId);
 
-        return targetElement;
+        return targetNode;
     }
 
     /**

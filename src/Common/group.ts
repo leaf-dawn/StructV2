@@ -2,6 +2,7 @@ import { Util } from "./util";
 import { BoundingRect, Bound } from "./boundingRect";
 import { SVModel } from "../Model/SVModel";
 import { ext } from '@antv/matrix-util';
+import { SVLink } from "../Model/SVLink";
 
 
 

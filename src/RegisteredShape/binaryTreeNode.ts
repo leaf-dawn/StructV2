@@ -1,7 +1,7 @@
-import G6 from '@antv/g6';
+import { registerNode } from '@antv/g6';
 
 
-export default G6.registerNode('binary-tree-node', {
+export default registerNode('binary-tree-node', {
     draw(cfg, group) {
         cfg.size = cfg.size;
 

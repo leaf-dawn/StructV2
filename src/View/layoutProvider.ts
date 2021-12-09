@@ -1,9 +1,11 @@
 import { IPoint } from '@antv/g6-core';
 import { Bound, BoundingRect } from '../Common/boundingRect';
 import { Group } from '../Common/group';
+import { Util } from '../Common/util';
 import { Vector } from '../Common/vector';
 import { Engine } from '../engine';
 import { LayoutGroupTable } from '../Model/modelConstructor';
+import { SVLink } from '../Model/SVLink';
 import { SVMarker } from '../Model/SVMarker';
 import { SVModel } from '../Model/SVModel';
 import { SVFreedLabel, SVLeakAddress, SVNode } from '../Model/SVNode';
@@ -24,14 +26,34 @@ export class LayoutProvider {
 
 
     /**
-     * 初始化布局参数
-     * @param nodes 
-     * @param markers 
+     * 布局前处理
+     * @param layoutGroupTable
      */
-    private initLayoutValue(nodes: SVNode[], markers: SVMarker[]) {
-        [...nodes, ...markers].forEach(item => {
+    private preLayoutProcess(layoutGroupTable: LayoutGroupTable) {
+        const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
+
+        modelList.forEach(item => {
+            item.preLayout = true;
+
             item.set('rotation', item.get('rotation'));
             item.set({ x: 0, y: 0 });
+        });
+    }
+
+    /**
+     * 布局后处理
+     * @param layoutGroupTable 
+     */
+    private postLayoutProcess(layoutGroupTable: LayoutGroupTable) {
+        const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
+
+        modelList.forEach(item => {
+            item.preLayout = false;
+
+            // 用两个变量保存节点布局完成后的坐标，因为拖拽节点会改变节点的x，y坐标
+            // 然后当节点移动到泄漏区的时候，不应该保持节点被拖拽后的状态，应该恢复到布局完成后的状态，不然就会很奇怪
+            item.layoutX = item.get('x');
+            item.layoutY = item.get('y');
         });
     }
 
@@ -132,7 +154,6 @@ export class LayoutProvider {
                 modelGroup.add(item);
             });
 
-            this.initLayoutValue(group.node, group.marker); // 初始化布局参数
             group.layoutCreator.layout(group.node, options);  // 布局节点
             modelGroupList.push(modelGroup);
         });
@@ -154,9 +175,16 @@ export class LayoutProvider {
     private layoutLeakModels(leakModels: SVModel[], accumulateLeakModels: SVModel[]) {
         const group: Group = new Group(),
             containerHeight = this.viewContainer.getG6Instance().getHeight(),
-            leakAreaHeightRatio = this.engine.viewOptions.leakAreaHeight,
-            leakAreaY = containerHeight * (1 - leakAreaHeightRatio),
+            leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
+            leakAreaY = containerHeight - leakAreaHeight,
             xOffset = 50;
+
+        leakModels.forEach(item => {
+            item.set({
+                x: item.layoutX,
+                y: item.layoutY
+            });
+        });
 
         group.add(...leakModels);
         const currentLeakGroupBound: BoundingRect = group.getBound(),
@@ -181,8 +209,7 @@ export class LayoutProvider {
             prevBound: BoundingRect,
             bound: BoundingRect,
             boundList: BoundingRect[] = [],
-            maxHeight: number = -Infinity,
-            dx = 0, dy = 0;
+            dx = 0;
 
         // 左往右布局
         for (let i = 0; i < modelGroupList.length; i++) {
@@ -196,25 +223,11 @@ export class LayoutProvider {
                 dx = bound.x;
             }
 
-            if (bound.height > maxHeight) {
-                maxHeight = bound.height;
-            }
-
             group.translate(dx, 0);
             Bound.translate(bound, dx, 0);
             boundList.push(bound);
             wrapperGroup.add(group);
             prevBound = bound;
-        }
-
-        // 居中对齐布局
-        for (let i = 0; i < modelGroupList.length; i++) {
-            group = modelGroupList[i];
-            bound = boundList[i];
-
-            dy = maxHeight / 2 - bound.height / 2;
-            group.translate(0, dy);
-            Bound.translate(bound, 0, dy);
         }
 
         return wrapperGroup;
@@ -229,10 +242,10 @@ export class LayoutProvider {
     private fitCenter(group: Group) {
         let width = this.viewContainer.getG6Instance().getWidth(),
             height = this.viewContainer.getG6Instance().getHeight(),
-            leakAreaHeightRatio = this.engine.viewOptions.leakAreaHeight;
+            leakAreaHeight = this.engine.viewOptions.leakAreaHeight;
 
         if (this.viewContainer.hasLeak) {
-            height = height * (1 - leakAreaHeightRatio);
+            height = height - leakAreaHeight;
         }
 
         const viewBound: BoundingRect = group.getBound(),
@@ -245,6 +258,8 @@ export class LayoutProvider {
         group.translate(dx, dy);
     }
 
+
+
     /**
      * 布局
      * @param layoutGroupTable 
@@ -252,13 +267,16 @@ export class LayoutProvider {
      * @param hasLeak
      */
     public layoutAll(layoutGroupTable: LayoutGroupTable, accumulateLeakModels: SVModel[], leakModels: SVModel[]) {
+        this.preLayoutProcess(layoutGroupTable);
+
         const modelGroupList: Group[] = this.layoutModels(layoutGroupTable);
-        const globalGroup: Group = this.layoutGroups(modelGroupList);
+        const generalGroup: Group = this.layoutGroups(modelGroupList);
 
         if (leakModels.length) {
             this.layoutLeakModels(leakModels, accumulateLeakModels);
         }
 
-        this.fitCenter(globalGroup);
+        this.fitCenter(generalGroup);
+        this.postLayoutProcess(layoutGroupTable);
     }
 }

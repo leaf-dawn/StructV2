@@ -72,11 +72,14 @@ export class ModelConstructor {
                 markerOptions = options.marker || {};
 
             nodeList = this.constructNodes(nodeOptions, group, sourceData, layout);
-            leakAddress = nodeList.map(item => item.leakAddress);
             markerList = this.constructMarkers(group, layout, markerOptions, nodeList);
             nodeList.forEach(item => {
                 if(item.freedLabel) {
                     freedLabelList.push(item.freedLabel);
+                }
+
+                if(item.leakAddress) {
+                    leakAddress.push(item.leakAddress);
                 }
             });
 

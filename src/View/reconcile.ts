@@ -91,8 +91,10 @@ export class Reconcile {
                     leakModels.push(item.freedLabel);
                 }
 
-                item.leakAddress.leaked = true;
-                leakModels.push(item.leakAddress);
+                if(item.leakAddress) {
+                    item.leakAddress.leaked = true;
+                    leakModels.push(item.leakAddress);
+                }
             }
         });
 

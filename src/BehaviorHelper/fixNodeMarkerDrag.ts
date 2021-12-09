@@ -1,6 +1,5 @@
-import { Graph } from "@antv/g6-pc";
+import { Graph } from "@antv/g6";
 import { SVNode } from "../Model/SVNode";
-import { LayoutGroupOptions } from "../options";
 
 
 /**
@@ -58,14 +57,11 @@ export function FixNodeMarkerDrag(g6Instance: Graph) {
             return false;
         }
 
-        let distanceX = event.canvasX - nodeData.startX,
-            distanceY = event.canvasY - nodeData.startY,
-            nodeX = nodeData.node.get('x'),
-            nodeY = nodeData.node.get('y');
+        let node: SVNode = nodeData.node;
 
-        nodeData.node.set({
-            x: nodeX + distanceX,
-            y: nodeY + distanceY
+        node.set({
+            x: node.G6Item.getModel().x,
+            y: node.G6Item.getModel().y
         });
 
         nodeData.node = null;

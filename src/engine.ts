@@ -29,7 +29,7 @@ export class Engine {
             fitCenter: true,
             fitView: false,
             groupPadding: 20,
-            leakAreaHeight: 0.3,
+            leakAreaHeight: 150,
             updateHighlight: '#fc5185'
         }, engineOptions.view);
 
@@ -85,19 +85,6 @@ export class Engine {
      */
     public reLayout() {
         this.viewContainer.reLayout();
-
-        // layoutGroupTable.forEach(group => {
-        //     group.modelList.forEach(item => {
-        //         if(item instanceof SVLink) return;
-
-        //         let model = item.G6Item.getModel(),
-        //             x = item.get('x'),
-        //             y = item.get('y');
-
-        //         model.x = x;
-        //         model.y = y;
-        //     });
-        // });
     }
 
     /**

@@ -11,38 +11,26 @@ import { ViewContainer } from "../View/viewContainer";
  */
 export function InitDragCanvasWithLeak(viewContainer: ViewContainer) {
     let g6Instance = viewContainer.getG6Instance(),
-        isDragStart = false,
-        startPositionY = 0,
-        currentLeakAreaY = 0;
+        prevDy = 0;
 
-    g6Instance.on('canvas:dragstart', event => {
-        isDragStart = true;
-        startPositionY = event.canvasY;
-        currentLeakAreaY = viewContainer.leakAreaY;
-    });
-
-    g6Instance.on('canvas:drag', event => {
-        if(!isDragStart) {
+    g6Instance.on('viewportchange', event => {
+        if(event.action !== 'translate') {
             return false;
         }
 
-        let zoom = g6Instance.getZoom(),
-            dy = (event.canvasY - startPositionY) / zoom,
-            leakAreaY = currentLeakAreaY + dy;
+        let translateX = event.matrix[7],
+            dy = translateX- prevDy;
+            
+        prevDy = translateX;
 
-        viewContainer.leakAreaY = leakAreaY;
-        if(viewContainer.hasLeak) {
-            EventBus.emit('onLeakAreaUpdate', { 
-                leakAreaY: viewContainer.leakAreaY, 
-                hasLeak: viewContainer.hasLeak 
+        viewContainer.leakAreaY = viewContainer.leakAreaY + dy;
+        if (viewContainer.hasLeak) {
+            EventBus.emit('onLeakAreaUpdate', {
+                leakAreaY: viewContainer.leakAreaY,
+                hasLeak: viewContainer.hasLeak
             });
         }
     });
-
-    g6Instance.on('canvas:dragend', event => {
-        isDragStart = false;
-        startPositionY = 0;
-    })
 }
 
 

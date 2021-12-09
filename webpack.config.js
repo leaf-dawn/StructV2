@@ -2,6 +2,7 @@ const path = require('path');
 
 
 module.exports = {
+    mode: 'development',
     entry: './src/StructV.ts',
     output: {
 		filename: './sv.js',
@@ -15,9 +16,9 @@ module.exports = {
 			{
 				test: /\.ts$/,
 				exclude: /node_modules/, 
-				loader: 'awesome-typescript-loader'
+				loader: 'ts-loader'
 			}
 		]
 	},
-	devtool: 'eval-source-map'
+	// devtool: 'eval-source-map'
 };

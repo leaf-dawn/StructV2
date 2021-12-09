@@ -1,8 +1,8 @@
-import G6 from '@antv/g6';
+import { registerNode } from '@antv/g6';
 
 
 
-export default G6.registerNode('two-cell-node', {
+export default registerNode('two-cell-node', {
     draw(cfg, group) {
         cfg.size = cfg.size || [30, 10];
 

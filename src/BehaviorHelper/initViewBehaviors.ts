@@ -18,7 +18,7 @@ export function InitViewBehaviors() {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     const selectNodeFilter = event => {
@@ -29,7 +29,7 @@ export function InitViewBehaviors() {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     defaultModes.push({
@@ -40,6 +40,10 @@ export function InitViewBehaviors() {
     defaultModes.push({
         type: 'drag-canvas'
     });
+
+    // defaultModes.push({
+    //     type: 'zoom-canvas'
+    // });
 
     defaultModes.push({
         type: 'click-select',

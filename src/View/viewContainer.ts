@@ -8,6 +8,7 @@ import { Reconcile } from "./reconcile";
 import { FixNodeMarkerDrag } from "../BehaviorHelper/fixNodeMarkerDrag";
 import { InitDragCanvasWithLeak } from "../BehaviorHelper/dragCanvasWithLeak";
 import { EventBus } from "../Common/eventBus";
+import { InitZoomCanvasWithLeak } from "../BehaviorHelper/zoomCanvasWithLeak";
 import { Group } from "../Common/group";
 
 
@@ -40,14 +41,14 @@ export class ViewContainer {
             height = this.getG6Instance().getHeight(),
             { drag, zoom } = this.engine.interactionOptions;
 
-        this.leakAreaY = height * (1 - leakAreaHeight);
+        this.leakAreaY = height - leakAreaHeight;
 
         if (drag) {
             InitDragCanvasWithLeak(this);
         }
 
         if (zoom) {
-            // InitZoomCanvas(g6Instance, g6GeneralGroup);
+            // InitZoomCanvasWithLeak(this);
         }
 
         FixNodeMarkerDrag(g6Instance);
@@ -61,6 +62,7 @@ export class ViewContainer {
      */
     reLayout() {
         this.layoutProvider.layoutAll(this.prevLayoutGroupTable, [], this.accumulateLeakModels);
+        this.getG6Instance().refresh();
     }
 
 
@@ -84,17 +86,20 @@ export class ViewContainer {
      * @param height 
      */
     resize(width: number, height: number) {
-        this.renderer.getG6Instance().changeSize(width, height);
+        const g6Instance = this.getG6Instance(),
+            prevContainerHeight = g6Instance.getHeight(),
+            globalGroup: Group = new Group();
 
-        const containerHeight = this.getG6Instance().getHeight(),
-            leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
-            targetY = containerHeight * (1 - leakAreaHeight);
+        globalGroup.add(...this.prevModelList, ...this.accumulateLeakModels);
+        this.renderer.changeSize(width, height);
 
-        const accumulateLeakGroup = new Group();
-        accumulateLeakGroup.add(...this.accumulateLeakModels);
-        accumulateLeakGroup.translate(0, targetY - this.leakAreaY);
-        this.leakAreaY = targetY;
+        const containerHeight = g6Instance.getHeight(),
+            dy = containerHeight - prevContainerHeight;
 
+        globalGroup.translate(0, dy);
+        this.renderer.refresh();
+
+        this.leakAreaY += dy;
         EventBus.emit('onLeakAreaUpdate', {
             leakAreaY: this.leakAreaY,
             hasLeak: this.hasLeak
@@ -131,7 +136,7 @@ export class ViewContainer {
                 hasLeak: this.hasLeak
             });
         }
-        
+
         this.renderer.build(renderModelList); // 首先在离屏canvas渲染先
         this.layoutProvider.layoutAll(layoutGroupTable, this.accumulateLeakModels, diffResult.LEAKED); // 进行布局（设置model的x，y，样式等）
 

@@ -2,7 +2,7 @@ import { EdgeConfig, GraphData, NodeConfig } from "@antv/g6-core";
 import { LayoutGroup, LayoutGroupTable } from "../Model/modelConstructor";
 import { SVLink } from "../Model/SVLink";
 import { SVModel } from "../Model/SVModel";
-import { SV } from "../StructV";
+import { Util as G6Util } from '@antv/g6';
 
 
 /**
@@ -132,7 +132,7 @@ export const Util = {
      * @param rotation 
      */
     calcRotateMatrix(matrix: number[], rotation: number): number[] {
-        const Mat3 = SV.G6.Util.mat3;
+        const Mat3 = G6Util.mat3;
         Mat3.rotate(matrix, matrix, rotation);
         return matrix;
     }

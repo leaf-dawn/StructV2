@@ -102,7 +102,8 @@ export class SVModel {
         // 更新G6Item
         if (this.G6Item) {
             if (this.preLayout) {
-                this.G6Item.getModel()[attr] = value;
+                const G6ItemModel = this.G6Item.getModel();
+                G6ItemModel[attr] = value;
             }
             else {
                 this.g6Instance.updateItem(this.G6Item, this.G6ModelProps);

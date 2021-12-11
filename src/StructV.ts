@@ -26,7 +26,7 @@ export interface StructV {
 
     registeredShape: any[];
 
-    registeredLayout: { [key: string]: LayoutCreator },
+    registeredLayout: { [key: string]: { [key: string]: LayoutCreator } },
 
     registerShape: Function,
 
@@ -61,7 +61,7 @@ SV.registeredShape = [
 ];
 
 SV.registerShape = G6.registerNode;
-SV.registerLayout = function(name: string, layoutCreator: LayoutCreator) {
+SV.registerLayout = function(name: string, layoutCreator: LayoutCreator, mode: string = 'default') {
 
     if(typeof layoutCreator.sourcesPreprocess !== 'function') {
         layoutCreator.sourcesPreprocess = function(data: SourceNode[]): SourceNode[] {
@@ -78,8 +78,12 @@ SV.registerLayout = function(name: string, layoutCreator: LayoutCreator) {
     if(typeof layoutCreator.defineOptions !== 'function' || typeof layoutCreator.layout !== 'function') {
         return;
     }
+
+    if(SV.registeredLayout[name] === undefined) {
+        SV.registeredLayout[name] = {};
+    }
     
-    SV.registeredLayout[name] = layoutCreator;
+    SV.registeredLayout[name][mode] = layoutCreator;
 };
 
 

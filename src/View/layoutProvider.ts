@@ -265,6 +265,7 @@ export class LayoutProvider {
      * @param layoutGroupTable 
      * @param leakModels
      * @param hasLeak
+     * @param needFitCenter
      */
     public layoutAll(layoutGroupTable: LayoutGroupTable, accumulateLeakModels: SVModel[], leakModels: SVModel[]) {
         this.preLayoutProcess(layoutGroupTable);

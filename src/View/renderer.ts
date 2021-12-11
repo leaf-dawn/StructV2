@@ -115,6 +115,9 @@ export class Renderer {
             item.G6Item = this.g6Instance.findById(item.id);
             item.G6Item['SVModel'] = item;
         });
+
+        this.g6Instance.getEdges().forEach(item => item.toFront());
+        this.g6Instance.paint();
     }
 
     /**

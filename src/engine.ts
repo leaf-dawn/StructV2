@@ -1,6 +1,6 @@
 import { Sources } from "./sources";
 import { ModelConstructor } from "./Model/modelConstructor";
-import { AnimationOptions, EngineOptions, InteractionOptions, LayoutGroupOptions, ViewOptions } from "./options";
+import { AnimationOptions, EngineOptions, InteractionOptions, ViewOptions } from "./options";
 import { SV } from "./StructV";
 import { EventBus } from "./Common/eventBus";
 import { ViewContainer } from "./View/viewContainer";
@@ -11,18 +11,16 @@ import { SVMarker } from "./Model/SVMarker";
 
 export class Engine { 
     private modelConstructor: ModelConstructor;
-    private viewContainer: ViewContainer
-    private prevStringSourceData: string;
+    private viewContainer: ViewContainer;
+    private prevSource: Sources;
+    private prevStringSource: string;
     
     public engineOptions: EngineOptions;
     public viewOptions: ViewOptions;
     public animationOptions: AnimationOptions;
     public interactionOptions: InteractionOptions;
 
-    public optionsTable: { [key: string]: LayoutGroupOptions };
-
     constructor(DOMContainer: HTMLElement, engineOptions: EngineOptions) {
-        this.optionsTable = {};
         this.engineOptions = Object.assign({}, engineOptions);
 
         this.viewOptions = Object.assign({
@@ -46,39 +44,54 @@ export class Engine {
             selectNode: true
         }, engineOptions.interaction);
 
-        // 初始化布局器配置项
-        Object.keys(SV.registeredLayout).forEach(layout => {
-            if(this.optionsTable[layout] === undefined) {
-                 const options: LayoutGroupOptions = SV.registeredLayout[layout].defineOptions();
-                 this.optionsTable[layout] = options;
-            }
-        });
-
         this.modelConstructor = new ModelConstructor(this);
         this.viewContainer = new ViewContainer(this, DOMContainer);
     }
 
     /**
      * 输入数据进行渲染
-     * @param sourcesData 
+     * @param sources
      */
-    public render(sourceData: Sources) {
-        if(sourceData === undefined || sourceData === null) {
+    public render(source: Sources) {
+        if(source === undefined || source === null) {
+            return;
+        }
+``
+        let stringSource = JSON.stringify(source);
+        if(this.prevStringSource === stringSource) {
             return;
         }
 
-        let stringSourceData = JSON.stringify(sourceData);
-        if(this.prevStringSourceData === stringSourceData) {
-            return;
-        }
-        this.prevStringSourceData = stringSourceData;
+        this.prevSource = source;
+        this.prevStringSource = stringSource;
 
         // 1 转换模型（data => model）
-        const layoutGroupTable = this.modelConstructor.construct(sourceData);
+        const layoutGroupTable = this.modelConstructor.construct(source);
         
         // 2 渲染（使用g6进行渲染）
         this.viewContainer.render(layoutGroupTable);
     }
+
+    /**
+     * 切换指定数据结构的 mode 主题
+     * @param mode 
+     */
+    public switchMode(layout: string, mode: string) {
+        if(this.prevSource === undefined || this.prevSource === null) {
+            return;
+        }
+
+        Object.keys(this.prevSource).map(group => {
+            let sourceGroup = this.prevSource[group];
+            
+            if(sourceGroup.layouter === layout) {
+                sourceGroup.mode = mode;
+            }
+        });
+
+        this.render(this.prevSource);
+    }
+
 
     /**
      * 重新布局

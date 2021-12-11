@@ -61,8 +61,19 @@ export class ViewContainer {
      * 对主视图进行重新布局
      */
     reLayout() {
-        this.layoutProvider.layoutAll(this.prevLayoutGroupTable, [], this.accumulateLeakModels);
-        this.getG6Instance().refresh();
+        const g6Instance = this.getG6Instance(),
+            group = g6Instance.getGroup(),
+            matrix = group.getMatrix();
+
+        if (matrix) {
+            let dx = matrix[6],
+                dy = matrix[7];
+
+            g6Instance.translate(-dx, -dy);
+        }
+
+        this.layoutProvider.layoutAll(this.prevLayoutGroupTable, this.accumulateLeakModels, []);
+        g6Instance.refresh();
     }
 
 
@@ -156,6 +167,11 @@ export class ViewContainer {
      */
     destroy() {
         this.renderer.destroy();
+        this.reconcile.destroy();
+        this.layoutProvider = null;
+        this.prevLayoutGroupTable = null;
+        this.prevModelList.length = 0;
+        this.accumulateLeakModels.length = 0;
     }
 
 
@@ -163,15 +179,9 @@ export class ViewContainer {
 
 
     /**
-     * 把渲染前要触发的逻辑放在这里
+     * 把渲染后要触发的逻辑放在这里
      */
     private afterRender() {
-        const g6Instance = this.renderer.getG6Instance();
-
-        // 把所有连线置顶
-        g6Instance.getEdges().forEach(item => item.toFront());
-        g6Instance.paint();
-
         this.prevModelList.forEach(item => {
             if (item.leaked === false) {
                 item.discarded = true;
@@ -180,11 +190,9 @@ export class ViewContainer {
     }
 
     /**
-     * 把渲染后要触发的逻辑放在这里
+     * 把渲染前要触发的逻辑放在这里
      */
-    private beforeRender() {
-
-    }
+    private beforeRender() { }
 }
 
 

@@ -61,6 +61,7 @@
     <button id="btn-next">next</button>
     <button id="resize">resize</button>
     <button id="relayout">relayout</button>
+    <button id="switch-mode">switch mode</button>
     <span id="pos"></span>
 
     <script src="./../dist/sv.js"></script>
@@ -83,6 +84,7 @@
     <script src="./Layouter/LinkStack.js"></script>
     <script src="./Layouter/AdjoinMatrixGraph.js"></script>
     <script src="./Layouter/AdjoinTableGraph.js"></script>
+    <script src="./Layouter/SqQueue.js"></script>
     <script>
 
         const curSelectData = { element: null, style: null };
@@ -96,39 +98,28 @@
 
 
         let data = [{
-            "LinkList0": {
-                "data": [
-                    { id: 0, data: 'A', index: 1 },
-                    { id: 1, data: 'B', index: 2 },
-                    { id: 2, data: 'C' }
-                ],
-                "layouter": "Array"
-            },
-            "LinkList1": {
-                "data": [
-                    { id: 10, data: 'A', next: 11 },
-                    { id: 11, data: 'B', next: 12 },
-                    { id: 12, data: 'C', next: 13 },
-                    { id: 13, data: 'D' }
-                ],
-                "layouter": "LinkList"
+            Array: {
+                data: [{ id: 1, data: 1 }, { id: 2, data: 2 }, { id: 3, data: 3 }, { id: 4, data: 4 }],
+                layouter: 'Array'
             }
         }, {
-            "LinkList0": {
-                "data": [
-                    { id: 10, data: 'A', next: 11, external: 'true' },
-                    { id: 11, next: 12, freed: true }
-                ],
-                "layouter": "LinkList"
+            Array: {
+                data: [{ id: 1, data: 1 }, { id: 2, data: 2 }, { id: 3, data: 3 }],
+                layouter: 'Array'
             }
         }, {
-            "LinkList0": {
-                "data": [
-                    { id: 0, data: 'A' }
-                ],
-                "layouter": "LinkList"
+            Array: {
+                data: [{ id: 1, data: 1 }, { id: 2, data: 2 }],
+                layouter: 'Array'
+            }
+        }, {
+            Array: {
+                data: [{ id: 1, data: 1 }, { id: 5, data: 5 }],
+                layouter: 'Array'
             }
         }];
+
+
 
 
 
@@ -156,19 +147,22 @@
         });
 
         document.getElementById('resize').addEventListener('click', e => {
-            container.style.height = 400 + 'px';
+            container.style.height = 800 + 'px';
             cur.resize(container.offsetWidth, container.offsetHeight);
         });
 
         document.getElementById('relayout').addEventListener('click', e => {
-            console.log();
             cur.reLayout();
+        });
+
+        document.getElementById('switch-mode').addEventListener('click', e => {
+            cur.switchMode('Array', 'colorful');
         });
 
         const leak = document.getElementById('leak');
 
         cur.on('onLeakAreaUpdate', payload => {
-            leak.style.opacity = payload.hasLeak? 1: 0;
+            leak.style.opacity = payload.hasLeak ? 1 : 0;
             leak.style.top = payload.leakAreaY - 40 + 'px';
         });
 

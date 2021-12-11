@@ -25,7 +25,7 @@ export const Util = {
      * @param obj 
      */
     objectClone<T extends Object>(obj: T): T {
-        return obj? JSON.parse(JSON.stringify(obj)): { };
+        return obj? JSON.parse(JSON.stringify(obj)): null;
     },
 
     /**

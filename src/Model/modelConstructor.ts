@@ -43,13 +43,13 @@ export class ModelConstructor {
      */
     public construct(sources: Sources): LayoutGroupTable {
         const layoutGroupTable = new Map<string, LayoutGroup>(),
-            layoutMap: { [key: string]: LayoutCreator } = SV.registeredLayout,
-            optionsTable = this.engine.optionsTable;
+            layoutMap: { [key: string]: { [key: string]: LayoutCreator } } = SV.registeredLayout;
 
         Object.keys(sources).forEach(group => {
             let sourceGroup = sources[group],
                 layout = sourceGroup.layouter,
-                layoutCreator: LayoutCreator = layoutMap[layout];
+                mode = sourceGroup.mode || 'default',
+                layoutCreator: LayoutCreator = layoutMap[layout][mode];
 
             if (!layout || !layoutCreator) {
                 return;
@@ -66,7 +66,7 @@ export class ModelConstructor {
                 return;
             }
 
-            const options: LayoutGroupOptions = optionsTable[layout],
+            const options: LayoutGroupOptions = layoutCreator.defineOptions(sourceGroup.data),
                 sourceData = layoutCreator.sourcesPreprocess(sourceGroup.data, options),
                 nodeOptions = options.node || options['element'] || {},
                 markerOptions = options.marker || {};
@@ -396,5 +396,6 @@ export class ModelConstructor {
      */
     destroy() {
         this.layoutGroupTable = null;
+        this.prevSourcesStringMap = null;
     }
 };

@@ -3,13 +3,15 @@
     "@antv/g6": "^4.4.1"
   },
   "devDependencies": {
-    "webpack": "^4.46.0",
-    "webpack-cli": "^3.2.3",
     "ts-loader": "^5.2.1",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.2",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.2.3"
   },
   "scripts": {
-    "build": "tsc && webpack",
-    "dev": "webpack --w"
+    "build": "webpack --config webpack.config.product.js",
+    "dep": "webpack --config webpack.config.product.js && node copyDist2Anyview.js",
+    "dev": "webpack --w --config webpack.config.develop.js",
+    "copy": "node copyDist2Anyview.js"
   }
 }

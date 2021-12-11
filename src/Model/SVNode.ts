@@ -116,7 +116,7 @@ export class SVNode extends SVModel {
     }
 
     protected generateG6ModelProps(options: NodeOption): NodeConfig {
-        let indexOptions = Util.objectClone<NodeIndexOption>(options.indexOptions);
+        let indexOptions = Util.objectClone<NodeIndexOption>(options.indexOptions) || { index: { position: 'bottom' } };
 
         if (indexOptions) {
             Object.keys(indexOptions).map(key => {

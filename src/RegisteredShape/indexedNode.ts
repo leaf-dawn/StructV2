@@ -39,7 +39,7 @@ export default registerNode('indexed-node', {
         }
 
         const indexCfg = cfg.indexCfg;
-        const offset = 20;
+        const offset = Number(cfg.style.offset) || 20;
         const indexPositionMap: { [key: string]: (width: number, height: number) => { x: number, y: number } } = {
             top: (width: number, height: number) => ({ x: width, y: height / 2 - offset }),
             right: (width: number, height: number) => ({ x: width * 1.5 + offset, y: height }),

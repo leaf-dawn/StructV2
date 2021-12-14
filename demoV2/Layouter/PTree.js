@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2021-12-12 20:35:54
- * @LastEditTime: 2021-12-13 21:31:01
- * @LastEditors: Please set LastEditors
- * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- * @FilePath: \froend_studentc:\Users\13127\Desktop\最近的前端文件\可视化源码\StructV2\demoV2\Layouter\PTree.js
- */
 
 // 解析数据：
 // {
@@ -50,27 +42,29 @@ SV.registerLayout('PTree', {
 
         return sources;
     },
+
+
     defineOptions() {
         return {
             node: {
                 default: {
-                    type: 'indexed-node',
+                    type: 'rect',
                     label: '[data]',
                     size: [40, 40],
+                    labelOptions: {
+                        style: { fontSize: 16 }
+                    },
                     style: {
                         stroke: '#333',
                         fill: '#95e1d3',
                         offset: 25
-                    },
-                    indexOptions: {
-                        index: { position: 'top' },
-                        indexLeft: { position: 'left' }
                     }
                 },  
             },
-            behavior: {
-                dragNode: false
-            } 
+            indexLabel: {
+                index: { position: 'top' },
+                indexLeft: { position: 'left' }
+            }
         };
     },
 

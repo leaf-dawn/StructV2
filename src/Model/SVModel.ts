@@ -1,9 +1,8 @@
 import { Util } from "../Common/util";
-import { ModelOption, Style } from "../options";
+import { Style } from "../options";
 import { BoundingRect } from "../Common/boundingRect";
 import { EdgeConfig, Item, NodeConfig } from "@antv/g6-core";
-import { Point } from "@antv/g-base";
-import { Graph } from "@antv/g6-pc";
+import { Graph } from "_@antv_g6-pc@0.5.0@@antv/g6-pc";
 
 
 
@@ -53,7 +52,7 @@ export class SVModel {
      * 定义 G6 model 的属性
      * @param option 
      */
-    protected generateG6ModelProps(options: ModelOption) {
+    protected generateG6ModelProps(options: unknown) {
         return null;
     }
 

@@ -2,9 +2,9 @@ import { EventBus } from "../Common/eventBus";
 import { Util } from "../Common/util";
 import { Engine } from "../engine";
 import { SVLink } from "../Model/SVLink";
-import { SVMarker } from "../Model/SVMarker";
 import { SVModel } from "../Model/SVModel";
-import { SVLeakAddress, SVNode } from "../Model/SVNode";
+import { SVNode } from "../Model/SVNode";
+import { SVAddressLabel, SVMarker, SVNodeAppendage } from "../Model/SVNodeAppendage";
 import { Animations } from "./animation";
 import { Renderer } from "./renderer";
 
@@ -58,7 +58,7 @@ export class Reconcile {
         appendModels.forEach(item => {
             let removeIndex = accumulateLeakModels.findIndex(leakModel => item.id === leakModel.id);
 
-            if(removeIndex > -1) {
+            if (removeIndex > -1) {
                 accumulateLeakModels.splice(removeIndex, 1);
             }
         });
@@ -83,20 +83,10 @@ export class Reconcile {
                 item.leaked = true;
                 leakModels.push(item);
 
-                if (item.marker) {
-                    item.marker.leaked = true;
-                    leakModels.push(item.marker);
-                }
-
-                if(item.freedLabel) {
-                    item.marker.leaked = true;
-                    leakModels.push(item.freedLabel);
-                }
-
-                if(item.leakAddress) {
-                    item.leakAddress.leaked = true;
-                    leakModels.push(item.leakAddress);
-                }
+                item.appendages.forEach(appendage => {
+                    appendage.leaked = true;
+                    leakModels.push(appendage);
+                });
             }
         });
 
@@ -184,13 +174,13 @@ export class Reconcile {
      * @param modelList 
      * @returns 
      */
-    private getFreedModels(prevModelList: SVModel[],  modelList: SVModel[]): SVNode[] {
+    private getFreedModels(prevModelList: SVModel[], modelList: SVModel[]): SVNode[] {
         const freedNodes = modelList.filter(item => item instanceof SVNode && item.freed) as SVNode[];
-        
+
         freedNodes.forEach(item => {
             const prev = prevModelList.find(prevModel => item.id === prevModel.id);
 
-            if(prev) {
+            if (prev) {
                 item.set('label', prev.get('label'));
             }
         });
@@ -205,10 +195,10 @@ export class Reconcile {
      * @param continuousModels 
      */
     private handleContinuousModels(continuousModels: SVModel[]) {
-        for(let i = 0; i < continuousModels.length; i++) {
+        for (let i = 0; i < continuousModels.length; i++) {
             let model = continuousModels[i];
 
-            if(model instanceof SVNode) {
+            if (model instanceof SVNode) {
                 const group = model.G6Item.getContainer();
                 group.attr({ opacity: 1 });
             }
@@ -223,9 +213,19 @@ export class Reconcile {
         let { duration, timingFunction } = this.engine.animationOptions;
 
         appendModels.forEach(item => {
-            if(item instanceof SVLeakAddress) {
-                const leakAddressG6Group = item.G6Item.getContainer();
-                leakAddressG6Group.attr({ opacity: 0 });
+            if (item instanceof SVNodeAppendage) {
+                // 先不显示泄漏区节点上面的地址文本
+                if (item instanceof SVAddressLabel) {
+                    // 先将透明度改为0，隐藏掉
+                    const AddressLabelG6Group = item.G6Item.getContainer();
+                    AddressLabelG6Group.attr({ opacity: 0 });
+                }
+                else {
+                    Animations.FADE_IN(item.G6Item, {
+                        duration,
+                        timingFunction
+                    });
+                }
             }
             else {
                 Animations.APPEND(item.G6Item, {
@@ -262,7 +262,7 @@ export class Reconcile {
         let { duration, timingFunction } = this.engine.animationOptions;
 
         leakModels.forEach(item => {
-            if(item instanceof SVLeakAddress) {
+            if (item instanceof SVAddressLabel) {
                 Animations.FADE_IN(item.G6Item, {
                     duration,
                     timingFunction
@@ -279,7 +279,7 @@ export class Reconcile {
      */
     private handleAccumulateLeakModels(accumulateModels: SVModel[]) {
         accumulateModels.forEach(item => {
-            if(item.generalStyle) {
+            if (item.generalStyle) {
                 item.set('style', { ...item.generalStyle });
             }
         });
@@ -292,7 +292,7 @@ export class Reconcile {
      */
     private handleFreedModels(freedModes: SVNode[]) {
         const { duration, timingFunction } = this.engine.animationOptions,
-              alpha = 0.4;
+            alpha = 0.4;
 
         freedModes.forEach(item => {
             const nodeGroup = item.G6Item.getContainer();
@@ -318,7 +318,7 @@ export class Reconcile {
      * @param models 
      */
     private handleChangeModels(models: SVModel[]) {
-        if(models.length === 0) {
+        if (models.length === 0) {
             models = this.prevChangeModels;
         }
 
@@ -329,7 +329,7 @@ export class Reconcile {
         }
 
         models.forEach(item => {
-            if(item.generalStyle === undefined) {
+            if (item.generalStyle === undefined) {
                 item.generalStyle = Util.objectClone(item.G6ModelProps.style);
             }
 
@@ -410,7 +410,7 @@ export class Reconcile {
         this.handleLeakModels(LEAKED);
         this.handleRemoveModels(REMOVE);
 
-        if(this.isFirstPatch) {
+        if (this.isFirstPatch) {
             this.isFirstPatch = false;
         }
     }

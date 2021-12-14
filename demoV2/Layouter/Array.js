@@ -16,18 +16,17 @@ SV.registerLayout('Array', {
 
     defineOptions() {
         return {
-            element: { 
+            node: { 
                 default: {
-                    type: 'indexed-node',
+                    type: 'rect',
                     label: '[id]',
                     size: [60, 30],
+                    labelOptions: {
+                        style: { fontSize: 20 }
+                    },
                     style: {
                         stroke: '#333',
                         fill: '#95e1d3'
-                    },
-                    indexOptions: {
-                        index: { position: 'bottom' },
-                        indexTop: { position: 'top' }
                     }
                 }
             },
@@ -47,8 +46,9 @@ SV.registerLayout('Array', {
                     }
                 }
             },
-            behavior: {
-                dragNode: false
+            indexLabel: {
+                index: { position: 'bottom' },
+                indexRight: { position: 'right' }
             }
         };
     },
@@ -84,7 +84,7 @@ SV.registerLayout('Array', {
 
     defineOptions() {
         return {
-            element: { 
+            node: { 
                 default: {
                     type: 'indexed-node',
                     label: '[id]',
@@ -92,10 +92,6 @@ SV.registerLayout('Array', {
                     style: {
                         stroke: '#333',
                         fill: '#355c7d'
-                    },
-                    indexOptions: {
-                        index: { position: 'bottom' },
-                        indexTop: { position: 'top' }
                     }
                 }
             },
@@ -114,6 +110,10 @@ SV.registerLayout('Array', {
                         fill: '#f08a5d'
                     }
                 }
+            },
+            indexLabel: {
+                index: { position: 'bottom' },
+                indexTop: { position: 'top' }
             }
         };
     },

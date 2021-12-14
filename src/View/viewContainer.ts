@@ -10,6 +10,7 @@ import { InitDragCanvasWithLeak } from "../BehaviorHelper/dragCanvasWithLeak";
 import { EventBus } from "../Common/eventBus";
 import { InitZoomCanvasWithLeak } from "../BehaviorHelper/zoomCanvasWithLeak";
 import { Group } from "../Common/group";
+import { Graph } from "_@antv_g6-pc@0.5.0@@antv/g6-pc";
 
 
 
@@ -80,8 +81,16 @@ export class ViewContainer {
     /**
      * 获取 g6 实例
      */
-    getG6Instance() {
+    getG6Instance(): Graph {
         return this.renderer.getG6Instance();
+    }
+
+    /**
+     * 获取泄漏区里面的元素
+     * @returns 
+     */
+    getAccumulateLeakModels(): SVModel[] {
+        return this.accumulateLeakModels;
     }
 
     /**

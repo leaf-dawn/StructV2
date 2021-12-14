@@ -9,7 +9,6 @@ import CLenQueuePointer from "./RegisteredShape/clenQueuePointer";
 import twoCellNode from "./RegisteredShape/twoCellNode";
 import Cursor from "./RegisteredShape/cursor";
 import { Vector } from "./Common/vector";
-import indexedNode from "./RegisteredShape/indexedNode";
 import { EngineOptions, LayoutCreator } from "./options";
 import { SVNode } from "./Model/SVNode";
 import { SourceNode } from "./sources";
@@ -55,7 +54,6 @@ SV.registeredShape = [
     linkListNode, 
     binaryTreeNode, 
     twoCellNode,
-    indexedNode,
     Cursor,
     CLenQueuePointer,
 ];

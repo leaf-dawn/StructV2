@@ -5,11 +5,9 @@ import { Util } from '../Common/util';
 import { Vector } from '../Common/vector';
 import { Engine } from '../engine';
 import { LayoutGroupTable } from '../Model/modelConstructor';
-import { SVLink } from '../Model/SVLink';
-import { SVMarker } from '../Model/SVMarker';
 import { SVModel } from '../Model/SVModel';
-import { SVFreedLabel, SVLeakAddress, SVNode } from '../Model/SVNode';
-import { LayoutOptions, MarkerOption, ViewOptions } from '../options';
+import { SVAddressLabel, SVFreedLabel, SVIndexLabel, SVMarker } from '../Model/SVNodeAppendage';
+import { AddressLabelOption, IndexLabelOption, LayoutOptions, MarkerOption, ViewOptions } from '../options';
 import { ViewContainer } from './viewContainer';
 
 
@@ -111,7 +109,7 @@ export class LayoutProvider {
      */
     private layoutFreedLabel(freedLabels: SVFreedLabel[]) {
         freedLabels.forEach(item => {
-            const freedNodeBound = item.node.getBound();
+            const freedNodeBound = item.target.getBound();
 
             item.set({
                 x: freedNodeBound.x + freedNodeBound.width / 2,
@@ -122,17 +120,63 @@ export class LayoutProvider {
     }
 
     /**
+     * 
+     * @param indexLabels 
+     * @param indexLabelOptions 
+     */
+    private layoutIndexLabel(indexLabels: SVIndexLabel[], indexLabelOptions: { [key: string]: IndexLabelOption }) {
+        const indexLabelPositionMap: { [key: string]: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => { x: number, y: number } } = {
+            top: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
+                return {
+                    x: nodeBound.x + nodeBound.width / 2,
+                    y: nodeBound.y - offset
+                };
+            },
+            right: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
+                return {
+                    x: nodeBound.x + nodeBound.width + offset,
+                    y: nodeBound.y + nodeBound.height / 2
+                };
+            },
+            bottom: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
+                return {
+                    x: nodeBound.x + nodeBound.width / 2,
+                    y: nodeBound.y + nodeBound.height + offset
+                };
+            },
+            left: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
+                return {
+                    x: nodeBound.x - labelBound.width - 2 * offset,
+                    y: nodeBound.y + nodeBound.height / 2
+                };
+            }
+        };
+
+        indexLabels.forEach(item => {
+            const options: IndexLabelOption = indexLabelOptions[item.sourceType],
+                nodeBound = item.target.getBound(),
+                labelBound = item.getBound(),
+                offset = options.offset ?? 20,
+                position = options.position ?? 'bottom';
+
+            const pos = indexLabelPositionMap[position](nodeBound, labelBound, offset);
+            item.set(pos);
+        });
+    }
+
+    /**
      * 布局泄漏区节点上面的address label
      * @param leakAddress
      */
-    private layoutLeakAddress(leakAddress: SVLeakAddress[]) {
+    private layoutAddressLabel(leakAddress: SVAddressLabel[], addressLabelOption: AddressLabelOption) {
+        const offset = addressLabelOption.offset || 16;
+
         leakAddress.forEach(item => {
-            const nodeBound = item.node.getBound();
+            const nodeBound = item.target.getBound();
 
             item.set({
                 x: nodeBound.x + nodeBound.width / 2,
-                y: nodeBound.y - 16,
-                size: [nodeBound.width, 0]
+                y: nodeBound.y - offset
             });
         });
     }
@@ -146,22 +190,28 @@ export class LayoutProvider {
         const modelGroupList: Group[] = [];
 
         layoutGroupTable.forEach(group => {
-            const options: LayoutOptions = group.options.layout,
-                modelList: SVModel[] = group.modelList,
+            const modelList: SVModel[] = group.modelList,
                 modelGroup: Group = new Group();
+
+            const layoutOptions: LayoutOptions = group.options.layout;
 
             modelList.forEach(item => {
                 modelGroup.add(item);
             });
 
-            group.layoutCreator.layout(group.node, options);  // 布局节点
+            group.layoutCreator.layout(group.node, layoutOptions);  // 布局节点
             modelGroupList.push(modelGroup);
         });
 
         layoutGroupTable.forEach(group => {
+            const markerOptions = group.options.marker || {},
+                indexLabelOptions = group.options.indexLabel || {},
+                addressLabelOption = group.options.addressLabel || {};
+
+            this.layoutIndexLabel(group.indexLabel, indexLabelOptions);
             this.layoutFreedLabel(group.freedLabel);
-            this.layoutLeakAddress(group.leakAddress);
-            this.layoutMarker(group.marker, group.options.marker);  // 布局外部指针
+            this.layoutAddressLabel(group.addressLabel, addressLabelOption);
+            this.layoutMarker(group.marker, markerOptions);  // 布局外部指针
         });
 
         return modelGroupList;

@@ -1,12 +1,11 @@
 import { Sources } from "./sources";
 import { ModelConstructor } from "./Model/modelConstructor";
 import { AnimationOptions, EngineOptions, InteractionOptions, ViewOptions } from "./options";
-import { SV } from "./StructV";
 import { EventBus } from "./Common/eventBus";
 import { ViewContainer } from "./View/viewContainer";
-import { SVLink } from "./Model/SVLink";
 import { SVNode } from "./Model/SVNode";
-import { SVMarker } from "./Model/SVMarker";
+import { Util } from "./Common/util";
+import { SVModel } from "./Model/SVModel";
 
 
 export class Engine { 
@@ -108,63 +107,6 @@ export class Engine {
     }
 
     /**
-     * 获取所有 element
-     * @param  group
-     */
-    public getNodes(group?: string): SVNode[] {
-        const layoutGroupTable = this.modelConstructor.getLayoutGroupTable();
-
-        if(group && layoutGroupTable.has('group')) {
-            return layoutGroupTable.get('group').node;
-        }
-
-        const nodes: SVNode[] = [];
-        layoutGroupTable.forEach(item => {
-            nodes.push(...item.node);
-        })
-
-        return nodes;
-    }
-
-    /**
-     * 获取所有 marker
-     * @param  group
-     */
-    public getMarkers(group?: string): SVMarker[] {
-        const layoutGroupTable = this.modelConstructor.getLayoutGroupTable();
-
-        if(group && layoutGroupTable.has('group')) {
-            return layoutGroupTable.get('group').marker;
-        }
-
-        const markers: SVMarker[] = [];
-        layoutGroupTable.forEach(item => {
-            markers.push(...item.marker);
-        })
-
-        return markers;
-    }
-
-    /**
-     * 获取所有 link
-     * @param  group
-     */
-    public getLinks(group?: string): SVLink[] {
-        const layoutGroupTable = this.modelConstructor.getLayoutGroupTable();
-
-        if(group && layoutGroupTable.has('group')) {
-            return layoutGroupTable.get('group').link;
-        }
-
-        const links: SVLink[] = [];
-        layoutGroupTable.forEach(item => {
-            links.push(...item.link);
-        })
-
-        return links;
-    }
-
-    /**
      * 隐藏某些组
      * @param groupNames 
      */
@@ -189,13 +131,23 @@ export class Engine {
     }
 
     /**
+     * 
+     */
+    public getAllModels(): SVModel[] {
+        const modelList = Util.convertGroupTable2ModelList(this.modelConstructor.getLayoutGroupTable());
+        const accumulateLeakModels = this.viewContainer.getAccumulateLeakModels();
+
+        return [...modelList, ...accumulateLeakModels];
+    }
+
+    /**
      * 使用id查找某个节点
      * @param id 
      */
     public findNode(id: string): SVNode {
-        const nodes = this.getNodes();
+        const modelList = this.getAllModels();
         const stringId = id.toString();
-        const targetNode = nodes.find(item => item.sourceId === stringId);
+        const targetNode: SVNode = modelList.find(item => item instanceof SVNode && item.sourceId === stringId) as SVNode;
 
         return targetNode;
     }

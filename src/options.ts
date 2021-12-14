@@ -22,10 +22,14 @@ export interface NodeLabelOption {
 };
 
 
-export interface NodeIndexOption extends NodeLabelOption {
+export interface AddressLabelOption {
+    offset?: number;
+    style?: Style;
+}
+
+
+export interface IndexLabelOption extends NodeLabelOption {
     position: 'top' | 'right' | 'bottom' | 'left';
-    value: string;
-    style: Style;
 }
 
 
@@ -49,7 +53,6 @@ export interface NodeOption extends ModelOption {
     rotation: number;
     label: string | string[];
     anchorPoints: number[][];
-    indexOptions: NodeIndexOption;
     labelOptions: NodeLabelOption;
 }
 
@@ -78,8 +81,10 @@ export interface LayoutOptions {
 
 export interface LayoutGroupOptions {
     node: { [key: string]: NodeOption };
-    link?: { [key: string]: LinkOption }
-    marker?: { [key: string]: MarkerOption }
+    link?: { [key: string]: LinkOption };
+    marker?: { [key: string]: MarkerOption };
+    addressLabel?: AddressLabelOption;
+    indexLabel?: { [key: string]: IndexLabelOption };
     layout?: LayoutOptions;
 };
 

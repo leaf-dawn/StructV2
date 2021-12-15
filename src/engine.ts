@@ -1,6 +1,6 @@
 import { Sources } from "./sources";
 import { ModelConstructor } from "./Model/modelConstructor";
-import { AnimationOptions, EngineOptions, InteractionOptions, ViewOptions } from "./options";
+import { AnimationOptions, EngineOptions, InteractionOptions, LayoutGroupOptions, LayoutOptions, ViewOptions } from "./options";
 import { EventBus } from "./Common/eventBus";
 import { ViewContainer } from "./View/viewContainer";
 import { SVNode } from "./Model/SVNode";
@@ -8,12 +8,12 @@ import { Util } from "./Common/util";
 import { SVModel } from "./Model/SVModel";
 
 
-export class Engine { 
+export class Engine {
     private modelConstructor: ModelConstructor;
     private viewContainer: ViewContainer;
     private prevSource: Sources;
     private prevStringSource: string;
-    
+
     public engineOptions: EngineOptions;
     public viewOptions: ViewOptions;
     public animationOptions: AnimationOptions;
@@ -50,14 +50,15 @@ export class Engine {
     /**
      * 输入数据进行渲染
      * @param sources
+     * @param force
      */
-    public render(source: Sources) {
-        if(source === undefined || source === null) {
+    public render(source: Sources, force: boolean = false) {
+        if (source === undefined || source === null) {
             return;
         }
-``
+        ``
         let stringSource = JSON.stringify(source);
-        if(this.prevStringSource === stringSource) {
+        if (force === false && this.prevStringSource === stringSource) {
             return;
         }
 
@@ -66,29 +67,9 @@ export class Engine {
 
         // 1 转换模型（data => model）
         const layoutGroupTable = this.modelConstructor.construct(source);
-        
+
         // 2 渲染（使用g6进行渲染）
         this.viewContainer.render(layoutGroupTable);
-    }
-
-    /**
-     * 切换指定数据结构的 mode 主题
-     * @param mode 
-     */
-    public switchMode(layout: string, mode: string) {
-        if(this.prevSource === undefined || this.prevSource === null) {
-            return;
-        }
-
-        Object.keys(this.prevSource).map(group => {
-            let sourceGroup = this.prevSource[group];
-            
-            if(sourceGroup.layouter === layout) {
-                sourceGroup.mode = mode;
-            }
-        });
-
-        this.render(this.prevSource);
     }
 
 
@@ -111,19 +92,19 @@ export class Engine {
      * @param groupNames 
      */
     public hideGroups(groupNames: string | string[]) {
-        const names = Array.isArray(groupNames)? groupNames: [groupNames],
-              instance = this.viewContainer.getG6Instance(),
-              layoutGroupTable = this.modelConstructor.getLayoutGroupTable();
+        const names = Array.isArray(groupNames) ? groupNames : [groupNames],
+            instance = this.viewContainer.getG6Instance(),
+            layoutGroupTable = this.modelConstructor.getLayoutGroupTable();
 
         layoutGroupTable.forEach(item => {
             const hasName = names.find(name => name === item.layout);
 
-            if(hasName && !item.isHide) {
+            if (hasName && !item.isHide) {
                 item.modelList.forEach(model => instance.hideItem(model.G6Item));
                 item.isHide = true;
             }
 
-            if(!hasName && item.isHide) {
+            if (!hasName && item.isHide) {
                 item.modelList.forEach(model => instance.showItem(model.G6Item));
                 item.isHide = false;
             }
@@ -138,6 +119,38 @@ export class Engine {
         const accumulateLeakModels = this.viewContainer.getAccumulateLeakModels();
 
         return [...modelList, ...accumulateLeakModels];
+    }
+
+    /**
+     * 根据配置变化更新视图
+     * @param modelType 
+     * @returns 
+     */
+    public updateStyle(group: string, newOptions: LayoutGroupOptions) {
+        const models = this.getAllModels(),
+            layoutGroup = this.modelConstructor.getLayoutGroupTable().get(group);
+
+        layoutGroup.options = newOptions;
+        models.forEach(item => {
+            if (item.group !== group) {
+                return;
+            }
+
+            const modelType = item.getModelType(),
+                optionsType = layoutGroup.options[modelType];
+
+            if (optionsType) {
+                if (modelType === 'addressLabel') {
+                    item.updateG6ModelStyle(item.generateG6ModelProps(optionsType));
+                }
+                else {
+                    const targetModelOption = optionsType[item.sourceType];
+                    if (targetModelOption) {
+                        item.updateG6ModelStyle(item.generateG6ModelProps(targetModelOption));
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -167,16 +180,16 @@ export class Engine {
      * @param callback 
      */
     public on(eventName: string, callback: Function) {
-        if(typeof callback !== 'function') {
+        if (typeof callback !== 'function') {
             return;
         }
 
-        if(eventName === 'onFreed' || eventName === 'onLeak') {
+        if (eventName === 'onFreed' || eventName === 'onLeak') {
             EventBus.on(eventName, callback);
             return;
         }
 
-        if(eventName === 'onLeakAreaUpdate') {
+        if (eventName === 'onLeakAreaUpdate') {
             EventBus.on(eventName, callback);
             return;
         }

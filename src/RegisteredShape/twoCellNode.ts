@@ -16,7 +16,7 @@ export default registerNode('two-cell-node', {
                 width: width,
                 height: height,
                 stroke: cfg.style.stroke,
-                fill: '#eee'
+                fill: cfg.style.backgroundFill || '#eee'
             },
             name: 'wrapper'
         });

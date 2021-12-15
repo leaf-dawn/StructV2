@@ -1,8 +1,10 @@
 {
   "dependencies": {
-    "@antv/g6": "^4.4.1"
+    "@antv/g6": "^4.4.1",
+    "merge": "^2.1.1"
   },
   "devDependencies": {
+    "merge": "^2.1.1",
     "ts-loader": "^5.2.1",
     "typescript": "^3.2.2",
     "webpack": "^4.46.0",

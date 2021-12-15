@@ -44,13 +44,12 @@ export class ModelConstructor {
      */
     public construct(sources: Sources): LayoutGroupTable {
         const layoutGroupTable = new Map<string, LayoutGroup>(),
-            layoutMap: { [key: string]: { [key: string]: LayoutCreator } } = SV.registeredLayout;
+            layoutMap: { [key: string]: LayoutCreator } = SV.registeredLayout;
 
         Object.keys(sources).forEach(group => {
             let sourceGroup = sources[group],
                 layout = sourceGroup.layouter,
-                mode = sourceGroup.mode || 'default',
-                layoutCreator: LayoutCreator = layoutMap[layout][mode];
+                layoutCreator: LayoutCreator = layoutMap[layout];
 
             if (!layout || !layoutCreator) {
                 return;
@@ -120,13 +119,6 @@ export class ModelConstructor {
         return this.layoutGroupTable;
     }
 
-    /**
-     * 
-     * @returns 
-     */
-    public getLayoutGroupTable(): LayoutGroupTable {
-        return this.layoutGroupTable;
-    }
 
     /**
      * 从源数据构建 node 集
@@ -428,6 +420,14 @@ export class ModelConstructor {
         }
 
         return counter <= 2;
+    }
+
+    /**
+     * 
+     * @returns 
+     */
+    public getLayoutGroupTable(): LayoutGroupTable {
+        return this.layoutGroupTable;
     }
 
     /**

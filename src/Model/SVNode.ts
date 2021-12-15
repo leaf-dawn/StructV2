@@ -51,7 +51,7 @@ export class SVNode extends SVModel {
         this.G6ModelProps = this.generateG6ModelProps(options);
     }
 
-    protected generateG6ModelProps(options: NodeOption): NodeConfig {
+    generateG6ModelProps(options: NodeOption): NodeConfig {
         const style = Util.objectClone<Style>(options.style);
 
         return {

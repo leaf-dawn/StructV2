@@ -24,8 +24,7 @@ export class SVLink extends SVModel {
         this.G6ModelProps = this.generateG6ModelProps(options);
     }
 
-
-    protected generateG6ModelProps(options: LinkOption): EdgeConfig {
+    generateG6ModelProps(options: LinkOption): EdgeConfig {
         let sourceAnchor = options.sourceAnchor, 
             targetAnchor = options.targetAnchor;
 

@@ -3,7 +3,7 @@ import { Style } from "../options";
 import { BoundingRect } from "../Common/boundingRect";
 import { EdgeConfig, Item, NodeConfig } from "@antv/g6-core";
 import { Graph } from "_@antv_g6-pc@0.5.0@@antv/g6-pc";
-
+import merge from 'merge';
 
 
 
@@ -52,7 +52,7 @@ export class SVModel {
      * 定义 G6 model 的属性
      * @param option 
      */
-    protected generateG6ModelProps(options: unknown) {
+    generateG6ModelProps(options: unknown): NodeConfig | EdgeConfig {
         return null;
     }
 
@@ -87,7 +87,7 @@ export class SVModel {
         }
 
         if (attr === 'style' || attr === 'labelCfg') {
-            Object.assign(this.G6ModelProps[attr], value);
+            this.G6ModelProps[attr] = merge(this.G6ModelProps[attr] || {}, value);
         }
         else {
             this.G6ModelProps[attr] = value;
@@ -110,6 +110,31 @@ export class SVModel {
         }
 
         // 更新shadowG6Item
+        if (this.shadowG6Item) {
+            this.shadowG6Instance.updateItem(this.shadowG6Item, this.G6ModelProps);
+        }
+    }
+
+    /**
+     * 
+     * @param G6ModelProps 
+     */
+    updateG6ModelStyle(G6ModelProps: NodeConfig | EdgeConfig) {
+        const newG6ModelProps = { 
+            style: {
+                ...G6ModelProps.style
+            },
+            labelCfg: {
+                ...G6ModelProps.labelCfg
+            }
+        };
+
+        this.G6ModelProps = merge(this.G6ModelProps, newG6ModelProps);
+
+        if (this.G6Item) {
+            this.g6Instance.updateItem(this.G6Item, this.G6ModelProps);
+        }
+
         if (this.shadowG6Item) {
             this.shadowG6Instance.updateItem(this.shadowG6Item, this.G6ModelProps);
         }

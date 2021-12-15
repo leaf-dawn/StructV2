@@ -19,7 +19,6 @@ export type Sources = {
     [key: string]: { 
         data: SourceNode[]; 
         layouter: string; 
-        mode?: string 
     }
 };
     

@@ -16,7 +16,7 @@ export default registerNode('binary-tree-node', {
                 height: height,
                 stroke: cfg.style.stroke || '#333',
                 cursor: cfg.style.cursor,
-                fill: '#eee'
+                fill: cfg.style.backgroundFill || '#eee'
             },
             name: 'wrapper'
         });

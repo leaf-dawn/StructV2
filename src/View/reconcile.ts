@@ -25,13 +25,11 @@ export class Reconcile {
 
     private engine: Engine;
     private renderer: Renderer;
-    private prevChangeModels: SVModel[];
     private isFirstPatch: boolean;
 
     constructor(engine: Engine, renderer: Renderer) {
         this.engine = engine;
         this.renderer = renderer;
-        this.prevChangeModels = [];
         this.isFirstPatch = true;
     }
 
@@ -318,10 +316,6 @@ export class Reconcile {
      * @param models 
      */
     private handleChangeModels(models: SVModel[]) {
-        if (models.length === 0) {
-            models = this.prevChangeModels;
-        }
-
         const changeHighlightColor: string = this.engine.viewOptions.updateHighlight;
 
         if (!changeHighlightColor || typeof changeHighlightColor !== 'string') {
@@ -344,8 +338,6 @@ export class Reconcile {
                 });
             }
         });
-
-        this.prevChangeModels = models;
     }
 
 
@@ -415,7 +407,5 @@ export class Reconcile {
         }
     }
 
-    public destroy() {
-        this.prevChangeModels.length = 0;
-    }
+    public destroy() { }
 }

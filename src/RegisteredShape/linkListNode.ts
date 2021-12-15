@@ -15,7 +15,7 @@ export default registerNode('link-list-node', {
                 width: width,
                 height: height,
                 stroke: cfg.style.stroke || '#333',
-                fill: '#eee',
+                fill: cfg.style.backgroundFill || '#eee',
                 cursor: cfg.style.cursor
             },
             name: 'wrapper'

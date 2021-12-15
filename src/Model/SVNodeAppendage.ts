@@ -1,7 +1,6 @@
-import { INode, NodeConfig } from "@antv/g6-core";
+import { INode, NodeConfig, EdgeConfig } from "@antv/g6-core";
 import { Util } from "../Common/util";
 import { AddressLabelOption, IndexLabelOption, MarkerOption, NodeLabelOption, Style } from "../options";
-import { SourceNode } from "../sources";
 import { SVModel } from "./SVModel";
 import { SVNode } from "./SVNode";
 
@@ -108,7 +107,7 @@ export class SVIndexLabel extends SVNodeAppendage {
         this.G6ModelProps = this.generateG6ModelProps(options) as NodeConfig;
     }
 
-    generateG6ModelProps(options: IndexLabelOption) {
+    generateG6ModelProps(options: IndexLabelOption): NodeConfig | EdgeConfig {
         return {
             id: this.id,
             x: 0,
@@ -155,7 +154,7 @@ export class SVMarker extends SVNodeAppendage {
         this.G6ModelProps = this.generateG6ModelProps(options);
     }
 
-    protected generateG6ModelProps(options: MarkerOption): NodeConfig {
+    generateG6ModelProps(options: MarkerOption): NodeConfig {
         this.anchor = options.anchor;
 
         const type = options.type,

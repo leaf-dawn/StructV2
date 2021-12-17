@@ -42,10 +42,10 @@ SV.registerLayout('LinkList', {
                     }
                 },
                 loopNext: {
-                    type: 'arc',
-                    curveOffset: 50,
+                    type: 'quadratic',
+                    curveOffset: -100,
                     sourceAnchor: 2,
-                    targetAnchor: 4,
+                    targetAnchor: 7,
                     style: {
                         stroke: '#333',
                         endArrow: 'default',

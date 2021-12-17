@@ -1,9 +1,8 @@
 import { Engine } from '../engine';
 import { SVModel } from '../Model/SVModel';
 import { Util } from '../Common/util';
-import G6 from '@antv/g6';
+import { Tooltip, Graph, GraphData } from '@antv/g6';
 import { InitViewBehaviors } from '../BehaviorHelper/initViewBehaviors';
-import { Graph, GraphData, IGroup } from '@antv/g6-pc';
 
 
 
@@ -28,7 +27,7 @@ export class Renderer {
             duration: number = this.engine.animationOptions.duration,
             timingFunction: string = this.engine.animationOptions.timingFunction;
 
-        const tooltip = new G6.Tooltip({
+        const tooltip = new Tooltip({
             offsetX: 10,
             offsetY: 20,
             shouldBegin(event) {
@@ -38,12 +37,12 @@ export class Renderer {
             itemTypes: ['node']
         });
 
-        this.shadowG6Instance = new G6.Graph({
+        this.shadowG6Instance = new Graph({
             container: DOMContainer.cloneNode() as HTMLElement
         });
 
         // 初始化g6实例
-        this.g6Instance = new G6.Graph({
+        this.g6Instance = new Graph({
             container: DOMContainer,
             width: DOMContainer.offsetWidth,
             height: DOMContainer.offsetHeight,
@@ -55,7 +54,7 @@ export class Renderer {
             },
             fitView: false,
             modes: {
-                default: InitViewBehaviors(this.engine.optionsTable)
+                default: InitViewBehaviors()
             },
             plugins: [tooltip]
         });
@@ -97,6 +96,7 @@ export class Renderer {
         this.shadowG6Instance.read(g6Data);
         renderModelList.forEach(item => {
             item.shadowG6Item = this.shadowG6Instance.findById(item.id);
+            item.shadowG6Instance = this.shadowG6Instance;
         });
     }
 
@@ -111,9 +111,13 @@ export class Renderer {
         this.g6Instance.changeData(renderData);
 
         renderModelList.forEach(item => {
+            item.g6Instance = this.g6Instance;
             item.G6Item = this.g6Instance.findById(item.id);
             item.G6Item['SVModel'] = item;
         });
+
+        this.g6Instance.getEdges().forEach(item => item.toFront());
+        this.g6Instance.paint();
     }
 
     /**
@@ -130,6 +134,24 @@ export class Renderer {
      */
     public getG6Instance() {
         return this.g6Instance;
+    }
+
+    /**
+     * 
+     */
+    public refresh() {
+        this.g6Instance.refresh();
+        this.shadowG6Instance.refresh();
+    }
+
+    /**
+     * 
+     * @param width 
+     * @param height 
+     */
+    public changeSize(width: number, height: number) {
+        this.g6Instance.changeSize(width, height);
+        this.shadowG6Instance.changeSize(width, height);
     }
 
     /**

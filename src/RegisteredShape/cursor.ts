@@ -1,7 +1,7 @@
-import G6 from '@antv/g6';
+import { registerNode } from '@antv/g6';
 
 
-export default G6.registerNode('cursor', {
+export default registerNode('cursor', {
     draw(cfg, group) {
         const keyShape = group.addShape('path', {
             attrs: {

@@ -1,9 +1,9 @@
 import { Util } from "../Common/util";
-import { ModelOption, Style } from "../options";
+import { Style } from "../options";
 import { BoundingRect } from "../Common/boundingRect";
 import { EdgeConfig, Item, NodeConfig } from "@antv/g6-core";
-import { Point } from "@antv/g-base";
-
+import { Graph } from "_@antv_g6-pc@0.5.0@@antv/g6-pc";
+import merge from 'merge';
 
 
 
@@ -11,13 +11,16 @@ import { Point } from "@antv/g-base";
 export class SVModel {
     public id: string;
     public sourceType: string;
-    
+
+    public g6Instance: Graph;
+    public shadowG6Instance: Graph;
     public group: string;
     public layout: string;
     public G6ModelProps: NodeConfig | EdgeConfig;
     public shadowG6Item: Item;
     public G6Item: Item;
 
+    public preLayout: boolean;   // 是否进入预备布局阶段
     public discarded: boolean;
     public freed: boolean;
     public leaked: boolean;
@@ -26,13 +29,17 @@ export class SVModel {
     private transformMatrix: number[];
     private modelType: string;
 
-    constructor(id: string, type: string, group: string, layout: string, modelType: string) { 
+    public layoutX: number;
+    public layoutY: number;
+
+    constructor(id: string, type: string, group: string, layout: string, modelType: string) {
         this.id = id;
         this.sourceType = type;
         this.group = group;
         this.layout = layout;
         this.shadowG6Item = null;
         this.G6Item = null;
+        this.preLayout = false;
         this.discarded = false;
         this.freed = false;
         this.leaked = false;
@@ -45,7 +52,7 @@ export class SVModel {
      * 定义 G6 model 的属性
      * @param option 
      */
-    protected generateG6ModelProps(options: ModelOption) {
+    generateG6ModelProps(options: unknown): NodeConfig | EdgeConfig {
         return null;
     }
 
@@ -64,53 +71,72 @@ export class SVModel {
      * @returns 
      */
     set(attr: string | object, value?: any) {
-        if(this.discarded) {
+        if (this.discarded) {
             return;
         }
 
-        if(typeof attr === 'object') {
+        if (typeof attr === 'object') {
             Object.keys(attr).map(item => {
                 this.set(item, attr[item]);
             });
             return;
         }
 
-        if(this.G6ModelProps[attr] === value) {
+        if (this.G6ModelProps[attr] === value) {
             return;
         }
 
-        if(attr === 'style' || attr === 'labelCfg') {
-            Object.assign(this.G6ModelProps[attr], value);
+        if (attr === 'style' || attr === 'labelCfg') {
+            this.G6ModelProps[attr] = merge(this.G6ModelProps[attr] || {}, value);
         }
         else {
             this.G6ModelProps[attr] = value;
         }
 
-        if(attr === 'rotation') {
+        if (attr === 'rotation') {
             const matrix = Util.calcRotateMatrix(this.getMatrix(), value);
             this.setMatrix(matrix);
         }
 
         // 更新G6Item
-        if(this.G6Item) {
-            if(attr === 'x' || attr === 'y') {
-                this.G6Item.updatePosition({ [attr]: value } as Point);
-                this.G6Item.refresh();
+        if (this.G6Item) {
+            if (this.preLayout) {
+                const G6ItemModel = this.G6Item.getModel();
+                G6ItemModel[attr] = value;
             }
             else {
-                this.G6Item.update(this.G6ModelProps);
+                this.g6Instance.updateItem(this.G6Item, this.G6ModelProps);
             }
         }
 
         // 更新shadowG6Item
-        if(this.shadowG6Item) {
-            if(attr === 'x' || attr === 'y') {
-                this.shadowG6Item.updatePosition({ [attr]: value } as Point);
-                this.shadowG6Item.refresh();
+        if (this.shadowG6Item) {
+            this.shadowG6Instance.updateItem(this.shadowG6Item, this.G6ModelProps);
+        }
+    }
+
+    /**
+     * 
+     * @param G6ModelProps 
+     */
+    updateG6ModelStyle(G6ModelProps: NodeConfig | EdgeConfig) {
+        const newG6ModelProps = { 
+            style: {
+                ...G6ModelProps.style
+            },
+            labelCfg: {
+                ...G6ModelProps.labelCfg
             }
-            else {
-                this.shadowG6Item.update(this.G6ModelProps);
-            }
+        };
+
+        this.G6ModelProps = merge(this.G6ModelProps, newG6ModelProps);
+
+        if (this.G6Item) {
+            this.g6Instance.updateItem(this.G6Item, this.G6ModelProps);
+        }
+
+        if (this.shadowG6Item) {
+            this.shadowG6Instance.updateItem(this.shadowG6Item, this.G6ModelProps);
         }
     }
 
@@ -128,7 +154,7 @@ export class SVModel {
     getMatrix(): number[] {
         return [...this.transformMatrix];
     }
-    
+
     /**
      * 设置变换矩阵
      * @param matrix 

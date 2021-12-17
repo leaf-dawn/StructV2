@@ -1,7 +1,7 @@
-import G6 from '@antv/g6';
+import { registerNode, Util } from '@antv/g6';
 
 
-export default G6.registerNode('clen-queue-pointer', {
+export default registerNode('clen-queue-pointer', {
     draw(cfg, group) {
         let id = cfg.id as string;
 
@@ -55,10 +55,10 @@ export default G6.registerNode('clen-queue-pointer', {
             });
 
             // rotate(text, angle, G6.Util.transform);
-            translate(text, 0, -75, G6.Util.transform);
+            translate(text, 0, -75, Util.transform);
         }
-        rotate(keyShape, angle, G6.Util.transform);
-        translate(keyShape, 0, -75, G6.Util.transform);
+        rotate(keyShape, angle, Util.transform);
+        translate(keyShape, 0, -75, Util.transform);
 
         return keyShape;
 

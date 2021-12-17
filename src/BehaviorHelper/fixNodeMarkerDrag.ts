@@ -1,66 +1,38 @@
-import { Graph } from "@antv/g6-pc";
+import { Graph } from "@antv/g6";
 import { SVNode } from "../Model/SVNode";
-import { LayoutGroupOptions } from "../options";
+import { SVNodeAppendage } from "../Model/SVNodeAppendage";
 
 
 /**
- * 在初始化渲染器之后，修正节点拖拽时，外部指针没有跟着动的问题
+ * 在初始化渲染器之后，修正节点拖拽时，外部指针或者其他 appendage 没有跟着动的问题
  * 
  */
-export function FixNodeMarkerDrag(g6Instance: Graph, optionsTable: { [key: string]: LayoutGroupOptions }) {
-    let dragActive: boolean = false;
-
-    const nodeData = {
-        node: null,
-        startX: 0,
-        startY: 0
-    };
-
-    const markerData = {
-        marker: null,
-        startX: 0,
-        startY: 0
-    };
-
-    const freedLabelData = {
-        freedLabel: null,
-        startX: 0,
-        startY: 0
-    };
+export function FixNodeMarkerDrag(g6Instance: Graph) {
+    let dragActive: boolean = false,
+        nodeData: { node: SVNode, startX: number, startY: number },
+        appendagesData: { appendage: SVNodeAppendage, startX: number, startY: number }[] = [];
 
     g6Instance.on('node:dragstart', event => {
-        nodeData.node = event.item['SVModel'];
-        let node: SVNode = nodeData.node;
+        let node: SVNode = event.item['SVModel'];
 
         if (node.isNode() === false || node.leaked) {
             return false;
         }
 
-        const dragNode = optionsTable[node.layout].behavior.dragNode;
-
-        if (dragNode === false) {
-            return;
-        }
-
-        if (Array.isArray(dragNode) && dragNode.find(item => item === node.sourceType) === undefined) {
-            return;
-        }
-
         dragActive = true;
-        nodeData.startX = event.canvasX;
-        nodeData.startY = event.canvasY;
+        nodeData = {
+            node,
+            startX: event.canvasX,
+            startY: event.canvasY
+        };
 
-        if (node.marker) {
-            markerData.marker = node.marker;
-            markerData.startX = markerData.marker.get('x');
-            markerData.startY = markerData.marker.get('y');
-        }
-
-        if(node.freedLabel) {
-            freedLabelData.freedLabel = node.freedLabel;
-            freedLabelData.startX = freedLabelData.freedLabel.get('x');
-            freedLabelData.startY = freedLabelData.freedLabel.get('y');
-        }
+        node.appendages.forEach(item => {
+            appendagesData.push({
+                appendage: item,
+                startX: item.get('x'),
+                startY: item.get('y')
+            });
+        });
     });
 
     g6Instance.on('node:dragend', event => {
@@ -68,25 +40,15 @@ export function FixNodeMarkerDrag(g6Instance: Graph, optionsTable: { [key: strin
             return false;
         }
 
-        let distanceX = event.canvasX - nodeData.startX,
-            distanceY = event.canvasY - nodeData.startY,
-            nodeX = nodeData.node.get('x'),
-            nodeY = nodeData.node.get('y');
+        let node: SVNode = nodeData.node;
 
-        nodeData.node.set({
-            x: nodeX + distanceX,
-            y: nodeY + distanceY
+        node.set({
+            x: node.G6Item.getModel().x,
+            y: node.G6Item.getModel().y
         });
 
-        nodeData.node = null;
-        nodeData.startX = 0;
-        nodeData.startY = 0;
-        markerData.marker = null;
-        markerData.startX = 0;
-        markerData.startY = 0;
-        freedLabelData.freedLabel = null;
-        freedLabelData.startX = 0;
-        freedLabelData.startY = 0;
+        nodeData = null;
+        appendagesData.length = 0;
         dragActive = false;
     });
 
@@ -99,18 +61,11 @@ export function FixNodeMarkerDrag(g6Instance: Graph, optionsTable: { [key: strin
             dy = ev.canvasY - nodeData.startY,
             zoom = g6Instance.getZoom();
 
-        if(markerData.marker) {
-            markerData.marker.set({
-                x: markerData.startX + dx / zoom,
-                y: markerData.startY + dy / zoom
+        appendagesData.forEach(item => {
+            item.appendage.set({
+                x: item.startX + dx / zoom,
+                y: item.startY + dy / zoom
             });
-        }
-
-        if(freedLabelData.freedLabel) {
-            freedLabelData.freedLabel.set({
-                x: freedLabelData.startX + dx / zoom,
-                y: freedLabelData.startY + dy / zoom
-            });
-        }
+        });
     });
 }

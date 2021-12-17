@@ -1,19 +1,20 @@
 import { Util } from "../Common/util";
 import { Engine } from "../engine";
-import { LayoutCreator, LayoutGroupOptions, LinkOption, MarkerOption, NodeOption } from "../options";
+import { AddressLabelOption, IndexLabelOption, LayoutCreator, LayoutGroupOptions, LinkOption, MarkerOption, NodeOption } from "../options";
 import { sourceLinkData, LinkTarget, Sources, SourceNode } from "../sources";
 import { SV } from "../StructV";
 import { SVLink } from "./SVLink";
-import { SVMarker } from "./SVMarker";
 import { SVModel } from "./SVModel";
-import { SVFreedLabel, SVLeakAddress, SVNode } from "./SVNode";
+import { SVNode } from "./SVNode";
+import { SVAddressLabel, SVFreedLabel, SVIndexLabel, SVMarker } from "./SVNodeAppendage";
 
 
 export type LayoutGroup = {
     name: string;
     node: SVNode[];
+    indexLabel: SVIndexLabel[];
     freedLabel: SVFreedLabel[];
-    leakAddress: SVLeakAddress[];
+    addressLabel: SVAddressLabel[];
     link: SVLink[];
     marker: SVMarker[];
     layoutCreator: LayoutCreator;
@@ -38,13 +39,12 @@ export class ModelConstructor {
     }
 
     /**
-     * 构建svnode，svlink 和 svmarker
+     * 构建SVNode，SVLink, SVMarker, SVAddressLabel, SVIndexLabel等
      * @param sourceList 
      */
     public construct(sources: Sources): LayoutGroupTable {
         const layoutGroupTable = new Map<string, LayoutGroup>(),
-            layoutMap: { [key: string]: LayoutCreator } = SV.registeredLayout,
-            optionsTable = this.engine.optionsTable;
+            layoutMap: { [key: string]: LayoutCreator } = SV.registeredLayout;
 
         Object.keys(sources).forEach(group => {
             let sourceGroup = sources[group],
@@ -59,21 +59,25 @@ export class ModelConstructor {
                 prevString: string = this.prevSourcesStringMap[group],
                 nodeList: SVNode[] = [],
                 freedLabelList: SVFreedLabel[] = [],
-                leakAddress: SVLeakAddress[] = [],
+                addressLabelList: SVAddressLabel[] = [],
+                indexLabelList: SVIndexLabel[] = [],
                 markerList: SVMarker[] = [];
 
             if (prevString === sourceDataString) {
                 return;
             }
 
-            const options: LayoutGroupOptions = optionsTable[layout],
+            const options: LayoutGroupOptions = layoutCreator.defineOptions(sourceGroup.data),
                 sourceData = layoutCreator.sourcesPreprocess(sourceGroup.data, options),
                 nodeOptions = options.node || options['element'] || {},
-                markerOptions = options.marker || {};
+                markerOptions = options.marker || {},
+                indexLabelOptions = options.indexLabel || {},
+                addressLabelOption = options.addressLabel || {};
 
-            nodeList = this.constructNodes(nodeOptions, group, sourceData, layout);
-            leakAddress = nodeList.map(item => item.leakAddress);
+            nodeList = this.constructNodes(group, layout, nodeOptions, sourceData);
             markerList = this.constructMarkers(group, layout, markerOptions, nodeList);
+            indexLabelList = this.constructIndexLabel(group, layout, indexLabelOptions, nodeList);
+            addressLabelList = this.constructAddressLabel(group, layout, addressLabelOption, nodeList);
             nodeList.forEach(item => {
                 if(item.freedLabel) {
                     freedLabelList.push(item.freedLabel);
@@ -84,12 +88,19 @@ export class ModelConstructor {
                 name: group,
                 node: nodeList,
                 freedLabel: freedLabelList, 
-                leakAddress: leakAddress,
+                addressLabel: addressLabelList,
+                indexLabel: indexLabelList,
                 link: [],
                 marker: markerList,
                 options: options,
                 layoutCreator,
-                modelList: [...nodeList, ...markerList, ...freedLabelList, ...leakAddress],
+                modelList: [
+                    ...nodeList, 
+                    ...markerList, 
+                    ...freedLabelList, 
+                    ...addressLabelList,
+                    ...indexLabelList
+                ],
                 layout,
                 isHide: false
             });
@@ -97,7 +108,7 @@ export class ModelConstructor {
 
         layoutGroupTable.forEach((layoutGroup: LayoutGroup, group: string) => {
             const linkOptions = layoutGroup.options.link || {},
-                linkList: SVLink[] = this.constructLinks(linkOptions, layoutGroup.node, layoutGroupTable, group, layoutGroup.layout, );
+                linkList: SVLink[] = this.constructLinks(group, layoutGroup.layout, linkOptions, layoutGroup.node, layoutGroupTable);
 
             layoutGroup.link = linkList;
             layoutGroup.modelList.push(...linkList);
@@ -108,13 +119,6 @@ export class ModelConstructor {
         return this.layoutGroupTable;
     }
 
-    /**
-     * 
-     * @returns 
-     */
-    public getLayoutGroupTable(): LayoutGroupTable {
-        return this.layoutGroupTable;
-    }
 
     /**
      * 从源数据构建 node 集
@@ -124,7 +128,7 @@ export class ModelConstructor {
      * @param layout
      * @returns 
      */
-    private constructNodes(nodeOptions: { [key: string]: NodeOption }, group: string, sourceList: SourceNode[], layout: string): SVNode[] {
+    private constructNodes(group: string, layout: string, nodeOptions: { [key: string]: NodeOption }, sourceList: SourceNode[]): SVNode[] {
         let defaultSourceNodeType: string = 'default',
             nodeList: SVNode[] = [];
 
@@ -150,7 +154,7 @@ export class ModelConstructor {
      * @param layoutGroupTable
      * @returns 
      */
-    private constructLinks(linkOptions: { [key: string]: LinkOption }, nodes: SVNode[], layoutGroupTable: LayoutGroupTable, group: string, layout: string): SVLink[] {
+    private constructLinks(group: string, layout: string, linkOptions: { [key: string]: LinkOption }, nodes: SVNode[], layoutGroupTable: LayoutGroupTable): SVLink[] {
         let linkList: SVLink[] = [],
             linkNames = Object.keys(linkOptions);
 
@@ -198,6 +202,52 @@ export class ModelConstructor {
     }
 
     /**
+     * 从配置项构建 indexLabel 集
+     * @param group 
+     * @param layout 
+     * @param indexLabelOptions 
+     */
+    private constructIndexLabel(group: string, layout: string, indexLabelOptions: { [key: string]: IndexLabelOption }, nodes: SVNode[]): SVIndexLabel[] {
+        let indexLabelList: SVIndexLabel[] = [],
+            indexNames = Object.keys(indexLabelOptions);
+
+        indexNames.forEach(name => {
+            for (let i = 0; i < nodes.length; i++) {
+                let node = nodes[i],
+                    value = node[name];
+
+                // 若没有指针字段的结点则跳过
+                if (!value) continue;
+
+                let id = `${group}.${name}#${value}`,
+                    indexLabel = new SVIndexLabel(id, name, group, layout, value, node, indexLabelOptions[name]);
+
+                indexLabelList.push(indexLabel);
+            }
+        });
+
+        return indexLabelList;
+    }
+
+    /**
+     * 
+     * @param group 
+     * @param layout 
+     * @param addressLabelOption 
+     * @param nodes 
+     */
+    private constructAddressLabel(group: string, layout: string, addressLabelOption: AddressLabelOption, nodes: SVNode[]): SVAddressLabel[] {
+        let addressLabelList: SVAddressLabel[] = [];
+
+        nodes.forEach(item => {
+            const addressLabel = new SVAddressLabel(`${item.id}-address-label`, item.sourceType, group, layout, item, addressLabelOption);
+            addressLabelList.push(addressLabel);
+        });
+        
+        return addressLabelList;
+    }
+
+    /**
      * 从配置和 node 集构建 marker 集
      * @param markerOptions 
      * @param nodes
@@ -216,8 +266,8 @@ export class ModelConstructor {
                 if (!markerData) continue;
 
                 let id = `${group}.${name}.${Array.isArray(markerData) ? markerData.join('-') : markerData}`,
-                    marker = this.createMarker(id, name, markerData, group, layout, node, markerOptions[name]);
-
+                    marker = new SVMarker(id, name, group, layout, markerData, node, markerOptions[name]);
+    
                 markerList.push(marker);
             }
         });
@@ -259,29 +309,13 @@ export class ModelConstructor {
         let label: string | string[] = this.resolveNodeLabel(options.label, sourceNode),
             id = sourceNodeType + '.' + sourceNode.id.toString(),
             node = new SVNode(id, sourceNodeType, group, layout, sourceNode, label, options);
-            node.leakAddress = new SVLeakAddress(`${id}-leak-adress`, sourceNodeType, group, layout, node);
-        
+
         if(node.freed) {
             node.freedLabel = new SVFreedLabel(`${id}-freed-label`, sourceNodeType, group, layout, node);
         }
 
         return node;
     }
-
-    /**
-     * 外部指针工厂，创建marker
-     * @param id 
-     * @param markerName 
-     * @param markerData 
-     * @param group 
-     * @param layout 
-     * @param target 
-     * @param options 
-     * @returns 
-     */
-    private createMarker(id: string, markerName: string, markerData: string | string[], group: string, layout: string, target: SVNode, options: MarkerOption): SVMarker {
-        return new SVMarker(id, markerName, group, layout, markerData, target, options);;
-    };
 
     /**
      * 连线工厂，创建Link
@@ -389,9 +423,18 @@ export class ModelConstructor {
     }
 
     /**
+     * 
+     * @returns 
+     */
+    public getLayoutGroupTable(): LayoutGroupTable {
+        return this.layoutGroupTable;
+    }
+
+    /**
      * 销毁
      */
     destroy() {
         this.layoutGroupTable = null;
+        this.prevSourcesStringMap = null;
     }
 };

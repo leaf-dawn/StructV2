@@ -1,19 +1,18 @@
 import { Engine } from "./engine";
 import { Bound } from "./Common/boundingRect";
 import { Group } from "./Common/group";
-import pointer from "./RegisteredShape/pointer";
 import G6, { Util } from '@antv/g6';
-import linkListNode from "./RegisteredShape/linkListNode";
-import binaryTreeNode from "./RegisteredShape/binaryTreeNode";
+import Pointer from "./RegisteredShape/pointer";
+import LinkListNode from "./RegisteredShape/linkListNode";
+import BinaryTreeNode from "./RegisteredShape/binaryTreeNode";
 import CLenQueuePointer from "./RegisteredShape/clenQueuePointer";
-import twoCellNode from "./RegisteredShape/twoCellNode";
+import TwoCellNode from "./RegisteredShape/twoCellNode";
+import ArrayNode from "./RegisteredShape/arrayNode";
 import Cursor from "./RegisteredShape/cursor";
 import { Vector } from "./Common/vector";
-import indexedNode from "./RegisteredShape/indexedNode";
 import { EngineOptions, LayoutCreator } from "./options";
 import { SVNode } from "./Model/SVNode";
 import { SourceNode } from "./sources";
-
 
 
 export interface StructV {
@@ -51,12 +50,12 @@ SV.G6 = G6;
 
 SV.registeredLayout = {};
 SV.registeredShape = [
-    pointer, 
-    linkListNode, 
-    binaryTreeNode, 
-    twoCellNode,
-    indexedNode,
+    Pointer, 
+    LinkListNode, 
+    BinaryTreeNode, 
+    TwoCellNode,
     Cursor,
+    ArrayNode,
     CLenQueuePointer,
 ];
 

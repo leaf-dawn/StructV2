@@ -6,7 +6,7 @@ SV.registerLayout('Array', {
     sourcesPreprocess(sources) {
         const firstElement = sources[0];
 
-        if(firstElement.external) {
+        if (firstElement.external) {
             firstElement.headExternal = firstElement.external;
             delete firstElement.external;
         }
@@ -16,18 +16,17 @@ SV.registerLayout('Array', {
 
     defineOptions() {
         return {
-            element: { 
+            node: {
                 default: {
-                    type: 'indexed-node',
+                    type: 'array-node',
                     label: '[id]',
                     size: [60, 30],
+                    labelOptions: {
+                        style: { fontSize: 20 }
+                    },
                     style: {
                         stroke: '#333',
                         fill: '#95e1d3'
-                    },
-                    indexOptions: {
-                        index: { position: 'bottom' },
-                        indexTop: { position: 'top' }
                     }
                 }
             },
@@ -47,8 +46,9 @@ SV.registerLayout('Array', {
                     }
                 }
             },
-            behavior: {
-                dragNode: false
+            indexLabel: {
+                index: { position: 'bottom' },
+                indexRight: { position: 'right' }
             }
         };
     },
@@ -56,13 +56,13 @@ SV.registerLayout('Array', {
     layout(elements) {
         let arr = elements;
 
-        for(let i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
             let width = arr[i].get('size')[0];
 
-            if(i > 0) {
+            if (i > 0) {
                 arr[i].set('x', arr[i - 1].get('x') + width);
             }
         }
     }
-}); 
+});
 

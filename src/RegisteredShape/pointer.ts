@@ -1,7 +1,7 @@
-import G6 from '@antv/g6';
+import { registerNode } from '@antv/g6';
 
 
-export default G6.registerNode('pointer', {
+export default registerNode('pointer', {
     draw(cfg, group) {
         const keyShape = group.addShape('path', {
             attrs: {
@@ -13,7 +13,7 @@ export default G6.registerNode('pointer', {
         });
 
         if (cfg.label) {
-            const style = (cfg.labelCfg && cfg.labelCfg.style) || {};
+            const labelStyle = (cfg.labelCfg && cfg.labelCfg.style) || {};
 
             const bgRect = group.addShape('rect', {
                 attrs: {
@@ -33,8 +33,8 @@ export default G6.registerNode('pointer', {
                     textAlign: 'center',
                     textBaseline: 'middle',
                     text: cfg.label,
-                    fill: style.fill || '#999',
-                    fontSize: style.fontSize || 16
+                    fill: labelStyle.fill || '#999',
+                    fontSize: labelStyle.fontSize || 16
                 },
                 name: 'pointer-text-shape'
             });

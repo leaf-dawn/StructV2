@@ -1,5 +1,4 @@
 import { SVModel } from "../Model/SVModel";
-import { LayoutGroupOptions } from "../options";
 
 
 
@@ -8,15 +7,8 @@ import { LayoutGroupOptions } from "../options";
  * @param optionsTable 
  * @returns 
  */
-export function InitViewBehaviors(optionsTable: { [key: string]: LayoutGroupOptions }) {
-    const dragNodeTable: { [key: string]: boolean | string[] } = {},
-        selectNodeTable: { [key: string]: boolean | string[] } = {},
-        defaultModes = [];
-
-    Object.keys(optionsTable).forEach(item => {
-        dragNodeTable[item] = optionsTable[item].behavior.dragNode;
-        selectNodeTable[item] = optionsTable[item].behavior.selectNode;
-    });
+export function InitViewBehaviors() {
+    const defaultModes = [];
 
     const dragNodeFilter = event => {
         let g6Item = event.item,
@@ -26,17 +18,7 @@ export function InitViewBehaviors(optionsTable: { [key: string]: LayoutGroupOpti
             return false;
         }
 
-        let dragNode = optionsTable[node.layout].behavior.dragNode;
-
-        if (typeof dragNode === 'boolean') {
-            return dragNode;
-        }
-
-        if (Array.isArray(dragNode) && dragNode.indexOf(node.sourceType) > -1) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     const selectNodeFilter = event => {
@@ -47,17 +29,7 @@ export function InitViewBehaviors(optionsTable: { [key: string]: LayoutGroupOpti
             return false;
         }
 
-        let selectNode = optionsTable[node.layout].behavior.selectNode;
-
-        if (typeof selectNode === 'boolean') {
-            return selectNode;
-        }
-
-        if (Array.isArray(selectNode) && selectNode.indexOf(node.sourceType) > -1) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     defaultModes.push({
@@ -68,6 +40,10 @@ export function InitViewBehaviors(optionsTable: { [key: string]: LayoutGroupOpti
     defaultModes.push({
         type: 'drag-canvas'
     });
+
+    // defaultModes.push({
+    //     type: 'zoom-canvas'
+    // });
 
     defaultModes.push({
         type: 'click-select',

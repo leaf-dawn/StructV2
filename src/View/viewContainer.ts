@@ -8,7 +8,9 @@ import { Reconcile } from "./reconcile";
 import { FixNodeMarkerDrag } from "../BehaviorHelper/fixNodeMarkerDrag";
 import { InitDragCanvasWithLeak } from "../BehaviorHelper/dragCanvasWithLeak";
 import { EventBus } from "../Common/eventBus";
+import { InitZoomCanvasWithLeak } from "../BehaviorHelper/zoomCanvasWithLeak";
 import { Group } from "../Common/group";
+import { Graph } from "_@antv_g6-pc@0.5.0@@antv/g6-pc";
 
 
 
@@ -40,17 +42,17 @@ export class ViewContainer {
             height = this.getG6Instance().getHeight(),
             { drag, zoom } = this.engine.interactionOptions;
 
-        this.leakAreaY = height * (1 - leakAreaHeight);
+        this.leakAreaY = height - leakAreaHeight;
 
         if (drag) {
             InitDragCanvasWithLeak(this);
         }
 
         if (zoom) {
-            // InitZoomCanvas(g6Instance, g6GeneralGroup);
+            // InitZoomCanvasWithLeak(this);
         }
 
-        FixNodeMarkerDrag(g6Instance, this.engine.optionsTable);
+        FixNodeMarkerDrag(g6Instance);
     }
 
 
@@ -60,15 +62,35 @@ export class ViewContainer {
      * 对主视图进行重新布局
      */
     reLayout() {
-        this.layoutProvider.layoutAll(this.prevLayoutGroupTable, [], this.accumulateLeakModels);
+        const g6Instance = this.getG6Instance(),
+            group = g6Instance.getGroup(),
+            matrix = group.getMatrix();
+
+        if (matrix) {
+            let dx = matrix[6],
+                dy = matrix[7];
+
+            g6Instance.translate(-dx, -dy);
+        }
+
+        this.layoutProvider.layoutAll(this.prevLayoutGroupTable, this.accumulateLeakModels, []);
+        g6Instance.refresh();
     }
 
 
     /**
      * 获取 g6 实例
      */
-    getG6Instance() {
+    getG6Instance(): Graph {
         return this.renderer.getG6Instance();
+    }
+
+    /**
+     * 获取泄漏区里面的元素
+     * @returns 
+     */
+    getAccumulateLeakModels(): SVModel[] {
+        return this.accumulateLeakModels;
     }
 
     /**
@@ -84,17 +106,20 @@ export class ViewContainer {
      * @param height 
      */
     resize(width: number, height: number) {
-        this.renderer.getG6Instance().changeSize(width, height);
+        const g6Instance = this.getG6Instance(),
+            prevContainerHeight = g6Instance.getHeight(),
+            globalGroup: Group = new Group();
 
-        const containerHeight = this.getG6Instance().getHeight(),
-            leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
-            targetY = containerHeight * (1 - leakAreaHeight);
+        globalGroup.add(...this.prevModelList, ...this.accumulateLeakModels);
+        this.renderer.changeSize(width, height);
 
-        const accumulateLeakGroup = new Group();
-        accumulateLeakGroup.add(...this.accumulateLeakModels);
-        accumulateLeakGroup.translate(0, targetY - this.leakAreaY);
-        this.leakAreaY = targetY;
+        const containerHeight = g6Instance.getHeight(),
+            dy = containerHeight - prevContainerHeight;
 
+        globalGroup.translate(0, dy);
+        this.renderer.refresh();
+
+        this.leakAreaY += dy;
         EventBus.emit('onLeakAreaUpdate', {
             leakAreaY: this.leakAreaY,
             hasLeak: this.hasLeak
@@ -131,7 +156,7 @@ export class ViewContainer {
                 hasLeak: this.hasLeak
             });
         }
-        
+
         this.renderer.build(renderModelList); // 首先在离屏canvas渲染先
         this.layoutProvider.layoutAll(layoutGroupTable, this.accumulateLeakModels, diffResult.LEAKED); // 进行布局（设置model的x，y，样式等）
 
@@ -144,10 +169,6 @@ export class ViewContainer {
 
         this.prevLayoutGroupTable = layoutGroupTable;
         this.prevModelList = modelList;
-
-        // modelList.forEach(item => {
-        //     console.log(item.getModelType(), item.getBound());
-        // });
     }
 
     /**
@@ -155,6 +176,11 @@ export class ViewContainer {
      */
     destroy() {
         this.renderer.destroy();
+        this.reconcile.destroy();
+        this.layoutProvider = null;
+        this.prevLayoutGroupTable = null;
+        this.prevModelList.length = 0;
+        this.accumulateLeakModels.length = 0;
     }
 
 
@@ -162,15 +188,9 @@ export class ViewContainer {
 
 
     /**
-     * 把渲染前要触发的逻辑放在这里
+     * 把渲染后要触发的逻辑放在这里
      */
     private afterRender() {
-        const g6Instance = this.renderer.getG6Instance();
-
-        // 把所有连线置顶
-        g6Instance.getEdges().forEach(item => item.toFront());
-        g6Instance.paint();
-
         this.prevModelList.forEach(item => {
             if (item.leaked === false) {
                 item.discarded = true;
@@ -179,11 +199,9 @@ export class ViewContainer {
     }
 
     /**
-     * 把渲染后要触发的逻辑放在这里
+     * 把渲染前要触发的逻辑放在这里
      */
-    private beforeRender() {
-
-    }
+    private beforeRender() { }
 }
 
 

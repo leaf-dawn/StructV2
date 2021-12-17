@@ -32,8 +32,9 @@ SV.registerLayout('BinaryTree', {
                     }
                 }
             },
-            pointer: {
+            marker: {
                 external: {
+                    type: 'pointer',
                     anchor: 0,
                     offset: 14,
                     style: {

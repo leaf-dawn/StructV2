@@ -1,7 +1,7 @@
-import G6 from '@antv/g6';
+import { registerNode } from '@antv/g6';
 
 
-export default G6.registerNode('link-list-node', {
+export default registerNode('link-list-node', {
     draw(cfg, group) {
         cfg.size = cfg.size || [30, 10];
 
@@ -15,7 +15,7 @@ export default G6.registerNode('link-list-node', {
                 width: width,
                 height: height,
                 stroke: cfg.style.stroke || '#333',
-                fill: '#eee',
+                fill: cfg.style.backgroundFill || '#eee',
                 cursor: cfg.style.cursor
             },
             name: 'wrapper'

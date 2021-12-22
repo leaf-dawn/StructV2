@@ -64,7 +64,8 @@ export default Util.registerShape('link-list-node', {
             [1, 0.5],
             [5 / 6, 1],
             [0.5, 1],
-            [0, 0.5]
+            [0, 0.5],
+            [1 / 3, 1]
         ];
     }
 }, 'rect');

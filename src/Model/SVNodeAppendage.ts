@@ -177,6 +177,6 @@ export class SVMarker extends SVNodeAppendage {
 
     public getLabelSizeRadius(): number {
         const { width, height } = this.shadowG6Item.getContainer().getChildren()[2].getBBox();
-        return width > height ? width : height;
+        return Math.max(width, height);
     }
 };

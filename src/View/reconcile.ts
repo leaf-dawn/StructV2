@@ -1,6 +1,7 @@
 import { EventBus } from "../Common/eventBus";
 import { Util } from "../Common/util";
 import { Engine } from "../engine";
+import { LayoutGroupTable } from "../Model/modelConstructor";
 import { SVLink } from "../Model/SVLink";
 import { SVModel } from "../Model/SVModel";
 import { SVNode } from "../Model/SVNode";
@@ -66,15 +67,30 @@ export class Reconcile {
 
     /**
      * 获取被泄露的节点
+     * @param layoutGroupTable 
      * @param prevModelList 
      * @param modelList 
      * @returns 
      */
-    private getLeakModels(prevModelList: SVModel[], modelList: SVModel[]): SVModel[] {
-        const potentialLeakModels: SVModel[] = prevModelList.filter(item =>
+    private getLeakModels(layoutGroupTable: LayoutGroupTable, prevModelList: SVModel[], modelList: SVModel[]): SVModel[] {
+        let potentialLeakModels: SVModel[] = prevModelList.filter(item =>
             !modelList.find(model => model.id === item.id) && !item.freed
         );
         const leakModels: SVModel[] = [];
+
+        // 先把节点拿出来
+        const potentialLeakNodes = potentialLeakModels.filter(item => item.isNode()) as SVNode[],
+              groups = Util.groupBy<SVNode>(potentialLeakNodes, 'group');
+
+        // 再把非节点的model拿出来
+        potentialLeakModels = potentialLeakModels.filter(item => item.isNode() === false);
+        
+        Object.keys(groups).forEach(key => {
+            const leakRule = layoutGroupTable.get(key).layoutCreator.defineLeakRule;
+            if(leakRule && typeof leakRule === 'function') {
+                potentialLeakModels.push(...leakRule(groups[key]));
+            }
+        });
 
         potentialLeakModels.forEach(item => {
             if (item instanceof SVNode) {
@@ -345,14 +361,15 @@ export class Reconcile {
 
     /**
      * 进行diff
-     * @param prevLayoutGroupTable 
      * @param layoutGroupTable 
-     * @param accumulateLeakModels
+     * @param prevModelList 
+     * @param modelList 
+     * @param accumulateLeakModels 
      * @returns 
      */
-    public diff(prevModelList: SVModel[], modelList: SVModel[], accumulateLeakModels: SVModel[]): DiffResult {
+    public diff(layoutGroupTable: LayoutGroupTable, prevModelList: SVModel[], modelList: SVModel[], accumulateLeakModels: SVModel[]): DiffResult {
         const continuousModels: SVModel[] = this.getContinuousModels(prevModelList, modelList);
-        const leakModels: SVModel[] = this.getLeakModels(prevModelList, modelList);
+        const leakModels: SVModel[] = this.getLeakModels(layoutGroupTable, prevModelList, modelList);
         const appendModels: SVModel[] = this.getAppendModels(prevModelList, modelList, accumulateLeakModels);
         const removeModels: SVModel[] = this.getRemoveModels(prevModelList, modelList);
         const updateModels: SVModel[] = [

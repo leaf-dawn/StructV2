@@ -99,84 +99,123 @@
 
 
         let data = [{
-            Array: {
-                data: [
-                    { id: 1, data: 1, child: [2, 3], external: 'exx' },
-                    { id: 2, data: 2 },
-                    { id: 3, data: 3, child: [6, 4] },
-                    { id: 4, data: 4 },
-                    { id: 6, data: 6 }
-                ],
-                layouter: 'BinaryTree'
-            },
-            L: {
-                data: [
-                    { id: 11, data: 11, next: 22, external: 'tt' },
-                    { id: 22, data: 22, next: 33 },
-                    { id: 33, data: 33, next: 44 },
-                    { id: 44, data: 44, freed: true }
-                ],
-                layouter: 'LinkList'
-            },
-            "ChainHashTable": {
+            "sqStack0": {
                 "data": [
                     {
-                        "type": "head",
-                        "id": "0x618090",
-                        "data": "T"
+                        "id": "0x617eb5",
+                        "data": "",
+                        "index": 5,
+                        "cursor": "top"
                     },
                     {
-                        "type": "node",
-                        "id": "0x618030",
-                        "data": "N"
+                        "id": "0x617eb4",
+                        "data": "2",
+                        "index": 4
                     },
                     {
-                        "type": "head",
-                        "id": "0x6180f0",
-                        "data": "U",
-                        "start": "node#0x618030"
+                        "id": "0x617eb3",
+                        "data": "6",
+                        "index": 3
                     },
                     {
-                        "type": "node",
-                        "id": "0x617ff0",
-                        "data": "V",
-                        "next": "node#0x617fd0"
+                        "id": "0x617eb2",
+                        "data": "7",
+                        "index": 2
                     },
                     {
-                        "type": "node",
-                        "id": "0x617fd0",
-                        "data": "A"
+                        "id": "0x617eb1",
+                        "data": "9",
+                        "index": 1
                     },
                     {
-                        "type": "head",
-                        "id": "0x618010",
-                        "data": "O",
-                        "start": "node#0x617ff0"
-                    },
-                    {
-                        "type": "node",
-                        "id": "0x618050",
-                        "data": "K"
-                    },
-                    {
-                        "type": "head",
-                        "id": "0x6180b0",
-                        "data": "R",
-                        "start": "node#0x618050"
+                        "id": "0x617eb0",
+                        "data": "1",
+                        "index": 0,
+                        "external": "S"
                     }
                 ],
-                    "layouter": "ChainHashTable"
+                "layouter": "Stack"
             }
         }, {
-            Array: {
-                data: [
-                    { id: 1, data: 1, child: [2, 3], external: 'exx' },
-                    { id: 2, data: 2 },
-                    { id: 3, data: 3, child: [6, 7] },
-                    { id: 7, data: 7 }
+            "sqStack0": {
+                "data": [
+                    {
+                        "id": "0x617eb4",
+                        "data": "2",
+                        "index": 4,
+                        "cursor": "top",
+                        "type": "default"
+                    },
+                    {
+                        "id": "0x617eb3",
+                        "data": "6",
+                        "index": 3,
+                        "type": "default"
+                    },
+                    {
+                        "id": "0x617eb2",
+                        "data": "7",
+                        "index": 2,
+                        "type": "default"
+                    },
+                    {
+                        "id": "0x617eb1",
+                        "data": "9",
+                        "index": 1,
+                        "type": "default"
+                    },
+                    {
+                        "id": "0x617eb0",
+                        "data": "1",
+                        "index": 0,
+                        "bottomExternal": "S",
+                        "type": "default"
+                    }
                 ],
-                layouter: 'BinaryTree'
+                "layouter": "Stack"
             }
+        }, {
+            "data": [
+                {
+                    "id": "0x617eb5",
+                    "data": "",
+                    "index": 5,
+                    "cursor": "top",
+                    "type": "default"
+                },
+                {
+                    "id": "0x617eb4",
+                    "data": "2",
+                    "index": 4,
+                    "type": "default"
+                },
+                {
+                    "id": "0x617eb3",
+                    "data": "6",
+                    "index": 3,
+                    "type": "default"
+                },
+                {
+                    "id": "0x617eb2",
+                    "data": "7",
+                    "index": 2,
+                    "type": "default"
+                },
+                {
+                    "id": "0x617eb1",
+                    "data": "9",
+                    "index": 1,
+                    "type": "default"
+                },
+                {
+                    "id": "0x617eb0",
+                    "data": "1",
+                    "index": 0,
+                    "bottomExternal": "S",
+                    "type": "default"
+                }
+            ],
+            "layouter": "Stack"
         }];
 
 

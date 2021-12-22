@@ -14,6 +14,10 @@ SV.registerLayout('Array', {
         return sources;
     },
 
+    defineLeakRule(nodes) {
+        return [];
+    },
+
     defineOptions() {
         return {
             node: {
@@ -49,6 +53,9 @@ SV.registerLayout('Array', {
             indexLabel: {
                 index: { position: 'bottom' },
                 indexRight: { position: 'right' }
+            },
+            behavior: {
+                dragNode: false
             }
         };
     },

@@ -129,7 +129,7 @@ export interface EngineOptions {
 export interface LayoutCreator {
     defineOptions(sourceData: SourceNode[]): LayoutGroupOptions;
     sourcesPreprocess?(sourceData: SourceNode[], options: LayoutGroupOptions): SourceNode[];
-    defineLeakRule?(models: SVModel[]): SVModel[];
+    defineLeakRule?(models: SVNode[]): SVNode[];
     layout(nodes: SVNode[], layoutOptions: LayoutOptions);
     [key: string]: any;
 }

@@ -129,7 +129,7 @@ export class SVModel {
             }
         };
 
-        this.G6ModelProps = merge(this.G6ModelProps, newG6ModelProps);
+        this.G6ModelProps = merge.recursive(this.G6ModelProps, newG6ModelProps);
 
         if (this.G6Item) {
             this.g6Instance.updateItem(this.G6Item, this.G6ModelProps);

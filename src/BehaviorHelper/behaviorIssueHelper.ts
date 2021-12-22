@@ -102,6 +102,10 @@ export function SolveNodeAppendagesDrag(viewContainer: ViewContainer) {
 
             node.appendages.forEach(item => {
                 item.setSelectedState(false);
+                item.set({
+                    x: item.G6Item.getModel().x,
+                    y: item.G6Item.getModel().y
+                });
             });
         }
 
@@ -110,6 +114,15 @@ export function SolveNodeAppendagesDrag(viewContainer: ViewContainer) {
                 x: item.G6Item.getModel().x,
                 y: item.G6Item.getModel().y
             });
+
+            if(item instanceof SVNode) {
+                item.appendages.forEach(appendage => {
+                    appendage.set({
+                        x: appendage.G6Item.getModel().x,
+                        y: appendage.G6Item.getModel().y
+                    });
+                });
+            }
         });
     });
 }

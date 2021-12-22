@@ -146,7 +146,7 @@ export class LayoutProvider {
             },
             left: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
                 return {
-                    x: nodeBound.x - labelBound.width - 2 * offset,
+                    x: nodeBound.x - labelBound.width - offset,
                     y: nodeBound.y + nodeBound.height / 2
                 };
             }
@@ -227,8 +227,11 @@ export class LayoutProvider {
             containerHeight = this.viewContainer.getG6Instance().getHeight(),
             leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
             leakAreaY = containerHeight - leakAreaHeight,
-            xOffset = 50;
+            xOffset = 60;
 
+        let prevBound: BoundingRect;
+
+        // 避免在泄漏前拖拽节点导致的位置变化，先把节点位置重置为布局后的标准位置
         leakModels.forEach(item => {
             item.set({
                 x: item.layoutX,
@@ -236,17 +239,26 @@ export class LayoutProvider {
             });
         });
 
-        group.add(...leakModels);
-        const currentLeakGroupBound: BoundingRect = group.getBound(),
-            globalLeakGroupBound: BoundingRect = accumulateLeakModels.length ?
-                Bound.union(...accumulateLeakModels.map(item => item.getBound())) :
-                { x: 0, y: leakAreaY, width: 0, height: 0 };
+        const globalLeakGroupBound: BoundingRect = accumulateLeakModels.length ?
+            Bound.union(...accumulateLeakModels.map(item => item.getBound())) :
+            { x: 0, y: leakAreaY, width: 0, height: 0 };
 
-        const { x: groupX, y: groupY } = currentLeakGroupBound,
-            dx = globalLeakGroupBound.x + globalLeakGroupBound.width + xOffset - groupX,
-            dy = globalLeakGroupBound.y - groupY;
+        const layoutGroups = Util.groupBy(leakModels, 'group');
+        Object.keys(layoutGroups).forEach(key => {
+            group.add(...layoutGroups[key]);
 
-        group.translate(dx, dy);
+            const currentBound: BoundingRect = group.getBound(),
+                prevBoundEnd = prevBound? prevBound.x + prevBound.width: 0,
+                { x: groupX, y: groupY } = currentBound,
+                dx = globalLeakGroupBound.x + globalLeakGroupBound.width + prevBoundEnd + xOffset - groupX,
+                dy = globalLeakGroupBound.y - groupY;
+
+            group.translate(dx, dy);
+            group.clear();
+            Bound.translate(currentBound, dx, dy);
+
+            prevBound = currentBound;
+        });
     }
 
     /**

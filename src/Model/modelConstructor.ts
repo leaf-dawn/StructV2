@@ -217,10 +217,10 @@ export class ModelConstructor {
                     value = node[name];
 
                 // 若没有指针字段的结点则跳过
-                if (!value) continue;
+                if (value === undefined || value === null) continue;
 
                 let id = `${group}.${name}#${value}`,
-                    indexLabel = new SVIndexLabel(id, name, group, layout, value, node, indexLabelOptions[name]);
+                    indexLabel = new SVIndexLabel(id, name, group, layout, value.toString(), node, indexLabelOptions[name]);
 
                 indexLabelList.push(indexLabel);
             }

@@ -20,7 +20,7 @@ export default Util.registerShape('cursor', {
                     x: 0, 
                     y: 0,
                     text: cfg.label,
-                    fill: '#fafafa',
+                    fill: 'transparent',
                     radius: 2,
                 },
                 name: 'bgRect'

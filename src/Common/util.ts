@@ -48,6 +48,28 @@ export const Util = {
     },
 
     /**
+     * 将列表分类
+     * @param list 
+     * @param category 
+     * @returns 
+     */
+    groupBy<T>(list: T[], category: string): { [key: string]: T[] } {
+        const result = {} as { [key: string]: T[] };
+
+        list.forEach(item => {
+            let value = item[category];
+
+            if(result[value] === undefined) {
+                result[value] = [];
+            }
+
+            result[value].push(item);
+        });
+
+        return result;
+    },
+
+    /**
      * 断言函数
      * @param assertFn 
      * @param errorText 

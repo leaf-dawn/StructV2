@@ -14,6 +14,7 @@ import { EngineOptions, LayoutCreator } from "./options";
 import { SourceNode } from "./sources";
 import { Util } from "./Common/util";
 import { SVModel } from "./Model/SVModel";
+import { SVNode } from "./Model/SVNode";
 
 
 
@@ -72,7 +73,7 @@ SV.registerLayout = function(name: string, layoutCreator: LayoutCreator) {
     }
 
     if(typeof layoutCreator.defineLeakRule !== 'function') {
-        layoutCreator.defineLeakRule = function(models: SVModel[]): SVModel[] {
+        layoutCreator.defineLeakRule = function(models: SVNode[]): SVNode[] {
             return models;
         }
     }

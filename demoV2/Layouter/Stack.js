@@ -13,11 +13,15 @@ SV.registerLayout('Stack', {
         return sources;
     },
 
+    defineLeakRule(nodes) {
+        return [];
+    },
+
     defineOptions() {
         return {
             element: { 
                 default: {
-                    type: 'indexed-node',
+                    type: 'array-node',
                     label: '[id]',
                     size: [60, 30],
                     style: {
@@ -48,6 +52,9 @@ SV.registerLayout('Stack', {
                         fill: '#f08a5d'
                     }
                 }
+            },
+            indexLabel: {
+                index: { position: 'left' }
             },
             behavior: {
                 dragNode: false

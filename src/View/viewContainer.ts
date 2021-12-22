@@ -20,7 +20,7 @@ export class ViewContainer {
     private reconcile: Reconcile;
     public renderer: Renderer;
 
-    private prevLayoutGroupTable: LayoutGroupTable;
+    private layoutGroupTable: LayoutGroupTable;
     private prevModelList: SVModel[];
     private accumulateLeakModels: SVModel[];
 
@@ -37,7 +37,7 @@ export class ViewContainer {
         this.layoutProvider = new LayoutProvider(engine, this);
         this.renderer = new Renderer(engine, DOMContainer, behaviorsModes);
         this.reconcile = new Reconcile(engine, this.renderer);
-        this.prevLayoutGroupTable = new Map();
+        this.layoutGroupTable = new Map();
         this.prevModelList = [];
         this.accumulateLeakModels = [];
         this.hasLeak = false; // 判断是否已经发生过泄漏
@@ -75,7 +75,7 @@ export class ViewContainer {
             g6Instance.translate(-dx, -dy);
         }
 
-        this.layoutProvider.layoutAll(this.prevLayoutGroupTable, this.accumulateLeakModels, []);
+        this.layoutProvider.layoutAll(this.layoutGroupTable, this.accumulateLeakModels, []);
         g6Instance.refresh();
     }
 
@@ -99,7 +99,7 @@ export class ViewContainer {
      * 
      */
     getLayoutGroupTable(): LayoutGroupTable {
-        return this.prevLayoutGroupTable;
+        return this.layoutGroupTable;
     }
 
     /**
@@ -142,7 +142,7 @@ export class ViewContainer {
      */
     render(layoutGroupTable: LayoutGroupTable) {
         const modelList = Util.convertGroupTable2ModelList(layoutGroupTable),
-            diffResult = this.reconcile.diff(this.prevModelList, modelList, this.accumulateLeakModels),
+            diffResult = this.reconcile.diff(this.layoutGroupTable, this.prevModelList, modelList, this.accumulateLeakModels),
             renderModelList = [
                 ...modelList,
                 ...diffResult.REMOVE,
@@ -176,7 +176,7 @@ export class ViewContainer {
 
         this.accumulateLeakModels.push(...diffResult.LEAKED);  // 对泄漏节点进行累积
 
-        this.prevLayoutGroupTable = layoutGroupTable;
+        this.layoutGroupTable = layoutGroupTable;
         this.prevModelList = modelList;
     }
 
@@ -187,9 +187,10 @@ export class ViewContainer {
         this.renderer.destroy();
         this.reconcile.destroy();
         this.layoutProvider = null;
-        this.prevLayoutGroupTable = null;
+        this.layoutGroupTable = null;
         this.prevModelList.length = 0;
         this.accumulateLeakModels.length = 0;
+        this.brushSelectedModels.length = 0;
     }
 
 

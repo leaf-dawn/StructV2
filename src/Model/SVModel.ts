@@ -165,6 +165,18 @@ export class SVModel {
     }
 
     /**
+     * 设置是否被选中的状态
+     * @param isSelected 
+     */
+    setSelectedState(isSelected: boolean) {
+        if(this.G6Item === null) {
+            return;
+        }
+
+        this.G6Item.setState('selected', isSelected);
+    }
+
+    /**
      * 
      * @returns 
      */
@@ -186,6 +198,8 @@ export class SVModel {
     isNode(): boolean {
         return false;
     }
+
+
 }
 
 

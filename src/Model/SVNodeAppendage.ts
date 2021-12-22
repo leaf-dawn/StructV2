@@ -47,6 +47,7 @@ export class SVFreedLabel extends SVNodeAppendage {
             },
             size: [0, 0],
             style: {
+                opacity: 0,
                 stroke: null,
                 fill: 'transparent'
             }

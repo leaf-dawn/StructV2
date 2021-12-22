@@ -266,6 +266,8 @@ export class Reconcile {
                     timingFunction
                 });
             }
+
+            item.G6Item.enableCapture(false);
         });
 
         EventBus.emit('onLeak', leakModels);

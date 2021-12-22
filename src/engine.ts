@@ -1,6 +1,6 @@
 import { Sources } from "./sources";
-import { ModelConstructor } from "./Model/modelConstructor";
-import { AnimationOptions, EngineOptions, InteractionOptions, LayoutGroupOptions, LayoutOptions, ViewOptions } from "./options";
+import { LayoutGroupTable, ModelConstructor } from "./Model/modelConstructor";
+import { AnimationOptions, BehaviorOptions, EngineOptions, LayoutGroupOptions, ViewOptions } from "./options";
 import { EventBus } from "./Common/eventBus";
 import { ViewContainer } from "./View/viewContainer";
 import { SVNode } from "./Model/SVNode";
@@ -11,13 +11,12 @@ import { SVModel } from "./Model/SVModel";
 export class Engine {
     private modelConstructor: ModelConstructor;
     private viewContainer: ViewContainer;
-    private prevSource: Sources;
     private prevStringSource: string;
 
     public engineOptions: EngineOptions;
     public viewOptions: ViewOptions;
     public animationOptions: AnimationOptions;
-    public interactionOptions: InteractionOptions;
+    public behaviorOptions: BehaviorOptions;
 
     constructor(DOMContainer: HTMLElement, engineOptions: EngineOptions) {
         this.engineOptions = Object.assign({}, engineOptions);
@@ -36,12 +35,12 @@ export class Engine {
             timingFunction: 'easePolyOut'
         }, engineOptions.animation);
 
-        this.interactionOptions = Object.assign({
+        this.behaviorOptions = Object.assign({
             drag: true,
             zoom: true,
             dragNode: true,
             selectNode: true
-        }, engineOptions.interaction);
+        }, engineOptions.behavior);
 
         this.modelConstructor = new ModelConstructor(this);
         this.viewContainer = new ViewContainer(this, DOMContainer);
@@ -62,7 +61,6 @@ export class Engine {
             return;
         }
 
-        this.prevSource = source;
         this.prevStringSource = stringSource;
 
         // 1 转换模型（data => model）
@@ -197,6 +195,15 @@ export class Engine {
         this.viewContainer.getG6Instance().on(eventName, event => {
             callback(event.item['SVModel']);
         });
+    }
+
+    /**
+     * 开启/关闭框选模式
+     * @param enable
+     */
+    public switchBrushSelect(enable: boolean) {
+        const g6Instance = this.viewContainer.getG6Instance();
+        enable ? g6Instance.setMode('brush') : g6Instance.setMode('default');
     }
 
     /**

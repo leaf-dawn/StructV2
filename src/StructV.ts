@@ -1,7 +1,7 @@
 import { Engine } from "./engine";
 import { Bound } from "./Common/boundingRect";
 import { Group } from "./Common/group";
-import G6, { Util } from '@antv/g6';
+import G6 from '@antv/g6';
 import Pointer from "./RegisteredShape/pointer";
 import LinkListNode from "./RegisteredShape/linkListNode";
 import BinaryTreeNode from "./RegisteredShape/binaryTreeNode";
@@ -11,8 +11,11 @@ import ArrayNode from "./RegisteredShape/arrayNode";
 import Cursor from "./RegisteredShape/cursor";
 import { Vector } from "./Common/vector";
 import { EngineOptions, LayoutCreator } from "./options";
-import { SVNode } from "./Model/SVNode";
 import { SourceNode } from "./sources";
+import { Util } from "./Common/util";
+import { SVModel } from "./Model/SVModel";
+
+
 
 
 export interface StructV {
@@ -45,7 +48,7 @@ export const SV: StructV = function(DOMContainer: HTMLElement, engineOptions: En
 SV.Group = Group;
 SV.Bound = Bound;
 SV.Vector = Vector;
-SV.Mat3 = Util.mat3;
+SV.Mat3 = G6.Util.mat3;
 SV.G6 = G6;
 
 SV.registeredLayout = {};
@@ -59,7 +62,7 @@ SV.registeredShape = [
     CLenQueuePointer,
 ];
 
-SV.registerShape = G6.registerNode;
+SV.registerShape = Util.registerShape;
 SV.registerLayout = function(name: string, layoutCreator: LayoutCreator) {
 
     if(typeof layoutCreator.sourcesPreprocess !== 'function') {
@@ -69,8 +72,8 @@ SV.registerLayout = function(name: string, layoutCreator: LayoutCreator) {
     }
 
     if(typeof layoutCreator.defineLeakRule !== 'function') {
-        layoutCreator.defineLeakRule = function(nodes: SVNode[]): SVNode[] {
-            return nodes;
+        layoutCreator.defineLeakRule = function(models: SVModel[]): SVModel[] {
+            return models;
         }
     }
 
@@ -80,5 +83,4 @@ SV.registerLayout = function(name: string, layoutCreator: LayoutCreator) {
     
     SV.registeredLayout[name] = layoutCreator;
 };
-
 

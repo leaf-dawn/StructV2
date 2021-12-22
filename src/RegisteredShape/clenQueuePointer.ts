@@ -1,7 +1,36 @@
-import { registerNode, Util } from '@antv/g6';
+import G6 from "@antv/g6";
+import { Util } from "../Common/util";
 
 
-export default registerNode('clen-queue-pointer', {
+
+
+export default function rotate(shape, angle, transform) {
+    const matrix1 = shape.getMatrix();
+    const newMatrix1 = transform(matrix1, [
+        ['r', angle],
+    ]);
+    shape.setMatrix(newMatrix1);
+}
+function translate(shape, x, y, transform) {
+    const matrix1 = shape.getMatrix();
+    const newMatrix1 = transform(matrix1, [
+        ['t', x, y],
+    ]);
+    shape.setMatrix(newMatrix1);
+}
+function culcuRotate(angle, R) {
+    let offsetX = Math.cos(angle) * R;
+    let offsetY = -Math.sin(angle) * R;
+    console.log(offsetX, offsetY, R);
+    return {
+        offsetX,
+        offsetY,
+    }
+}
+
+
+
+Util.registerShape('clen-queue-pointer', {
     draw(cfg, group) {
         let id = cfg.id as string;
 
@@ -55,10 +84,10 @@ export default registerNode('clen-queue-pointer', {
             });
 
             // rotate(text, angle, G6.Util.transform);
-            translate(text, 0, -75, Util.transform);
+            translate(text, 0, -75, G6.Util.transform);
         }
-        rotate(keyShape, angle, Util.transform);
-        translate(keyShape, 0, -75, Util.transform);
+        rotate(keyShape, angle, G6.Util.transform);
+        translate(keyShape, 0, -75, G6.Util.transform);
 
         return keyShape;
 
@@ -89,26 +118,3 @@ export default registerNode('clen-queue-pointer', {
 });
 
         
-function rotate(shape, angle, transform) {
-    const matrix1 = shape.getMatrix();
-    const newMatrix1 = transform(matrix1, [
-        ['r', angle],
-    ]);
-    shape.setMatrix(newMatrix1);
-}
-function translate(shape, x, y, transform) {
-    const matrix1 = shape.getMatrix();
-    const newMatrix1 = transform(matrix1, [
-        ['t', x, y],
-    ]);
-    shape.setMatrix(newMatrix1);
-}
-function culcuRotate(angle, R) {
-    let offsetX = Math.cos(angle) * R;
-    let offsetY = -Math.sin(angle) * R;
-    console.log(offsetX, offsetY, R);
-    return {
-        offsetX,
-        offsetY,
-    }
-}

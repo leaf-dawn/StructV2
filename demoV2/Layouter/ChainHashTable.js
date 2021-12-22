@@ -34,7 +34,7 @@ SV.registerLayout('ChainHashTable', {
                 start: { 
                     type: 'line',
                     sourceAnchor: 1,
-                    targetAnchor: 5,
+                    targetAnchor: 6,
                     style: {
                         stroke: '#333',
                         endArrow: {
@@ -77,7 +77,7 @@ SV.registerLayout('ChainHashTable', {
                 xInterval: 50,
                 yInterval: 50
             },
-            interaction: {
+            behavior: {
                 dragNode: ['node']
             }
         };

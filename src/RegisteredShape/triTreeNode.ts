@@ -1,7 +1,7 @@
-import { registerNode } from '@antv/g6';
+import { Util } from '../Common/util';
 
 
-export default registerNode('tri-tree-node', {
+export default Util.registerShape('tri-tree-node', {
     draw(cfg, group) {
         cfg.size = cfg.size;
 
@@ -97,4 +97,4 @@ export default registerNode('tri-tree-node', {
             [0.5, 0.125]
         ];
     },
-});
+}, 'rect');

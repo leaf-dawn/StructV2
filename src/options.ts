@@ -1,3 +1,4 @@
+import { SVModel } from "./Model/SVModel";
 import { SVNode } from "./Model/SVNode";
 import { SourceNode } from "./sources";
 
@@ -86,6 +87,9 @@ export interface LayoutGroupOptions {
     addressLabel?: AddressLabelOption;
     indexLabel?: { [key: string]: IndexLabelOption };
     layout?: LayoutOptions;
+    behavior?: {
+        dragNode: boolean | string[];
+    }
 };
 
 
@@ -110,7 +114,7 @@ export interface AnimationOptions {
 };
 
 
-export interface InteractionOptions {
+export interface BehaviorOptions {
     drag: boolean;
     zoom: boolean;
 }
@@ -118,14 +122,14 @@ export interface InteractionOptions {
 export interface EngineOptions {
     view?: ViewOptions;
     animation?: AnimationOptions;
-    interaction?: InteractionOptions;
+    behavior?: BehaviorOptions;
 };
 
 
 export interface LayoutCreator {
     defineOptions(sourceData: SourceNode[]): LayoutGroupOptions;
     sourcesPreprocess?(sourceData: SourceNode[], options: LayoutGroupOptions): SourceNode[];
-    defineLeakRule?(nodes: SVNode[]): SVNode[];
+    defineLeakRule?(models: SVModel[]): SVModel[];
     layout(nodes: SVNode[], layoutOptions: LayoutOptions);
     [key: string]: any;
 }

@@ -77,6 +77,9 @@ SV.registerLayout('LinkList', {
             layout: {
                 xInterval: 50,
                 yInterval: 50
+            },
+            behavior: {
+                dragNode: false
             }
         };
     },

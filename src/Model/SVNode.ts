@@ -76,6 +76,21 @@ export class SVNode extends SVModel {
         return true;
     }
 
+    /**
+     * 设置是否被选中的状态
+     * @param isSelected 
+     */
+    setSelectedState(isSelected: boolean) {
+        if (this.G6Item === null) {
+            return;
+        }
+
+        this.G6Item.setState('selected', isSelected);
+        this.appendages.forEach(item => {
+            item.setSelectedState(isSelected);
+        });
+    }
+
     getSourceId(): string {
         return this.sourceId;
     }

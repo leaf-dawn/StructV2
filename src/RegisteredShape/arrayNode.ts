@@ -1,7 +1,7 @@
-import G6 from '@antv/g6';
+import { Util } from "../Common/util";
 
 
-export default G6.registerNode('array-node', {
+export default Util.registerShape('array-node', {
     getAnchorPoints() {
         return [
             [0.5, 0],

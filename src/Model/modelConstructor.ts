@@ -92,7 +92,7 @@ export class ModelConstructor {
                 indexLabel: indexLabelList,
                 link: [],
                 marker: markerList,
-                options: options,
+                options,
                 layoutCreator,
                 modelList: [
                     ...nodeList, 

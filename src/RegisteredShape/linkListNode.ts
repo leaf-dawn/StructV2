@@ -1,7 +1,8 @@
-import { registerNode } from '@antv/g6';
+import { Util } from "../Common/util";
 
 
-export default registerNode('link-list-node', {
+
+export default Util.registerShape('link-list-node', {
     draw(cfg, group) {
         cfg.size = cfg.size || [30, 10];
 
@@ -66,4 +67,4 @@ export default registerNode('link-list-node', {
             [0, 0.5]
         ];
     }
-});
+}, 'rect');

@@ -1,4 +1,4 @@
-import { EdgeConfig, GraphData, NodeConfig } from "@antv/g6-core";
+import { EdgeConfig, GraphData, NodeConfig, registerNode } from "@antv/g6-core";
 import { LayoutGroup, LayoutGroupTable } from "../Model/modelConstructor";
 import { SVLink } from "../Model/SVLink";
 import { SVModel } from "../Model/SVModel";
@@ -14,10 +14,10 @@ export const Util = {
      * 生成唯一id
      */
     generateId(): string {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            let r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-            return v.toString(16);
-        });
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
     },
 
     /**
@@ -25,7 +25,7 @@ export const Util = {
      * @param obj 
      */
     objectClone<T extends Object>(obj: T): T {
-        return obj? JSON.parse(JSON.stringify(obj)): null;
+        return obj ? JSON.parse(JSON.stringify(obj)) : null;
     },
 
     /**
@@ -36,8 +36,8 @@ export const Util = {
     removeFromList<T>(list: T[], fn: (item: T) => boolean): T[] {
         const res: T[] = [];
 
-        for(let i = 0; i < list.length; i++) {
-            if(fn(list[i])) {
+        for (let i = 0; i < list.length; i++) {
+            if (fn(list[i])) {
                 let removeItem = list.splice(i, 1);
                 res.push(...removeItem);
                 i--;
@@ -53,7 +53,7 @@ export const Util = {
      * @param errorText 
      */
     assert(condition: boolean, errorText: string): void | never {
-        if(condition) {
+        if (condition) {
             throw errorText;
         }
     },
@@ -65,7 +65,7 @@ export const Util = {
     textParser(text: string): string[] | string {
         let fieldReg = /\[[^\]]*\]/g;
 
-        if(fieldReg.test(text)) {
+        if (fieldReg.test(text)) {
             let contents = text.match(fieldReg),
                 values = contents.map(item => item.replace(/\[|\]/g, ''));
             return values;
@@ -80,9 +80,9 @@ export const Util = {
      * @param value 
      */
     clamp(value: number, max: number, min: number): number {
-        if(value <= max && value >= min) return value;
-        if(value > max) return max;
-        if(value < min) return min;
+        if (value <= max && value >= min) return value;
+        if (value > max) return max;
+        if (value < min) return min;
     },
 
     /**
@@ -109,8 +109,8 @@ export const Util = {
         let nodes = [...layoutGroup.node, ...layoutGroup.marker],
             edges = layoutGroup.link;
 
-        return { 
-            nodes: nodes.map(item => item.getG6ModelProps()) as NodeConfig[], 
+        return {
+            nodes: nodes.map(item => item.getG6ModelProps()) as NodeConfig[],
             edges: edges.map(item => item.getG6ModelProps()) as EdgeConfig[]
         };
     },
@@ -135,6 +135,12 @@ export const Util = {
         const Mat3 = G6Util.mat3;
         Mat3.rotate(matrix, matrix, rotation);
         return matrix;
+    },
+
+    registerShape(shapeName: string, shapeDefinition, extendShapeType?: string) {
+        // 不定义update，g6的自定义节点里面的update好像有bug
+        shapeDefinition.update = undefined;
+        return registerNode(shapeName, shapeDefinition, extendShapeType);
     }
 };
 

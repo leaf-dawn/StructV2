@@ -1,8 +1,8 @@
 import { Engine } from '../engine';
 import { SVModel } from '../Model/SVModel';
 import { Util } from '../Common/util';
-import { Tooltip, Graph, GraphData } from '@antv/g6';
-import { InitViewBehaviors } from '../BehaviorHelper/initViewBehaviors';
+import { Tooltip, Graph, GraphData, Modes } from '@antv/g6';
+import { InitG6Behaviors } from '../BehaviorHelper/initG6Behaviors';
 
 
 
@@ -20,7 +20,7 @@ export class Renderer {
     private g6Instance: Graph; // g6 实例
     private shadowG6Instance: Graph;
 
-    constructor(engine: Engine, DOMContainer: HTMLElement) {
+    constructor(engine: Engine, DOMContainer: HTMLElement, behaviorsModes: Modes) {
         this.engine = engine;
 
         const enable: boolean = this.engine.animationOptions.enable,
@@ -53,9 +53,7 @@ export class Renderer {
                 easing: timingFunction
             },
             fitView: false,
-            modes: {
-                default: InitViewBehaviors()
-            },
+            modes: behaviorsModes,
             plugins: [tooltip]
         });
     }
@@ -69,7 +67,7 @@ export class Renderer {
     private getTooltipContent(model: SVModel, items: { [key: string]: string }): HTMLDivElement {
         const wrapper = document.createElement('div');
 
-        if(model === null || model === undefined) {
+        if (model === null || model === undefined) {
             return wrapper;
         }
 

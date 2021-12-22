@@ -1,12 +1,12 @@
-import { registerNode } from '@antv/g6';
+import { Util } from '../Common/util';
 
 
-export default registerNode('binary-tree-node', {
+export default Util.registerShape('binary-tree-node', {
     draw(cfg, group) {
         cfg.size = cfg.size;
 
         const width = cfg.size[0],
-              height = cfg.size[1];
+            height = cfg.size[1];
 
         const wrapperRect = group.addShape('rect', {
             attrs: {
@@ -27,7 +27,7 @@ export default registerNode('binary-tree-node', {
                 y: height / 2,
                 width: width / 2,
                 height: height,
-                fill: cfg.color || cfg.style.fill,
+                fill: cfg.style.fill,
                 stroke: cfg.style.stroke || '#333',
                 cursor: cfg.style.cursor
             },
@@ -64,4 +64,4 @@ export default registerNode('binary-tree-node', {
             [0.125, 0.5]
         ];
     },
-});
+}, 'rect');

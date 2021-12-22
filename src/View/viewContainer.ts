@@ -5,12 +5,12 @@ import { Util } from "../Common/util";
 import { SVModel } from "../Model/SVModel";
 import { Renderer } from "./renderer";
 import { Reconcile } from "./reconcile";
-import { FixNodeMarkerDrag } from "../BehaviorHelper/fixNodeMarkerDrag";
-import { InitDragCanvasWithLeak } from "../BehaviorHelper/dragCanvasWithLeak";
 import { EventBus } from "../Common/eventBus";
-import { InitZoomCanvasWithLeak } from "../BehaviorHelper/zoomCanvasWithLeak";
 import { Group } from "../Common/group";
-import { Graph } from "_@antv_g6-pc@0.5.0@@antv/g6-pc";
+import { Graph, Modes } from "@antv/g6-pc";
+import { InitG6Behaviors } from "../BehaviorHelper/initG6Behaviors";
+import { SVNode } from "../Model/SVNode";
+import { SolveBrushSelectDrag, SolveDragCanvasWithLeak, SolveNodeAppendagesDrag, SolveZoomCanvasWithLeak } from "../BehaviorHelper/behaviorIssueHelper";
 
 
 
@@ -26,33 +26,35 @@ export class ViewContainer {
 
     public hasLeak: boolean;
     public leakAreaY: number;
+    public brushSelectedModels: SVModel[]; // 保存框选过程中被选中的节点
+    public clickSelectNode: SVNode; // 点击选中的节点 
+
 
     constructor(engine: Engine, DOMContainer: HTMLElement) {
+        const behaviorsModes: Modes = InitG6Behaviors(engine, this);
+
         this.engine = engine;
         this.layoutProvider = new LayoutProvider(engine, this);
-        this.renderer = new Renderer(engine, DOMContainer);
+        this.renderer = new Renderer(engine, DOMContainer, behaviorsModes);
         this.reconcile = new Reconcile(engine, this.renderer);
         this.prevLayoutGroupTable = new Map();
         this.prevModelList = [];
         this.accumulateLeakModels = [];
         this.hasLeak = false; // 判断是否已经发生过泄漏
+        this.brushSelectedModels = [];
+        this.clickSelectNode = null;
 
         const g6Instance = this.renderer.getG6Instance(),
             leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
             height = this.getG6Instance().getHeight(),
-            { drag, zoom } = this.engine.interactionOptions;
+            { drag, zoom } = this.engine.behaviorOptions;
 
         this.leakAreaY = height - leakAreaHeight;
 
-        if (drag) {
-            InitDragCanvasWithLeak(this);
-        }
-
-        if (zoom) {
-            // InitZoomCanvasWithLeak(this);
-        }
-
-        FixNodeMarkerDrag(g6Instance);
+        SolveNodeAppendagesDrag(this);
+        SolveBrushSelectDrag(this);
+        drag && SolveDragCanvasWithLeak(this);
+        zoom && SolveZoomCanvasWithLeak(this);
     }
 
 
@@ -91,6 +93,13 @@ export class ViewContainer {
      */
     getAccumulateLeakModels(): SVModel[] {
         return this.accumulateLeakModels;
+    }
+
+    /**
+     * 
+     */
+    getLayoutGroupTable(): LayoutGroupTable {
+        return this.prevLayoutGroupTable;
     }
 
     /**

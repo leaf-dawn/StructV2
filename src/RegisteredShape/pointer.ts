@@ -1,7 +1,7 @@
-import { registerNode } from '@antv/g6';
+import { Util } from '../Common/util';
 
 
-export default registerNode('pointer', {
+export default Util.registerShape('pointer', {
     draw(cfg, group) {
         const keyShape = group.addShape('path', {
             attrs: {

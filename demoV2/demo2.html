@@ -87,6 +87,7 @@
     <script src="./Layouter/AdjoinTableGraph.js"></script>
     <script src="./Layouter/SqQueue.js"></script>
     <script src="./Layouter/PTree.js"></script>
+    <script src="./Layouter/PCTree.js"></script>
 
     <script>
 
@@ -98,7 +99,49 @@
         });
 
 
-        let data = [{
+        let data = [
+            {
+                pctree:{
+                    data:[
+                        {
+                            id: 1,
+                            data: 'a',
+                            type: 'PCTreeHead',
+                            parent: '-1',
+                            headNext: 'PCTreeNode#2',
+                            index: 0,
+                            root: true
+                            
+                        },
+                        {
+                            id: 2,
+                            type: 'PCTreeNode',
+                            data: 1,
+                            next: 'PCTreeNode#3'
+                        },
+                        {
+                            id: 3,
+                            type: 'PCTreeNode',
+                            data: 1,
+                        },
+                        {
+                            id: 4,
+                            data: 'b',
+                            type: 'PCTreeHead',
+                            parent: '0',
+                            headNext: 'PCTreeNode#5',
+                            index: 1,
+                        },
+                        {
+                            id: 5,
+                            type: 'PCTreeNode',
+                            data: 2,
+                        },
+                    ],
+                    layouter: 'PCTree'
+                }
+            },
+            {
             "sqStack0": {
                 "data": [
                     {

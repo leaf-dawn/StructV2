@@ -75,10 +75,16 @@ export class Renderer {
             let value = model[items[key]];
             if (value !== undefined && value !== null) {
                 let item = document.createElement('div');
-                item.innerHTML = `${key}：${value}`;
+                item.innerHTML = `${key}：${value !== '' ? value : model.G6ModelProps['label']}`;
                 wrapper.appendChild(item);
             }
         });
+
+        if (model.freed) {
+          let item = document.createElement('div');
+          item.innerHTML = '(freed)';
+          wrapper.appendChild(item);
+        }
 
         return wrapper;
     }

@@ -2,10 +2,14 @@
 
 
 SV.registerLayout('PCTree', {
-
+ 
     sourcesPreprocess(sources) {
-        
-        sources[0].rootLabel = ['data', 'parent', 'firstChild'];
+
+        for(let i = 0; i < sources.length; i++){
+            if(sources[i].root){
+                sources[i].rootLabel = ['data', 'parent', 'firstChild'];
+            }
+        }
 
         return sources;
     },

@@ -174,7 +174,7 @@ export class Reconcile {
             const prevLabel = prevItem.get('label'),
                 label = item.get('label');
 
-            if (prevLabel !== label) {
+            if (String(prevLabel) !== String(label)) {
                 labelChangeModels.push(item);
             }
         });

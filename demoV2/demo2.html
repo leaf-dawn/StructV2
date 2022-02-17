@@ -129,14 +129,49 @@
                             data: 'b',
                             type: 'PCTreeHead',
                             parent: '0',
+                            index: 1,
+                        },
+                    ],
+                    layouter: 'PCTree'
+                }
+            },
+            {
+                pctree:{
+                    data:[
+                        {
+                            id: 1,
+                            data: 'a',
+                            type: 'PCTreeHead',
+                            parent: '-1',
+                            headNext: 'PCTreeNode#2',
+                            index: 0,
+                            root: true
+                            
+                        },
+                        {
+                            id: 2,
+                            type: 'PCTreeNode',
+                            data: 1,
+                        },
+                        {
+                            id: 4,
+                            data: 'b',
+                            type: 'PCTreeHead',
+                            parent: '0',
                             headNext: 'PCTreeNode#5',
                             index: 1,
                         },
                         {
                             id: 5,
                             type: 'PCTreeNode',
+                            next: 'PCTreeNode#6',
                             data: 2,
                         },
+                        {
+                            id: 6,
+                            data: 3,
+                            type: 'PCTreeNode'
+                        }
                     ],
                     layouter: 'PCTree'
                 }

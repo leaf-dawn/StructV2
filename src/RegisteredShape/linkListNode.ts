@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2022-01-26 01:58:25
+ * @LastEditTime: 2022-02-17 21:57:51
+ * @LastEditors: Please set LastEditors
+ * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @FilePath: \水功能c:\Users\13127\Desktop\最近的前端文件\可视化0126\StructV2\src\RegisteredShape\linkListNode.ts
+ */
 import { Util } from "../Common/util";
 
 
@@ -36,8 +44,9 @@ export default Util.registerShape('link-list-node', {
             draggable: true
         });
 
+        const style = (cfg.labelCfg && cfg.labelCfg.style) || {};
+
         if (cfg.label) {
-            const style = (cfg.labelCfg && cfg.labelCfg.style) || {};
             group.addShape('text', {
                 attrs: {
                     x: width * (5 / 6), 
@@ -47,6 +56,24 @@ export default Util.registerShape('link-list-node', {
                     text: cfg.label,
                     fill: style.fill || '#000',
                     fontSize: style.fontSize || 16
+                },
+                name: 'text',
+                draggable: true
+            });
+        }
+        
+        //节点没有后续指针时
+        if(!cfg.next){
+            group.addShape('text', {
+                attrs: {
+                    x: width * (4 / 3), 
+                    y: height * ( 6 / 5),
+                    textAlign: 'center',
+                    textBaseline: 'middle',
+                    text: '^',
+                    fill: style.fill || '#000',
+                    fontSize: 18,
+                    cursor: cfg.style.cursor,
                 },
                 name: 'text',
                 draggable: true

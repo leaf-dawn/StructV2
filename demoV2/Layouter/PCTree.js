@@ -5,7 +5,7 @@ SV.registerLayout('PCTree', {
 
     sourcesPreprocess(sources) {
         
-        sources[0].rootLabel = ['data', 'parent', 'fistChild'];
+        sources[0].rootLabel = ['data', 'parent', 'firstChild'];
 
         return sources;
     },
@@ -28,7 +28,7 @@ SV.registerLayout('PCTree', {
                     size: [60, 27],
                     style: {
                         stroke: '#333',
-                        fill: '#95e1d3'
+                        fill: '#00AF92'
                     }
                 }
             },
@@ -68,7 +68,7 @@ SV.registerLayout('PCTree', {
                 xInterval: 50
             },
             behavior: {
-                dragNode: false
+                dragNode: ['PCTreeNode']
             }
         };
     },

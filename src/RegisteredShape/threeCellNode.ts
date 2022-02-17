@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-01-18 20:42:31
- * @LastEditTime: 2022-01-26 01:59:47
+ * @LastEditTime: 2022-02-17 21:57:59
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \测试数据c:\Users\13127\Desktop\最近的前端文件\可视化源码-new\StructV2\src\RegisteredShape\treeCellNode.ts
@@ -66,8 +66,9 @@ export default registerNode('three-cell', {
                     textAlign: 'center',
                     textBaseline: 'middle',
                     text: cfg.rootLabel[0],
-                    fill: style.fill || '#000',
+                    fill: style.fill || '#bbb',
                     fontSize: style.fontSize || 16,
+                    fontStyle: 'italic',
                     cursor: cfg.style.cursor,
                 },
                 name: 'text',
@@ -81,8 +82,9 @@ export default registerNode('three-cell', {
                     textAlign: 'center',
                     textBaseline: 'middle',
                     text: cfg.rootLabel[1],
-                    fill: style.fill || '#000',
+                    fill: style.fill || '#bbb',
                     fontSize: style.fontSize || 16,
+                    fontStyle: 'italic',
                     cursor: cfg.style.cursor,
                 },
                 name: 'text',
@@ -96,8 +98,9 @@ export default registerNode('three-cell', {
                     textAlign: 'center',
                     textBaseline: 'middle',
                     text: cfg.rootLabel[2],
-                    fill: style.fill || '#000',
+                    fill: style.fill || '#bbb',
                     fontSize: style.fontSize || 16,
+                    fontStyle: 'italic',
                     cursor: cfg.style.cursor,
                 },
                 name: 'text',
@@ -114,8 +117,9 @@ export default registerNode('three-cell', {
                     textAlign: 'center',
                     textBaseline: 'middle',
                     text: cfg.index,
-                    fill: style.fill || '#000',
+                    fill: style.fill || '#bbb',
                     fontSize: style.fontSize || 16,
+                    fontStyle: 'italic',
                     cursor: cfg.style.cursor,
                 },
                 name: 'text',

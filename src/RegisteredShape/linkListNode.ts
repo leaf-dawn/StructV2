@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-01-26 01:58:25
- * @LastEditTime: 2022-02-17 21:57:51
+ * @LastEditTime: 2022-02-18 18:51:28
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \水功能c:\Users\13127\Desktop\最近的前端文件\可视化0126\StructV2\src\RegisteredShape\linkListNode.ts
@@ -63,7 +63,7 @@ export default Util.registerShape('link-list-node', {
         }
         
         //节点没有后续指针时
-        if(!cfg.next){
+        if(!cfg.next && !cfg.loopNext){
             group.addShape('text', {
                 attrs: {
                     x: width * (4 / 3), 

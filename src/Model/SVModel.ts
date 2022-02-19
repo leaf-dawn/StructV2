@@ -4,6 +4,7 @@ import { BoundingRect } from "../Common/boundingRect";
 import { EdgeConfig, Item, NodeConfig } from "@antv/g6-core";
 import { Graph } from "@antv/g6-pc";
 import merge from 'merge';
+import { ModelConstructor } from "./modelConstructor";
 
 
 
@@ -198,8 +199,6 @@ export class SVModel {
     isNode(): boolean {
         return false;
     }
-
-
 }
 
 

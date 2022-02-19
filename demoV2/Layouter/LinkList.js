@@ -1,11 +1,11 @@
 
 
 SV.registerLayout('LinkList', {
-    
+
     sourcesPreprocess(sources) {
         let root = sources[0];
 
-        if(root.external) {
+        if (root.external) {
             root.rootExternal = root.external;
             delete root.external;
         }
@@ -15,7 +15,7 @@ SV.registerLayout('LinkList', {
 
     defineOptions() {
         return {
-            node: { 
+            node: {
                 default: {
                     type: 'link-list-node',
                     label: '[data]',
@@ -28,7 +28,7 @@ SV.registerLayout('LinkList', {
                 }
             },
             link: {
-                next: { 
+                next: {
                     type: 'line',
                     sourceAnchor: 2,
                     targetAnchor: 6,
@@ -36,7 +36,7 @@ SV.registerLayout('LinkList', {
                         stroke: '#333',
                         endArrow: 'default',
                         startArrow: {
-                            path: G6.Arrow.circle(2, -1), 
+                            path: G6.Arrow.circle(2, -1),
                             fill: '#333'
                         }
                     }
@@ -50,7 +50,7 @@ SV.registerLayout('LinkList', {
                         stroke: '#333',
                         endArrow: 'default',
                         startArrow: {
-                            path: G6.Arrow.circle(2, -1), 
+                            path: G6.Arrow.circle(2, -1),
                             fill: '#333'
                         }
                     }
@@ -85,32 +85,17 @@ SV.registerLayout('LinkList', {
     },
 
 
-    /**
-     * 对子树进行递归布局
-     * @param node 
-     * @param parent 
-     */
-    layoutItem(node, prev, layoutOptions) {
-        if(!node) {
-            return null;
-        }
-
-        let width = node.get('size')[0];
-
-        if(prev) {
-            node.set('y', prev.get('y'));
-            node.set('x', prev.get('x') + layoutOptions.xInterval + width);
-        }
-
-        if(node.next) {
-            this.layoutItem(node.next, node, layoutOptions);
-        }
-    },   
-
-
     layout(elements, layoutOptions) {
-        let root = elements[0];
-        this.layoutItem(root, null, layoutOptions);
+        for (let i = 0; i < elements.length; i++) {
+            let node = elements[i],
+                prev = elements[1 - 1],
+                width = node.get('size')[0];
+
+            if (prev) {
+                node.set('y', prev.get('y'));
+                node.set('x', prev.get('x') + layoutOptions.xInterval + width);
+            }
+        }
     }
 });
 

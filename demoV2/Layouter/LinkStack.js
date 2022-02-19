@@ -83,7 +83,7 @@
 
         let height = node.get('size')[1];
 
-        if(prev) {
+        if(prev && node.isSameGroup(prev)) {
             node.set('x', prev.get('x'));
             node.set('y', prev.get('y') - layoutOptions.yInterval - height);
         }

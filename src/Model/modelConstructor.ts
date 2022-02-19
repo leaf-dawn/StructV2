@@ -314,6 +314,8 @@ export class ModelConstructor {
             node.freedLabel = new SVFreedLabel(`${id}-freed-label`, sourceNodeType, group, layout, node);
         }
 
+        node.modelConstructor = this;
+
         return node;
     }
 
@@ -431,9 +433,19 @@ export class ModelConstructor {
     }
 
     /**
+	 * 判断这个节点是否来自相同group
+	 * @param node1
+     * @param node2
+	 */
+	public isSameGroup(node1: SVNode, node2: SVNode): boolean {
+        const layoutGroup = this.layoutGroupTable.get(node1.group);
+        return layoutGroup.node.find(item => item.id === node2.id) !== undefined;
+    }
+
+    /**
      * 销毁
      */
-    destroy() {
+    public destroy() {
         this.layoutGroupTable = null;
         this.prevSourcesStringMap = null;
     }

@@ -1,360 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>DEMO</title>
+		<style>
+			* {
+				padding: 0;
+				margin: 0;
+				user-select: none;
+			}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMO</title>
-    <style>
-        * {
-            padding: 0;
-            margin: 0;
-            user-select: none;
-        }
+			.container {
+				background-color: #fafafa;
+				border: 1px solid #ccc;
+				position: relative;
+			}
 
-        .container {
-            background-color: #fafafa;
-            border: 1px solid #ccc;
-            position: relative;
-        }
+			.down {
+				display: flex;
+				margin-top: 20px;
+			}
 
-        .down {
-            display: flex;
-            margin-top: 20px;
-        }
+			#container {
+				width: 100%;
+				height: 500px;
+				position: relative;
+				overflow: hidden;
+			}
 
-        #container {
-            width: 100%;
-            height: 500px;
-            position: relative;
-            overflow: hidden;
-        }
+			#leak {
+				position: absolute;
+				left: 0;
+				opacity: 0;
+				top: 100px;
+				width: 100%;
+				box-sizing: border-box;
+				padding: 4px;
+				border-top: 1px dashed #000;
+				pointer-events: none;
+				transition: opacity 0.75s ease-in-out;
+			}
 
-        #leak {
-            position: absolute;
-            left: 0;
-            opacity: 0;
-            top: 100px;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 4px;
-            border-top: 1px dashed #000;
-            pointer-events: none;
-            transition: opacity 0.75s ease-in-out;
-        }
+			#leak > span {
+				color: #000;
+			}
+		</style>
+	</head>
 
-        #leak>span {
-            color: #000;
-        }
-    </style>
-</head>
+	<body>
+		<div class="container" id="container">
+			<div id="leak">
+				<span>泄漏区</span>
+			</div>
+		</div>
 
-<body>
+		<button id="btn-prev">prev</button>
+		<button id="btn-next">next</button>
+		<button id="resize">resize</button>
+		<button id="relayout">relayout</button>
+		<button id="switch-mode">switch mode</button>
+		<button id="brush-select">brush-select</button>
+		<span id="pos"></span>
 
-    <div class="container" id="container">
-        <div id="leak">
-            <span>泄漏区</span>
-        </div>
-    </div>
+		<script src="./../dist/sv.js"></script>
+		<script>
+			const Group = SV.Group,
+				Bound = SV.Bound,
+				G6 = SV.G6,
+				Vector = SV.Vector;
+		</script>
+		<script src="./Layouter/LinkList.js"></script>
+		<script src="./Layouter/BinaryTree.js"></script>
+		<script src="./Layouter/Stack.js"></script>
+		<script src="./Layouter/LinkQueue.js"></script>
+		<script src="./Layouter/GeneralizedList.js"></script>
+		<script src="./Layouter/ChainHashTable.js"></script>
+		<script src="./Layouter/Array.js"></script>
+		<script src="./Layouter/HashTable.js"></script>
+		<script src="./Layouter/LinkStack.js"></script>
+		<script src="./Layouter/AdjoinMatrixGraph.js"></script>
+		<script src="./Layouter/AdjoinTableGraph.js"></script>
+		<script src="./Layouter/SqQueue.js"></script>
+		<script src="./Layouter/PTree.js"></script>
+		<script src="./Layouter/PCTree.js"></script>
 
-    <button id="btn-prev">prev</button>
-    <button id="btn-next">next</button>
-    <button id="resize">resize</button>
-    <button id="relayout">relayout</button>
-    <button id="switch-mode">switch mode</button>
-    <button id="brush-select">brush-select</button>
-    <span id="pos"></span>
+		<script>
+			let cur = SV(document.getElementById('container'), {
+				view: {
+					leakAreaHeight: 130,
+					groupPadding: 40,
+				},
+			});
 
-    <script src="./../dist/sv.js"></script>
-    <script>
+			let data = [
+				{
+					LinkStack0: {
+						data: [
+							{
+								id: '0x616eb0',
+								data: '',
+								next: '0x616ed0',
+								headExternal: ['ls'],
+								type: 'default',
+							},
+							{
+								id: '0x616ed0',
+								data: 'f',
+								external: ['p'],
+								next: '0x616ef0',
+								type: 'default',
+							},
+							{
+								id: '0x616ef0',
+								data: 'g',
+								external: ['p1'],
+								next: null,
+								type: 'default',
+							},
+						],
+						layouter: 'LinkStack',
+					},
+					LinkStack1: {
+						data: [
+							{
+								id: '0x616f10',
+								data: '',
+								next: 'LinkStack0#0x616ef0',
+								headExternal: ['ls1'],
+								type: 'default',
+							},
+						],
+						layouter: 'LinkStack',
+					},
+				},
+			];
 
-        const Group = SV.Group,
-            Bound = SV.Bound,
-            G6 = SV.G6,
-            Vector = SV.Vector;
+			let dataIndex = 0,
+				curData = data[dataIndex];
 
-    </script>
-    <script src="./Layouter/LinkList.js"></script>
-    <script src="./Layouter/BinaryTree.js"></script>
-    <script src="./Layouter/Stack.js"></script>
-    <script src="./Layouter/LinkQueue.js"></script>
-    <script src="./Layouter/GeneralizedList.js"></script>
-    <script src="./Layouter/ChainHashTable.js"></script>
-    <script src="./Layouter/Array.js"></script>
-    <script src="./Layouter/HashTable.js"></script>
-    <script src="./Layouter/LinkStack.js"></script>
-    <script src="./Layouter/AdjoinMatrixGraph.js"></script>
-    <script src="./Layouter/AdjoinTableGraph.js"></script>
-    <script src="./Layouter/SqQueue.js"></script>
-    <script src="./Layouter/PTree.js"></script>
-    <script src="./Layouter/PCTree.js"></script>
+			let enableBrushSelect = false;
 
-    <script>
+			const container = document.getElementById('container'),
+				pos = document.getElementById('pos');
 
-        let cur = SV(document.getElementById('container'), {
-            view: {
-                leakAreaHeight: 130,
-                groupPadding: 40,
-            },
-        });
+			const leak = document.getElementById('leak');
 
+			cur.render(curData);
 
-        let data = [
-            {
-                pctree:{
-                    data:[
-                        {
-                            id: 1,
-                            data: 'a',
-                            type: 'PCTreeHead',
-                            parent: '-1',
-                            headNext: 'PCTreeNode#2',
-                            index: 0,
-                            root: true
-                            
-                        },
-                        {
-                            id: 2,
-                            type: 'PCTreeNode',
-                            data: 1,
-                            next: 'PCTreeNode#3'
-                        },
-                        {
-                            id: 3,
-                            type: 'PCTreeNode',
-                            data: 1,
-                        },
-                        {
-                            id: 4,
-                            data: 'b',
-                            type: 'PCTreeHead',
-                            parent: '0',
-                            index: 1,
-                        },
-                    ],
-                    layouter: 'PCTree'
-                }
-            },
-            {
-                pctree:{
-                    data:[
-                        {
-                            id: 1,
-                            data: 'a',
-                            type: 'PCTreeHead',
-                            parent: '-1',
-                            headNext: 'PCTreeNode#2',
-                            index: 0,
-                            root: true
-                            
-                        },
-                        {
-                            id: 2,
-                            type: 'PCTreeNode',
-                            data: 1,
-                        },
-                        {
-                            id: 4,
-                            data: 'b',
-                            type: 'PCTreeHead',
-                            parent: '0',
-                            headNext: 'PCTreeNode#5',
-                            index: 1,
-                        },
-                        {
-                            id: 5,
-                            type: 'PCTreeNode',
-                            next: 'PCTreeNode#6',
-                            data: 2,
-                        },
-                        {
-                            id: 6,
-                            data: 3,
-                            type: 'PCTreeNode'
-                        }
-                    ],
-                    layouter: 'PCTree'
-                }
-            },
-            {
-            "sqStack0": {
-                "data": [
-                    {
-                        "id": "0x617eb5",
-                        "data": "",
-                        "index": 5,
-                        "cursor": "top"
-                    },
-                    {
-                        "id": "0x617eb4",
-                        "data": "2",
-                        "index": 4
-                    },
-                    {
-                        "id": "0x617eb3",
-                        "data": "6",
-                        "index": 3
-                    },
-                    {
-                        "id": "0x617eb2",
-                        "data": "7",
-                        "index": 2
-                    },
-                    {
-                        "id": "0x617eb1",
-                        "data": "9",
-                        "index": 1
-                    },
-                    {
-                        "id": "0x617eb0",
-                        "data": "1",
-                        "index": 0,
-                        "external": "S"
-                    }
-                ],
-                "layouter": "Stack"
-            }
-        }, {
-            "sqStack0": {
-                "data": [
-                    {
-                        "id": "0x617eb4",
-                        "data": "2",
-                        "index": 4,
-                        "cursor": "top",
-                        "type": "default"
-                    },
-                    {
-                        "id": "0x617eb3",
-                        "data": "6",
-                        "index": 3,
-                        "type": "default"
-                    },
-                    {
-                        "id": "0x617eb2",
-                        "data": "7",
-                        "index": 2,
-                        "type": "default"
-                    },
-                    {
-                        "id": "0x617eb1",
-                        "data": "9",
-                        "index": 1,
-                        "type": "default"
-                    },
-                    {
-                        "id": "0x617eb0",
-                        "data": "1",
-                        "index": 0,
-                        "bottomExternal": "S",
-                        "type": "default"
-                    }
-                ],
-                "layouter": "Stack"
-            }
-        }, {
-            "data": [
-                {
-                    "id": "0x617eb5",
-                    "data": "",
-                    "index": 5,
-                    "cursor": "top",
-                    "type": "default"
-                },
-                {
-                    "id": "0x617eb4",
-                    "data": "2",
-                    "index": 4,
-                    "type": "default"
-                },
-                {
-                    "id": "0x617eb3",
-                    "data": "6",
-                    "index": 3,
-                    "type": "default"
-                },
-                {
-                    "id": "0x617eb2",
-                    "data": "7",
-                    "index": 2,
-                    "type": "default"
-                },
-                {
-                    "id": "0x617eb1",
-                    "data": "9",
-                    "index": 1,
-                    "type": "default"
-                },
-                {
-                    "id": "0x617eb0",
-                    "data": "1",
-                    "index": 0,
-                    "bottomExternal": "S",
-                    "type": "default"
-                }
-            ],
-            "layouter": "Stack"
-        }];
+			document.getElementById('btn-next').addEventListener('click', e => {
+				curData = data[++dataIndex];
+				cur.render(curData);
+			});
 
+			document.getElementById('btn-prev').addEventListener('click', e => {
+				curData = data[--dataIndex];
+				cur.render(curData);
+			});
 
+			document.getElementById('resize').addEventListener('click', e => {
+				container.style.height = 800 + 'px';
+				cur.resize(container.offsetWidth, container.offsetHeight);
+			});
 
+			document.getElementById('relayout').addEventListener('click', e => {
+				cur.reLayout();
+			});
 
+			document.getElementById('switch-mode').addEventListener('click', e => {
+				cur.updateStyle('Array', newArrayOption);
+			});
 
-        let dataIndex = 0,
-            curData = data[dataIndex];
+			document.getElementById('brush-select').addEventListener('click', e => {
+				enableBrushSelect = !enableBrushSelect;
+				cur.switchBrushSelect(enableBrushSelect);
+			});
 
-        let enableBrushSelect = false;
+			cur.on('onLeakAreaUpdate', payload => {
+				leak.style.opacity = payload.hasLeak ? 1 : 0;
+				leak.style.top = payload.leakAreaY - 40 + 'px';
+			});
 
-        const container = document.getElementById('container'),
-            pos = document.getElementById('pos');
+			// -------------------------------------------------------------------------------------------------------
 
-        const leak = document.getElementById('leak');
-
-        cur.render(curData);
-
-        document.getElementById('btn-next').addEventListener('click', e => {
-            curData = data[++dataIndex];
-            cur.render(curData);
-        });
-
-        document.getElementById('btn-prev').addEventListener('click', e => {
-            curData = data[--dataIndex];
-            cur.render(curData);
-        });
-
-        document.getElementById('resize').addEventListener('click', e => {
-            container.style.height = 800 + 'px';
-            cur.resize(container.offsetWidth, container.offsetHeight);
-        });
-
-        document.getElementById('relayout').addEventListener('click', e => {
-            cur.reLayout();
-        });
-
-        document.getElementById('switch-mode').addEventListener('click', e => {
-            cur.updateStyle('Array', newArrayOption);
-        });
-
-        document.getElementById('brush-select').addEventListener('click', e => {
-            enableBrushSelect = !enableBrushSelect;
-            cur.switchBrushSelect(enableBrushSelect);
-        });
-
-        cur.on('onLeakAreaUpdate', payload => {
-            leak.style.opacity = payload.hasLeak ? 1 : 0;
-            leak.style.top = payload.leakAreaY - 40 + 'px';
-        });
-
-        // -------------------------------------------------------------------------------------------------------
-
-        container.addEventListener('mousemove', e => {
-            let x = e.offsetX, y = e.offsetY;
-            pos.innerHTML = `${x},${y}`;
-        });
-
-
-
-    </script>
-</body>
-
+			container.addEventListener('mousemove', e => {
+				let x = e.offsetX,
+					y = e.offsetY;
+				pos.innerHTML = `${x},${y}`;
+			});
+		</script>
+	</body>
 </html>

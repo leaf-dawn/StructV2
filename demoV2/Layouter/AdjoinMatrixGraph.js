@@ -20,7 +20,6 @@ const isNeighbor = function (itemA, itemB) {
 
 
 SV.registerLayout('AdjoinMatrixGraph', {
-
     sourcesPreprocess(sources) {
         let dataLength = sources.length;
         let matrixNodeLength = dataLength * dataLength;

@@ -40,9 +40,10 @@ export default Util.registerShape('pointer', {
             });
 
             const { width: textWidth, height: textHeight } = text.getBBox();
+            const {width: pointerWidth, height: pointerHeight} = keyShape.getBBox();
             bgRect.attr({ 
-                width: textWidth + 6,
-                height: textHeight + 6
+                width: textWidth + pointerWidth + 6,
+                height: textHeight + pointerHeight + 6
             });
 
             // 旋转文字
@@ -61,6 +62,7 @@ export default Util.registerShape('pointer', {
                     y: textY - textHeight / 2 - 3
                 });
             }
+            return bgRect;
         }
 
         return keyShape;

@@ -1,9 +1,7 @@
-
-
 SV.registerLayout('BinaryTree', {
     defineOptions() {
         return {
-            element: { 
+            element: {
                 default: {
                     type: 'binary-tree-node',
                     size: [60, 30],
@@ -16,9 +14,9 @@ SV.registerLayout('BinaryTree', {
                 }
             },
             link: {
-                child: { 
+                child: {
                     type: 'line',
-                    sourceAnchor: index => index === 0? 3: 1,
+                    sourceAnchor: index => index === 0 ? 3 : 1,
                     targetAnchor: 0,
                     style: {
                         stroke: '#333',
@@ -26,7 +24,7 @@ SV.registerLayout('BinaryTree', {
                         cursor: 'pointer',
                         endArrow: 'default',
                         startArrow: {
-                            path: G6.Arrow.circle(2, -1), 
+                            path: G6.Arrow.circle(2, -1),
                             fill: '#333'
                         }
                     }
@@ -62,7 +60,7 @@ SV.registerLayout('BinaryTree', {
      */
     layoutItem(node, parent, index, layoutOptions) {
         // 次双亲不进行布局
-        if(!node) {
+        if (!node) {
             return null;
         }
 
@@ -71,49 +69,56 @@ SV.registerLayout('BinaryTree', {
             height = bound.height,
             group = new Group(node);
 
-        if(parent) {
+        if (node.visited) {
+            return;
+        }
+
+
+        if (parent) {
             node.set('y', parent.get('y') + layoutOptions.yInterval + height);
 
             // 左节点
-            if(index === 0) {
+            if (index === 0) {
                 node.set('x', parent.get('x') - layoutOptions.xInterval / 2 - width / 2);
             }
 
             // 右结点
-            if(index === 1) {
+            if (index === 1) {
                 node.set('x', parent.get('x') + layoutOptions.xInterval / 2 + width / 2);
             }
         }
 
-        if(node.child && (node.child[0] || node.child[1])) {
+        node.visited = true;
+
+        if (node.child && (node.child[0] || node.child[1])) {
             let leftChild = node.child[0],
                 rightChild = node.child[1],
                 leftGroup = this.layoutItem(leftChild, node, 0, layoutOptions),
                 rightGroup = this.layoutItem(rightChild, node, 1, layoutOptions),
                 intersection = null,
                 move = 0;
-            
+
             // 处理左右子树相交问题
-            if(leftGroup && rightGroup) {
+            if (leftGroup && rightGroup) {
                 intersection = Bound.intersect(leftGroup.getBound(), rightGroup.getBound());
                 move = 0;
 
-                if(intersection && intersection.width > 0) {
+                if (intersection && intersection.width > 0) {
                     move = (intersection.width + layoutOptions.xInterval) / 2;
                     leftGroup.translate(-move, 0);
                     rightGroup.translate(move, 0);
                 }
             }
 
-            if(leftGroup) {
+            if (leftGroup) {
                 group.add(leftGroup);
             }
 
-            if(rightGroup) {
+            if (rightGroup) {
                 group.add(rightGroup)
             }
         }
-       
+
         return group;
     },
 
@@ -124,6 +129,7 @@ SV.registerLayout('BinaryTree', {
      */
     layout(elements, layoutOptions) {
         let root = elements[0];
+        let visited = new Group();
         this.layoutItem(root, null, -1, layoutOptions);
     }
 });
@@ -132,16 +138,13 @@ SV.registerLayout('BinaryTree', {
 
 
 
-[
-    {
-        "id": 6385328,
-        "data": "",
-        "external": [
-            "L"
-        ],
-        "root": true,
-        "after": null,
-        "next": null
-    }
-]
-
+[{
+    "id": 6385328,
+    "data": "",
+    "external": [
+        "L"
+    ],
+    "root": true,
+    "after": null,
+    "next": null
+}]

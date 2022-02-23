@@ -87,8 +87,7 @@ export default Util.registerShape('two-cell-node', {
                 });
             }
         }
-        console.log(cfg);
-
+              
         //图 数据结构中没有后续指针
         if(cfg.id.includes('tableHeadNode') && !cfg.headNext){
             group.addShape('text', {

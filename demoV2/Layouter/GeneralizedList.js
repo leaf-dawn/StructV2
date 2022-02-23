@@ -63,6 +63,40 @@ SV.registerShape('three-cell-node', {
             });
         }
 
+        //节点没有原子时
+        if(!cfg.sub){
+            group.addShape('text', {
+                attrs: {
+                    x: width, 
+                    y: height * ( 8 / 7),
+                    textAlign: 'center',
+                    textBaseline: 'middle',
+                    text: '^',
+                    fill: '#000',
+                    fontSize: 20,
+                },
+                name: 'text',
+                draggable: true
+            });
+        }
+
+        //节点没有子表时
+        if(!cfg.next){
+            group.addShape('text', {
+                attrs: {
+                    x: width * (4 / 3), 
+                    y: height * ( 8 / 7),
+                    textAlign: 'center',
+                    textBaseline: 'middle',
+                    text: '^',
+                    fill: '#000',
+                    fontSize: 20,
+                },
+                name: 'text',
+                draggable: true
+            });
+        }
+
         return wrapperRect;
     },
 

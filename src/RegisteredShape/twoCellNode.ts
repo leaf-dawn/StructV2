@@ -87,7 +87,44 @@ export default Util.registerShape('two-cell-node', {
                 });
             }
         }
+        console.log(cfg);
 
+        //图 数据结构中没有后续指针
+        if(cfg.id.includes('tableHeadNode') && !cfg.headNext){
+            group.addShape('text', {
+                attrs: {
+                    x: width * (5 / 4), 
+                    y: height * ( 8 / 7),
+                    textAlign: 'center',
+                    textBaseline: 'middle',
+                    text: '^',
+                    fill: style.fill || '#000',
+                    fontSize: 20,
+                    cursor: cfg.style.cursor,
+                },
+                name: 'text',
+                draggable: true
+            });
+        }
+
+        //哈希表 数据结构中没有后续指针
+        if(cfg.id.includes('head') && !cfg.start){
+            group.addShape('text', {
+                attrs: {
+                    x: width * (5 / 4), 
+                    y: height * ( 8 / 7),
+                    textAlign: 'center',
+                    textBaseline: 'middle',
+                    text: '^',
+                    fill: style.fill || '#000',
+                    fontSize: 20,
+                    cursor: cfg.style.cursor,
+                },
+                name: 'text',
+                draggable: true
+            });
+        }
+        
         return wrapperRect;
     },
 

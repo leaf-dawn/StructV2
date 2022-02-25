@@ -367,9 +367,9 @@ export class Reconcile {
      * @param accumulateLeakModels 
      * @returns 
      */
-    public diff(layoutGroupTable: LayoutGroupTable, prevModelList: SVModel[], modelList: SVModel[], accumulateLeakModels: SVModel[]): DiffResult {
+    public diff(layoutGroupTable: LayoutGroupTable, prevModelList: SVModel[], modelList: SVModel[], accumulateLeakModels: SVModel[], isEnterFunction: boolean): DiffResult {
         const continuousModels: SVModel[] = this.getContinuousModels(prevModelList, modelList);
-        const leakModels: SVModel[] = this.getLeakModels(layoutGroupTable, prevModelList, modelList);
+        const leakModels: SVModel[] = isEnterFunction? []: this.getLeakModels(layoutGroupTable, prevModelList, modelList);
         const appendModels: SVModel[] = this.getAppendModels(prevModelList, modelList, accumulateLeakModels);
         const removeModels: SVModel[] = this.getRemoveModels(prevModelList, modelList);
         const updateModels: SVModel[] = [

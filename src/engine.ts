@@ -67,7 +67,7 @@ export class Engine {
         const layoutGroupTable = this.modelConstructor.construct(source);
 
         // 2 渲染（使用g6进行渲染）
-        this.viewContainer.render(layoutGroupTable, source.enterFunction as boolean);
+        this.viewContainer.render(layoutGroupTable, source.isEnterFunction as boolean);
     }
 
 

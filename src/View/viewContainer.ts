@@ -140,9 +140,9 @@ export class ViewContainer {
      * @param models 
      * @param layoutFn 
      */
-    render(layoutGroupTable: LayoutGroupTable, a: boolean) {
+    render(layoutGroupTable: LayoutGroupTable, isEnterFunction: boolean) {
         const modelList = Util.convertGroupTable2ModelList(layoutGroupTable),
-            diffResult = this.reconcile.diff(this.layoutGroupTable, this.prevModelList, modelList, this.accumulateLeakModels),
+            diffResult = this.reconcile.diff(this.layoutGroupTable, this.prevModelList, modelList, this.accumulateLeakModels, isEnterFunction),
             renderModelList = [
                 ...modelList,
                 ...diffResult.REMOVE,

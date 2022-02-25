@@ -10,336 +10,343 @@ import { SVAddressLabel, SVFreedLabel, SVIndexLabel, SVMarker } from '../Model/S
 import { AddressLabelOption, IndexLabelOption, LayoutOptions, MarkerOption, ViewOptions } from '../options';
 import { ViewContainer } from './viewContainer';
 
-
 export class LayoutProvider {
-    private engine: Engine;
-    private viewOptions: ViewOptions;
-    private viewContainer: ViewContainer;
+	private engine: Engine;
+	private viewOptions: ViewOptions;
+	private viewContainer: ViewContainer;
 
-    constructor(engine: Engine, viewContainer: ViewContainer) {
-        this.engine = engine;
-        this.viewOptions = this.engine.viewOptions;
-        this.viewContainer = viewContainer;
-    }
+	constructor(engine: Engine, viewContainer: ViewContainer) {
+		this.engine = engine;
+		this.viewOptions = this.engine.viewOptions;
+		this.viewContainer = viewContainer;
+	}
 
+	/**
+	 * 布局前处理
+	 * @param layoutGroupTable
+	 */
+	private preLayoutProcess(layoutGroupTable: LayoutGroupTable) {
+		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
 
-    /**
-     * 布局前处理
-     * @param layoutGroupTable
-     */
-    private preLayoutProcess(layoutGroupTable: LayoutGroupTable) {
-        const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
+		modelList.forEach(item => {
+			item.preLayout = true;
 
-        modelList.forEach(item => {
-            item.preLayout = true;
+			item.set('rotation', item.get('rotation'));
+			item.set({ x: 0, y: 0 });
+		});
+	}
 
-            item.set('rotation', item.get('rotation'));
-            item.set({ x: 0, y: 0 });
-        });
-    }
+	/**
+	 * 布局后处理
+	 * @param layoutGroupTable
+	 */
+	private postLayoutProcess(layoutGroupTable: LayoutGroupTable) {
+		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
 
-    /**
-     * 布局后处理
-     * @param layoutGroupTable 
-     */
-    private postLayoutProcess(layoutGroupTable: LayoutGroupTable) {
-        const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
+		modelList.forEach(item => {
+			item.preLayout = false;
 
-        modelList.forEach(item => {
-            item.preLayout = false;
+			// 用两个变量保存节点布局完成后的坐标，因为拖拽节点会改变节点的x，y坐标
+			// 然后当节点移动到泄漏区的时候，不应该保持节点被拖拽后的状态，应该恢复到布局完成后的状态，不然就会很奇怪
+			item.layoutX = item.get('x');
+			item.layoutY = item.get('y');
+		});
+	}
 
-            // 用两个变量保存节点布局完成后的坐标，因为拖拽节点会改变节点的x，y坐标
-            // 然后当节点移动到泄漏区的时候，不应该保持节点被拖拽后的状态，应该恢复到布局完成后的状态，不然就会很奇怪
-            item.layoutX = item.get('x');
-            item.layoutY = item.get('y');
-        });
-    }
+	/**
+	 * 布局外部指针
+	 * @param marker
+	 * @param markerOptions
+	 */
+	private layoutMarker(markers: SVMarker[], markerOptions: { [key: string]: MarkerOption }) {
+		markers.forEach(item => {
+			const options: MarkerOption = markerOptions[item.sourceType],
+				offset = options.offset ?? 8,
+				anchor = item.anchor ?? 0,
+				labelOffset = options.labelOffset ?? 2;
 
-    /**
-     * 布局外部指针
-     * @param marker 
-     * @param markerOptions
-     */
-    private layoutMarker(markers: SVMarker[], markerOptions: { [key: string]: MarkerOption }) {
-        markers.forEach(item => {
-            const options: MarkerOption = markerOptions[item.sourceType],
-                offset = options.offset ?? 8,
-                anchor = item.anchor ?? 0,
-                labelOffset = options.labelOffset ?? 2;
+			let target = item.target,
+				targetBound: BoundingRect = target.getBound(),
+				g6AnchorPosition = item.target.shadowG6Item.getAnchorPoints()[anchor] as IPoint,
+				center: [number, number] = [
+					targetBound.x + targetBound.width / 2,
+					targetBound.y + targetBound.height / 2,
+				],
+				markerPosition: [number, number],
+				markerEndPosition: [number, number];
 
-            let target = item.target,
-                targetBound: BoundingRect = target.getBound(),
-                g6AnchorPosition = item.target.shadowG6Item.getAnchorPoints()[anchor] as IPoint,
-                center: [number, number] = [targetBound.x + targetBound.width / 2, targetBound.y + targetBound.height / 2],
-                markerPosition: [number, number],
-                markerEndPosition: [number, number];
+			let anchorPosition: [number, number] = [g6AnchorPosition.x, g6AnchorPosition.y];
 
-            let anchorPosition: [number, number] = [g6AnchorPosition.x, g6AnchorPosition.y];
+			let anchorVector = Vector.subtract(anchorPosition, center),
+				angle = 0,
+				len = Vector.length(anchorVector) + offset;
 
-            let anchorVector = Vector.subtract(anchorPosition, center),
-                angle = 0, len = Vector.length(anchorVector) + offset;
+			if (anchorVector[0] === 0) {
+				angle = anchorVector[1] > 0 ? -Math.PI : 0;
+			} else {
+				angle = Math.sign(anchorVector[0]) * (Math.PI / 2 - Math.atan(anchorVector[1] / anchorVector[0]));
+			}
 
-            if (anchorVector[0] === 0) {
-                angle = anchorVector[1] > 0 ? -Math.PI : 0;
-            }
-            else {
-                angle = Math.sign(anchorVector[0]) * (Math.PI / 2 - Math.atan(anchorVector[1] / anchorVector[0]));
-            }
+			const markerHeight = item.get('size')[1],
+				labelRadius = item.getLabelSizeRadius() / 2;
 
-            const markerHeight = item.get('size')[1],
-                labelRadius = item.getLabelSizeRadius() / 2;
+			anchorVector = Vector.normalize(anchorVector);
+			markerPosition = Vector.location(center, anchorVector, len);
+			markerEndPosition = Vector.location(center, anchorVector, markerHeight + len + labelRadius + labelOffset);
+			markerEndPosition = Vector.subtract(markerEndPosition, markerPosition);
 
-            anchorVector = Vector.normalize(anchorVector);
-            markerPosition = Vector.location(center, anchorVector, len);
-            markerEndPosition = Vector.location(center, anchorVector, markerHeight + len + labelRadius + labelOffset);
-            markerEndPosition = Vector.subtract(markerEndPosition, markerPosition);
+			item.set({
+				x: markerPosition[0],
+				y: markerPosition[1],
+				rotation: angle,
+				markerEndPosition,
+			});
+		});
+	}
 
-            item.set({
-                x: markerPosition[0],
-                y: markerPosition[1],
-                rotation: angle,
-                markerEndPosition
-            });
-        });
-    }
+	/**
+	 * 布局节点的‘已释放’文本
+	 * @param freedLabels
+	 */
+	private layoutFreedLabel(freedLabels: SVFreedLabel[]) {
+		freedLabels.forEach(item => {
+			const freedNodeBound = item.target.getBound();
 
-    /**
-     * 布局节点的‘已释放’文本
-     * @param freedLabels 
-     */
-    private layoutFreedLabel(freedLabels: SVFreedLabel[]) {
-        freedLabels.forEach(item => {
-            const freedNodeBound = item.target.getBound();
+			item.set({
+				x: freedNodeBound.x + freedNodeBound.width / 2,
+				y: freedNodeBound.y + freedNodeBound.height * 1.5,
+				size: [freedNodeBound.width, 0],
+			});
+		});
+	}
 
-            item.set({
-                x: freedNodeBound.x + freedNodeBound.width / 2,
-                y: freedNodeBound.y + freedNodeBound.height * 1.5,
-                size: [freedNodeBound.width, 0]
-            });
-        });
-    }
+	/**
+	 *
+	 * @param indexLabels
+	 * @param indexLabelOptions
+	 */
+	private layoutIndexLabel(indexLabels: SVIndexLabel[], indexLabelOptions: { [key: string]: IndexLabelOption }) {
+		const indexLabelPositionMap: {
+			[key: string]: (
+				nodeBound: BoundingRect,
+				labelBound: BoundingRect,
+				offset: number
+			) => { x: number; y: number };
+		} = {
+			top: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
+				return {
+					x: nodeBound.x + nodeBound.width / 2,
+					y: nodeBound.y - offset,
+				};
+			},
+			right: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
+				return {
+					x: nodeBound.x + nodeBound.width + offset,
+					y: nodeBound.y + nodeBound.height / 2,
+				};
+			},
+			bottom: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
+				return {
+					x: nodeBound.x + nodeBound.width / 2,
+					y: nodeBound.y + nodeBound.height + offset,
+				};
+			},
+			left: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
+				return {
+					x: nodeBound.x - labelBound.width - offset,
+					y: nodeBound.y + nodeBound.height / 2,
+				};
+			},
+		};
 
-    /**
-     * 
-     * @param indexLabels 
-     * @param indexLabelOptions 
-     */
-    private layoutIndexLabel(indexLabels: SVIndexLabel[], indexLabelOptions: { [key: string]: IndexLabelOption }) {
-        const indexLabelPositionMap: { [key: string]: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => { x: number, y: number } } = {
-            top: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
-                return {
-                    x: nodeBound.x + nodeBound.width / 2,
-                    y: nodeBound.y - offset
-                };
-            },
-            right: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
-                return {
-                    x: nodeBound.x + nodeBound.width + offset,
-                    y: nodeBound.y + nodeBound.height / 2
-                };
-            },
-            bottom: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
-                return {
-                    x: nodeBound.x + nodeBound.width / 2,
-                    y: nodeBound.y + nodeBound.height + offset
-                };
-            },
-            left: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
-                return {
-                    x: nodeBound.x - labelBound.width - offset,
-                    y: nodeBound.y + nodeBound.height / 2
-                };
-            }
-        };
+		indexLabels.forEach(item => {
+			const options: IndexLabelOption = indexLabelOptions[item.sourceType],
+				nodeBound = item.target.getBound(),
+				labelBound = item.getBound(),
+				offset = options.offset ?? 20,
+				position = options.position ?? 'bottom';
 
-        indexLabels.forEach(item => {
-            const options: IndexLabelOption = indexLabelOptions[item.sourceType],
-                nodeBound = item.target.getBound(),
-                labelBound = item.getBound(),
-                offset = options.offset ?? 20,
-                position = options.position ?? 'bottom';
+			const pos = indexLabelPositionMap[position](nodeBound, labelBound, offset);
+			item.set(pos);
+		});
+	}
 
-            const pos = indexLabelPositionMap[position](nodeBound, labelBound, offset);
-            item.set(pos);
-        });
-    }
+	/**
+	 * 布局泄漏区节点上面的address label
+	 * @param leakAddress
+	 */
+	private layoutAddressLabel(leakAddress: SVAddressLabel[], addressLabelOption: AddressLabelOption) {
+		const offset = addressLabelOption.offset || 16;
 
-    /**
-     * 布局泄漏区节点上面的address label
-     * @param leakAddress
-     */
-    private layoutAddressLabel(leakAddress: SVAddressLabel[], addressLabelOption: AddressLabelOption) {
-        const offset = addressLabelOption.offset || 16;
+		leakAddress.forEach(item => {
+			const nodeBound = item.target.getBound();
 
-        leakAddress.forEach(item => {
-            const nodeBound = item.target.getBound();
+			item.set({
+				x: nodeBound.x + nodeBound.width / 2,
+				y: nodeBound.y - offset,
+			});
+		});
+	}
 
-            item.set({
-                x: nodeBound.x + nodeBound.width / 2,
-                y: nodeBound.y - offset
-            });
-        });
-    }
+	/**
+	 * 对每个组内部的model进行布局
+	 * @param layoutGroupTable
+	 */
+	private layoutModels(layoutGroupTable: LayoutGroupTable): Group[] {
+		const modelGroupList: Group[] = [];
 
+		layoutGroupTable.forEach(group => {
+			const modelList: SVModel[] = group.modelList,
+				modelGroup: Group = new Group();
 
-    /**
-     * 对每个组内部的model进行布局
-     * @param layoutGroupTable
-     */
-    private layoutModels(layoutGroupTable: LayoutGroupTable): Group[] {
-        const modelGroupList: Group[] = [];
+			const layoutOptions: LayoutOptions = group.options.layout;
 
-        layoutGroupTable.forEach(group => {
-            const modelList: SVModel[] = group.modelList,
-                modelGroup: Group = new Group();
+			modelList.forEach(item => {
+				modelGroup.add(item);
+			});
 
-            const layoutOptions: LayoutOptions = group.options.layout;
+			group.layoutCreator.layout(group.node, layoutOptions); // 布局节点
+			modelGroupList.push(modelGroup);
+		});
 
-            modelList.forEach(item => {
-                modelGroup.add(item);
-            });
+		layoutGroupTable.forEach(group => {
+			const markerOptions = group.options.marker || {},
+				indexLabelOptions = group.options.indexLabel || {},
+				addressLabelOption = group.options.addressLabel || {};
 
-            group.layoutCreator.layout(group.node, layoutOptions);  // 布局节点
-            modelGroupList.push(modelGroup);
-        });
+			this.layoutIndexLabel(group.indexLabel, indexLabelOptions);
+			this.layoutFreedLabel(group.freedLabel);
+			this.layoutAddressLabel(group.addressLabel, addressLabelOption);
+			this.layoutMarker(group.marker, markerOptions); // 布局外部指针
+		});
 
-        layoutGroupTable.forEach(group => {
-            const markerOptions = group.options.marker || {},
-                indexLabelOptions = group.options.indexLabel || {},
-                addressLabelOption = group.options.addressLabel || {};
+		return modelGroupList;
+	}
 
-            this.layoutIndexLabel(group.indexLabel, indexLabelOptions);
-            this.layoutFreedLabel(group.freedLabel);
-            this.layoutAddressLabel(group.addressLabel, addressLabelOption);
-            this.layoutMarker(group.marker, markerOptions);  // 布局外部指针
-        });
+	/**
+	 * 对泄漏区进行布局
+	 * @param leakModels
+	 * @param accumulateLeakModels
+	 */
+	private layoutLeakModels(leakModels: SVModel[], accumulateLeakModels: SVModel[]) {
+		const group: Group = new Group(),
+			containerHeight = this.viewContainer.getG6Instance().getHeight(),
+			leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
+			leakAreaY = containerHeight - leakAreaHeight,
+			xOffset = 60;
 
-        return modelGroupList;
-    }
+		let prevBound: BoundingRect;
 
-    /**
-     * 对泄漏区进行布局
-     * @param leakModels 
-     * @param accumulateLeakModels
-     */
-    private layoutLeakModels(leakModels: SVModel[], accumulateLeakModels: SVModel[]) {
-        const group: Group = new Group(),
-            containerHeight = this.viewContainer.getG6Instance().getHeight(),
-            leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
-            leakAreaY = containerHeight - leakAreaHeight,
-            xOffset = 60;
+		// 避免在泄漏前拖拽节点导致的位置变化，先把节点位置重置为布局后的标准位置
+		leakModels.forEach(item => {
+			item.set({
+				x: item.layoutX,
+				y: item.layoutY,
+			});
+		});
 
-        let prevBound: BoundingRect;
+		const globalLeakGroupBound: BoundingRect = accumulateLeakModels.length
+			? Bound.union(...accumulateLeakModels.map(item => item.getBound()))
+			: { x: 0, y: leakAreaY, width: 0, height: 0 };
 
-        // 避免在泄漏前拖拽节点导致的位置变化，先把节点位置重置为布局后的标准位置
-        leakModels.forEach(item => {
-            item.set({
-                x: item.layoutX,
-                y: item.layoutY
-            });
-        });
+		const layoutGroups = Util.groupBy(leakModels, 'group');
+		Object.keys(layoutGroups).forEach(key => {
+			group.add(...layoutGroups[key]);
 
-        const globalLeakGroupBound: BoundingRect = accumulateLeakModels.length ?
-            Bound.union(...accumulateLeakModels.map(item => item.getBound())) :
-            { x: 0, y: leakAreaY, width: 0, height: 0 };
+			const currentBound: BoundingRect = group.getBound(),
+				prevBoundEnd = prevBound ? prevBound.x + prevBound.width : 0,
+				{ x: groupX, y: groupY } = currentBound,
+				dx = globalLeakGroupBound.x + globalLeakGroupBound.width + prevBoundEnd + xOffset - groupX,
+				dy = globalLeakGroupBound.y - groupY;
 
-        const layoutGroups = Util.groupBy(leakModels, 'group');
-        Object.keys(layoutGroups).forEach(key => {
-            group.add(...layoutGroups[key]);
+			group.translate(dx, dy);
+			group.clear();
+			Bound.translate(currentBound, dx, dy);
 
-            const currentBound: BoundingRect = group.getBound(),
-                prevBoundEnd = prevBound? prevBound.x + prevBound.width: 0,
-                { x: groupX, y: groupY } = currentBound,
-                dx = globalLeakGroupBound.x + globalLeakGroupBound.width + prevBoundEnd + xOffset - groupX,
-                dy = globalLeakGroupBound.y - groupY;
+			prevBound = currentBound;
+		});
+	}
 
-            group.translate(dx, dy);
-            group.clear();
-            Bound.translate(currentBound, dx, dy);
+	/**
+	 * 对所有组进行相互布局
+	 * @param modelGroupTable
+	 */
+	private layoutGroups(modelGroupList: Group[]): Group {
+		let wrapperGroup: Group = new Group(),
+			group: Group,
+			prevBound: BoundingRect,
+			bound: BoundingRect,
+			boundList: BoundingRect[] = [],
+			dx = 0;
 
-            prevBound = currentBound;
-        });
-    }
+		// 左往右布局
+		for (let i = 0; i < modelGroupList.length; i++) {
+			group = modelGroupList[i];
+			bound = group.getPaddingBound(this.viewOptions.groupPadding);
 
-    /**
-     * 对所有组进行相互布局
-     * @param modelGroupTable 
-     */
-    private layoutGroups(modelGroupList: Group[]): Group {
-        let wrapperGroup: Group = new Group(),
-            group: Group,
-            prevBound: BoundingRect,
-            bound: BoundingRect,
-            boundList: BoundingRect[] = [],
-            dx = 0;
+			if (prevBound) {
+				dx = prevBound.x + prevBound.width - bound.x;
+			} else {
+				dx = bound.x;
+			}
 
-        // 左往右布局
-        for (let i = 0; i < modelGroupList.length; i++) {
-            group = modelGroupList[i];
-            bound = group.getPaddingBound(this.viewOptions.groupPadding);
+			group.translate(dx, 0);
+			Bound.translate(bound, dx, 0);
+			boundList.push(bound);
+			wrapperGroup.add(group);
+			prevBound = bound;
+		}
 
-            if (prevBound) {
-                dx = prevBound.x + prevBound.width - bound.x;
-            }
-            else {
-                dx = bound.x;
-            }
+		return wrapperGroup;
+	}
 
-            group.translate(dx, 0);
-            Bound.translate(bound, dx, 0);
-            boundList.push(bound);
-            wrapperGroup.add(group);
-            prevBound = bound;
-        }
+	/**
+	 * 将视图调整至画布中心
+	 * @param models
+	 * @param leakAreaHeight
+	 */
+	private fitCenter(group: Group) {
+		let width = this.viewContainer.getG6Instance().getWidth(),
+			height = this.viewContainer.getG6Instance().getHeight(),
+			viewBound: BoundingRect = group.getBound(),
+			leakAreaHeight = this.engine.viewOptions.leakAreaHeight;
 
-        return wrapperGroup;
-    }
+		const centerX = width / 2,
+			centerY = height / 2,
+			boundCenterX = viewBound.x + viewBound.width / 2;
 
+		let dx = centerX - boundCenterX,
+			dy = 0;
 
-    /**
-     * 将视图调整至画布中心
-     * @param models
-     * @param leakAreaHeight
-     */
-    private fitCenter(group: Group) {
-        let width = this.viewContainer.getG6Instance().getWidth(),
-            height = this.viewContainer.getG6Instance().getHeight(),
-            leakAreaHeight = this.engine.viewOptions.leakAreaHeight;
+		if (this.viewContainer.hasLeak) {
+			const boundBottomY = viewBound.y + viewBound.height;
+			dy = height - leakAreaHeight - 100 - boundBottomY;
+		} else {
+			const boundCenterY = viewBound.y + viewBound.height / 2;
+			dy = centerY - boundCenterY;
+		}
 
-        if (this.viewContainer.hasLeak) {
-            height = height - leakAreaHeight;
-        }
+		group.translate(dx, dy);
+	}
 
-        const viewBound: BoundingRect = group.getBound(),
-            centerX = width / 2, centerY = height / 2,
-            boundCenterX = viewBound.x + viewBound.width / 2,
-            boundCenterY = viewBound.y + viewBound.height / 2,
-            dx = centerX - boundCenterX,
-            dy = centerY - boundCenterY;
+	/**
+	 * 布局
+	 * @param layoutGroupTable
+	 * @param leakModels
+	 * @param hasLeak
+	 * @param needFitCenter
+	 */
+	public layoutAll(layoutGroupTable: LayoutGroupTable, accumulateLeakModels: SVModel[], leakModels: SVModel[]) {
+		this.preLayoutProcess(layoutGroupTable);
 
-        group.translate(dx, dy);
-    }
+		const modelGroupList: Group[] = this.layoutModels(layoutGroupTable);
+		const generalGroup: Group = this.layoutGroups(modelGroupList);
 
+		if (leakModels.length) {
+			this.layoutLeakModels(leakModels, accumulateLeakModels);
+		}
 
-
-    /**
-     * 布局
-     * @param layoutGroupTable 
-     * @param leakModels
-     * @param hasLeak
-     * @param needFitCenter
-     */
-    public layoutAll(layoutGroupTable: LayoutGroupTable, accumulateLeakModels: SVModel[], leakModels: SVModel[]) {
-        this.preLayoutProcess(layoutGroupTable);
-
-        const modelGroupList: Group[] = this.layoutModels(layoutGroupTable);
-        const generalGroup: Group = this.layoutGroups(modelGroupList);
-
-        if (leakModels.length) {
-            this.layoutLeakModels(leakModels, accumulateLeakModels);
-        }
-
-        this.fitCenter(generalGroup);
-        this.postLayoutProcess(layoutGroupTable);
-    }
+		this.fitCenter(generalGroup);
+		this.postLayoutProcess(layoutGroupTable);
+	}
 }

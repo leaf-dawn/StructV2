@@ -16,6 +16,7 @@ export interface SourceNode {
 
 
 export type Sources = {
+    enterFunction: any;
     [key: string]: { 
         data: SourceNode[]; 
         layouter: string; 

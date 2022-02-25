@@ -129,7 +129,6 @@ SV.registerLayout('BinaryTree', {
      */
     layout(elements, layoutOptions) {
         let root = elements[0];
-        let visited = new Group();
         this.layoutItem(root, null, -1, layoutOptions);
     }
 });

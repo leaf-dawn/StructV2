@@ -140,7 +140,7 @@ export class ViewContainer {
      * @param models 
      * @param layoutFn 
      */
-    render(layoutGroupTable: LayoutGroupTable) {
+    render(layoutGroupTable: LayoutGroupTable, a: boolean) {
         const modelList = Util.convertGroupTable2ModelList(layoutGroupTable),
             diffResult = this.reconcile.diff(this.layoutGroupTable, this.prevModelList, modelList, this.accumulateLeakModels),
             renderModelList = [

@@ -8,185 +8,182 @@
  */
 import { registerNode } from '@antv/g6';
 
-
-
 export default registerNode('three-cell', {
-    draw(cfg, group) {
-        cfg.size = cfg.size || [30, 10]; 
-        
-        const width = cfg.size[0],
-              height = cfg.size[1];
+	draw(cfg, group) {
+		cfg.size = cfg.size || [30, 10];
 
-        const wrapperRect = group.addShape('rect', {
-            attrs: {
-                x: width / 2,
-                y: height / 2,
-                width: width,
-                height: height,
-                stroke: cfg.style.stroke,
-                fill: cfg.style.backgroundFill || '#eee'
-            },
-            name: 'wrapper'
-        });
+		const width = cfg.size[0],
+			height = cfg.size[1];
 
-        group.addShape('rect', {
-            attrs: {
-                x: width / 2,
-                y: height / 2,
-                width: width / 3,
-                height: height,
-                fill: cfg.style.fill,
-                stroke: cfg.style.stroke
-            },
-            name: 'left-rect',
-            draggable: true
-        });
+		const wrapperRect = group.addShape('rect', {
+			attrs: {
+				x: width / 2,
+				y: height / 2,
+				width: width,
+				height: height,
+				stroke: cfg.style.stroke,
+				fill: cfg.style.backgroundFill || '#eee',
+			},
+			name: 'wrapper',
+		});
 
-        group.addShape('rect', {
-            attrs: {
-                x: width * (5 / 6),
-                y: height / 2,
-                width: width / 3,
-                height: height,
-                fill: cfg.style.fill,
-                stroke: cfg.style.stroke
-            },
-            name: 'middle-rect',
-            draggable: true
-        });
+		group.addShape('rect', {
+			attrs: {
+				x: width / 2,
+				y: height / 2,
+				width: width / 3,
+				height: height,
+				fill: cfg.style.fill,
+				stroke: cfg.style.stroke,
+			},
+			name: 'left-rect',
+			draggable: true,
+		});
 
-        const style = (cfg.labelCfg && cfg.labelCfg.style) || {};
+		group.addShape('rect', {
+			attrs: {
+				x: width * (5 / 6),
+				y: height / 2,
+				width: width / 3,
+				height: height,
+				fill: cfg.style.fill,
+				stroke: cfg.style.stroke,
+			},
+			name: 'middle-rect',
+			draggable: true,
+		});
 
-         //节点上方文字
-        if(cfg.root && cfg.rootLabel){
-            group.addShape('text', {
-                attrs: {
-                    x: width * (2 / 3), 
-                    y: 0,
-                    textAlign: 'center',
-                    textBaseline: 'middle',
-                    text: cfg.rootLabel[0],
-                    fill: style.fill || '#bbb',
-                    fontSize: style.fontSize || 16,
-                    fontStyle: 'italic',
-                    cursor: cfg.style.cursor,
-                },
-                name: 'text',
-                draggable: true
-            });
+		const style = (cfg.labelCfg && cfg.labelCfg.style) || {};
 
-            group.addShape('text', {
-                attrs: {
-                    x: width, 
-                    y: 0,
-                    textAlign: 'center',
-                    textBaseline: 'middle',
-                    text: cfg.rootLabel[1],
-                    fill: style.fill || '#bbb',
-                    fontSize: style.fontSize || 16,
-                    fontStyle: 'italic',
-                    cursor: cfg.style.cursor,
-                },
-                name: 'text',
-                draggable: true
-            });
+		//节点上方文字
+		if (cfg.root && cfg.rootLabel) {
+			group.addShape('text', {
+				attrs: {
+					x: width * (2 / 3),
+					y: 0,
+					textAlign: 'center',
+					textBaseline: 'middle',
+					text: cfg.rootLabel[0],
+					fill: style.fill || '#bbb',
+					fontSize: style.fontSize || 16,
+					fontStyle: 'italic',
+					cursor: cfg.style.cursor,
+				},
+				name: 'text',
+				draggable: true,
+			});
 
-            group.addShape('text', {
-                attrs: {
-                    x: width * (4 / 3), 
-                    y: 0,
-                    textAlign: 'center',
-                    textBaseline: 'middle',
-                    text: cfg.rootLabel[2],
-                    fill: style.fill || '#bbb',
-                    fontSize: style.fontSize || 16,
-                    fontStyle: 'italic',
-                    cursor: cfg.style.cursor,
-                },
-                name: 'text',
-                draggable: true
-            });
-        }
+			group.addShape('text', {
+				attrs: {
+					x: width,
+					y: 0,
+					textAlign: 'center',
+					textBaseline: 'middle',
+					text: cfg.rootLabel[1],
+					fill: style.fill || '#bbb',
+					fontSize: style.fontSize || 16,
+					fontStyle: 'italic',
+					cursor: cfg.style.cursor,
+				},
+				name: 'text',
+				draggable: true,
+			});
 
-        //节点左边文字
-        if(cfg.index !== null){
-            group.addShape('text', {
-                attrs: {
-                    x: width * (2 / 5), 
-                    y: height,
-                    textAlign: 'center',
-                    textBaseline: 'middle',
-                    text: cfg.index,
-                    fill: style.fill || '#bbb',
-                    fontSize: style.fontSize || 16,
-                    fontStyle: 'italic',
-                    cursor: cfg.style.cursor,
-                },
-                name: 'text',
-                draggable: true
-            });
-        }
-        //节点文字（数组形式）
-        if(cfg.label) {
-            group.addShape('text', {
-                attrs: {
-                    x: width * (2 / 3), 
-                    y: height,
-                    textAlign: 'center',
-                    textBaseline: 'middle',
-                    text: cfg.label[0],
-                    fill: style.fill || '#000',
-                    fontSize: style.fontSize || 16,
-                    cursor: cfg.style.cursor,
-                },
-                name: 'text',
-                draggable: true
-            });
+			group.addShape('text', {
+				attrs: {
+					x: width * (4 / 3),
+					y: 0,
+					textAlign: 'center',
+					textBaseline: 'middle',
+					text: cfg.rootLabel[2],
+					fill: style.fill || '#bbb',
+					fontSize: style.fontSize || 16,
+					fontStyle: 'italic',
+					cursor: cfg.style.cursor,
+				},
+				name: 'text',
+				draggable: true,
+			});
+		}
 
-            group.addShape('text', {
-                attrs: {
-                    x: width, 
-                    y: height,
-                    textAlign: 'center',
-                    textBaseline: 'middle',
-                    text: cfg.label[1],
-                    fill: style.fill || '#000',
-                    fontSize: style.fontSize || 16,
-                    cursor: cfg.style.cursor,
-                },
-                name: 'text',
-                draggable: true
-            });
-        }
+		//节点左边文字
+		if (cfg.index !== null) {
+			group.addShape('text', {
+				attrs: {
+					x: width * (2 / 5),
+					y: height,
+					textAlign: 'center',
+					textBaseline: 'middle',
+					text: cfg.index,
+					fill: style.fill || '#bbb',
+					fontSize: style.fontSize || 16,
+					fontStyle: 'italic',
+					cursor: cfg.style.cursor,
+				},
+				name: 'text',
+				draggable: true,
+			});
+		}
+		//节点文字（数组形式）
+		if (cfg.label) {
+			group.addShape('text', {
+				attrs: {
+					x: width * (2 / 3),
+					y: height,
+					textAlign: 'center',
+					textBaseline: 'middle',
+					text: cfg.label[0],
+					fill: style.fill || '#000',
+					fontSize: style.fontSize || 16,
+					cursor: cfg.style.cursor,
+				},
+				name: 'text',
+				draggable: true,
+			});
 
-        //节点没有后续指针时
-        if(!cfg.headNext){
-            group.addShape('text', {
-                attrs: {
-                    x: width * (4 / 3), 
-                    y: height * ( 6 / 5),
-                    textAlign: 'center',
-                    textBaseline: 'middle',
-                    text: '^',
-                    fill: style.fill || '#000',
-                    fontSize: 25,
-                    cursor: cfg.style.cursor,
-                },
-                name: 'text',
-                draggable: true
-            });
-        }
+			group.addShape('text', {
+				attrs: {
+					x: width,
+					y: height,
+					textAlign: 'center',
+					textBaseline: 'middle',
+					text: cfg.label[1],
+					fill: style.fill || '#000',
+					fontSize: style.fontSize || 16,
+					cursor: cfg.style.cursor,
+				},
+				name: 'text',
+				draggable: true,
+			});
+		}
 
+		//节点没有后续指针时
+		if (!cfg.headNext) {
+			group.addShape('text', {
+				attrs: {
+					x: width * (4 / 3),
+					y: height * (6 / 5),
+					textAlign: 'center',
+					textBaseline: 'middle',
+					text: '^',
+					fill: style.fill || '#000',
+					fontSize: 22,
+					cursor: cfg.style.cursor,
+				},
+				name: 'text',
+				draggable: true,
+			});
+		}
 
-        return wrapperRect;
-    },
+		return wrapperRect;
+	},
 
-    getAnchorPoints() {
-        return [
-            [0.5, 0],
-            [5 / 6, 0.5],
-            [0.5, 1],
-            [0, 0.5]
-        ];
-    }
+	getAnchorPoints() {
+		return [
+			[0.5, 0],
+			[5 / 6, 0.5],
+			[0.5, 1],
+			[0, 0.5],
+		];
+	},
 });

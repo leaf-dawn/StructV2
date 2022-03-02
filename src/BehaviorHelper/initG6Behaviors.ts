@@ -45,7 +45,7 @@ export function InitG6Behaviors(engine: Engine, viewContainer: ViewContainer): M
         // 这里之所以要把节点和其 appendages 的选中状态设置为true，是因为 g6 处理拖拽节点的逻辑是将所以已选中的元素一起拖动，
         // 这样 appendages 就可以很自然地跟着节点动（我是看源码才知道的）
         node.setSelectedState(true);
-        node.appendages.forEach(item => {
+        node.getAppendagesList().forEach(item => {
             item.setSelectedState(true);
         });
 

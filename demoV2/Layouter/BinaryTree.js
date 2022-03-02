@@ -1,11 +1,11 @@
 SV.registerLayout('BinaryTree', {
 	defineOptions() {
 		return {
-			element: {
+			node: {
 				default: {
 					type: 'binary-tree-node',
 					size: [60, 30],
-					label: '[data]',
+					label: '[id]',
 					style: {
 						fill: '#b83b5e',
 						stroke: '#333',
@@ -58,7 +58,7 @@ SV.registerLayout('BinaryTree', {
 	/**
 	 * 对子树进行递归布局
 	 */
-	layoutItem(node, parent, index, layoutOptions) {
+	layoutItem(node, layoutOptions) {
 		// 次双亲不进行布局
 		if (!node) {
 			return null;
@@ -69,43 +69,54 @@ SV.registerLayout('BinaryTree', {
 			height = bound.height,
 			group = new Group(node),
 			leftGroup = null,
-			rightGroup = null;
+			rightGroup = null,
+            leftBound = null,
+            rightBound = null;
 
 		if (node.visited) {
 			return null;
 		}
 
 		if (node.child && node.child[0]) {
-			leftGroup = this.layoutItem(node.child[0], node, 0, layoutOptions);
+			leftGroup = this.layoutItem(node.child[0], layoutOptions);
 		}
 
 		if (node.child && node.child[1]) {
-			rightGroup = this.layoutItem(node.child[1], node, 1, layoutOptions);
+			rightGroup = this.layoutItem(node.child[1], layoutOptions);
 		}
 
-		// 处理左右子树相交问题
-		if (leftGroup && rightGroup) {
-			let intersection = Bound.intersect(leftGroup.getBound(), rightGroup.getBound()),
-				move = 0;
+        if (leftGroup) {
+            leftBound = leftGroup.getBound();
+            node.set('y', leftBound.y - layoutOptions.yInterval - height);
+        }
 
-			if (intersection && intersection.width > 0) {
-				move = (intersection.width + layoutOptions.xInterval) / 2;
-				leftGroup.translate(-move, 0);
-				rightGroup.translate(move, 0);
+        if(rightGroup) {
+            rightBound = rightGroup.getBound();
+
+            if(leftGroup) {
+                rightGroup.translate(0, leftBound.y - rightBound.y)
+            }
+
+            rightBound = rightGroup.getBound();
+            node.set('y', rightBound.y - layoutOptions.yInterval - height);
+        }
+
+        // 处理左右子树相交问题
+		if (leftGroup && rightGroup) {
+			let move = Math.abs(rightBound.x - layoutOptions.xInterval - leftBound.x - leftBound.width);
+			if (move > 0) {
+				leftGroup.translate(-move / 2, 0);
+				rightGroup.translate(move / 2, 0);
 			}
 		}
 
         if (leftGroup) {
-            let leftBound = leftGroup.getBound();
-
-            node.set('y', leftBound.y - layoutOptions.yInterval - height);
+            leftBound = leftGroup.getBound();
             node.set('x', leftBound.x + leftBound.width + layoutOptions.xInterval / 2 - width);
         }
 
         if(rightGroup) {
-            let rightBound = rightGroup.getBound();
-
-            node.set('y', rightBound.y - layoutOptions.yInterval - height);
+            rightBound = rightGroup.getBound();
             node.set('x', rightBound.x - layoutOptions.xInterval / 2 - width);
         }
 
@@ -129,7 +140,7 @@ SV.registerLayout('BinaryTree', {
 	 */
 	layout(elements, layoutOptions) {
 		let root = elements[0];
-		this.layoutItem(root, null, -1, layoutOptions);
+		this.layoutItem(root, layoutOptions);
 	},
 });
 

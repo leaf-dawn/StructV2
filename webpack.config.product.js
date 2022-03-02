@@ -17,6 +17,5 @@ module.exports = {
                 loader: 'ts-loader'
             }
         ]
-    },
-    // devtool: 'eval-source-map'
+    }
 };

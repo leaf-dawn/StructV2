@@ -49,15 +49,15 @@ export class Engine {
     /**
      * 输入数据进行渲染
      * @param sources
-     * @param force
+     * @param prevStep
      */
-    public render(source: Sources, force: boolean = false) {
+    public render(source: Sources, prevStep: boolean = false) {
         if (source === undefined || source === null) {
             return;
         }
         ``
         let stringSource = JSON.stringify(source);
-        if (force === false && this.prevStringSource === stringSource) {
+        if (this.prevStringSource === stringSource) {
             return;
         }
 
@@ -67,7 +67,7 @@ export class Engine {
         const layoutGroupTable = this.modelConstructor.construct(source);
 
         // 2 渲染（使用g6进行渲染）
-        this.viewContainer.render(layoutGroupTable, source.isEnterFunction as boolean);
+        this.viewContainer.render(layoutGroupTable, source.isEnterFunction as boolean, prevStep);
     }
 
 

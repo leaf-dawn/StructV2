@@ -22,7 +22,6 @@ import { Vector } from "./Common/vector";
 import { EngineOptions, LayoutCreator } from "./options";
 import { SourceNode } from "./sources";
 import { Util } from "./Common/util";
-import { SVModel } from "./Model/SVModel";
 import { SVNode } from "./Model/SVNode";
 
 

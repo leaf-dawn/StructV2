@@ -77,25 +77,37 @@ SV.registerLayout('LinkList', {
             layout: {
                 xInterval: 50,
                 yInterval: 50
-            },
-            behavior: {
-                dragNode: false
             }
         };
     },
 
 
-    layout(elements, layoutOptions) {
-        for (let i = 0; i < elements.length; i++) {
-            let node = elements[i],
-                prev = elements[1 - 1],
-                width = node.get('size')[0];
-
-            if (prev) {
-                node.set('y', prev.get('y'));
-                node.set('x', prev.get('x') + layoutOptions.xInterval + width);
-            }
+    /**
+     * 对子树进行递归布局
+     * @param node 
+     * @param parent 
+     */
+     layoutItem(node, prev, layoutOptions) {
+        if (!node) {
+            return null;
         }
+
+        let width = node.get('size')[0];
+
+        if (prev) {
+            node.set('y', prev.get('y'));
+            node.set('x', prev.get('x') + layoutOptions.xInterval + width);
+        }
+
+        if (node.next) {
+            this.layoutItem(node.next, node, layoutOptions);
+        }
+    },
+
+
+    layout(elements, layoutOptions) {
+        let root = elements[0];
+        this.layoutItem(root, null, layoutOptions);
     }
 });
 

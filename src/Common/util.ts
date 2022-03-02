@@ -123,21 +123,6 @@ export const Util = {
     },
 
     /**
-     * G6 data 转换器
-     * @param layoutGroup 
-     * @returns 
-     */
-    convertG6Data(layoutGroup: LayoutGroup): GraphData {
-        let nodes = [...layoutGroup.node, ...layoutGroup.marker],
-            edges = layoutGroup.link;
-
-        return {
-            nodes: nodes.map(item => item.getG6ModelProps()) as NodeConfig[],
-            edges: edges.map(item => item.getG6ModelProps()) as EdgeConfig[]
-        };
-    },
-
-    /**
      * 将 modelList 转换到 G6Data
      * @param modelList
      */

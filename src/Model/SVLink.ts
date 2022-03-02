@@ -49,4 +49,11 @@ export class SVLink extends SVModel {
             curveOffset: options.curveOffset
         };
     }
+
+    beforeDestroy(): void {
+        Util.removeFromList(this.target.links.inDegree, item => item.id === this.id);
+        Util.removeFromList(this.node.links.outDegree, item => item.id === this.id);
+        this.node = null;
+        this.target = null;
+    }
 };

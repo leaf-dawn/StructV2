@@ -76,7 +76,7 @@ export function SolveNodeAppendagesDrag(viewContainer: ViewContainer) {
                 item.setSelectedState(false);
 
                 if (item instanceof SVNode) {
-                    item.appendages.forEach(appendage => appendage.setSelectedState(false));
+                    item.getAppendagesList().forEach(appendage => appendage.setSelectedState(false));
                 }
             });
             viewContainer.brushSelectedModels.length = 0;
@@ -100,7 +100,7 @@ export function SolveNodeAppendagesDrag(viewContainer: ViewContainer) {
                 y: node.G6Item.getModel().y
             });
 
-            node.appendages.forEach(item => {
+            node.getAppendagesList().forEach(item => {
                 item.setSelectedState(false);
                 item.set({
                     x: item.G6Item.getModel().x,
@@ -116,7 +116,7 @@ export function SolveNodeAppendagesDrag(viewContainer: ViewContainer) {
             });
 
             if(item instanceof SVNode) {
-                item.appendages.forEach(appendage => {
+                item.getAppendagesList().forEach(appendage => {
                     appendage.set({
                         x: appendage.G6Item.getModel().x,
                         y: appendage.G6Item.getModel().y

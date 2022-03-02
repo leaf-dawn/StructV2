@@ -5,7 +5,7 @@ import { SourceNode } from '../sources';
 import { ModelConstructor } from './modelConstructor';
 import { SVLink } from './SVLink';
 import { SVModel } from './SVModel';
-import { SVAddressLabel, SVFreedLabel, SVIndexLabel, SVMarker, SVNodeAppendage } from './SVNodeAppendage';
+import { SVNodeAppendage } from './SVNodeAppendage';
 
 export class SVNode extends SVModel {
 	public sourceId: string;
@@ -17,17 +17,7 @@ export class SVNode extends SVModel {
 
 	private label: string | string[];
 	private disable: boolean;
-
-	public shadowG6Item: INode;
-	public G6Item: INode;
-
-	public marker: SVMarker;
-	public freedLabel: SVFreedLabel;
-	public indexLabel: SVIndexLabel;
-	public addressLabel: SVAddressLabel;
-	public appendages: SVNodeAppendage[];
-
-    public modelConstructor: ModelConstructor;
+	public appendages: { [key: string]: SVNodeAppendage[] };
 
 	constructor(
 		id: string,
@@ -53,7 +43,7 @@ export class SVNode extends SVModel {
 		this.sourceId = sourceNode.id.toString();
 
 		this.links = { inDegree: [], outDegree: [] };
-		this.appendages = [];
+		this.appendages = {};
 		this.sourceNode = sourceNode;
 		this.label = label;
 		this.G6ModelProps = this.generateG6ModelProps(options);
@@ -94,7 +84,7 @@ export class SVNode extends SVModel {
 		}
 
 		this.G6Item.setState('selected', isSelected);
-		this.appendages.forEach(item => {
+		this.getAppendagesList().forEach(item => {
 			item.setSelectedState(isSelected);
 		});
 	}
@@ -103,11 +93,28 @@ export class SVNode extends SVModel {
 		return this.sourceId;
 	}
 
+    getAppendagesList(): SVNodeAppendage[] {
+        const list = [];
+
+        Object.entries(this.appendages).forEach(item => {
+            list.push(...item[1]);
+        });
+
+        return list;
+    }
+
 	/**
 	 * 判断这个节点是否来自相同group
 	 * @param node
 	 */
 	isSameGroup(node: SVNode): boolean {
-        return this.modelConstructor.isSameGroup(this, node);
+        return ModelConstructor.isSameGroup(this, node);
+    }
+
+    beforeDestroy(): void {
+        this.sourceNode = null;
+        this.links.inDegree.length = 0;
+        this.links.outDegree.length = 0;
+        this.appendages = {};
     }
 }

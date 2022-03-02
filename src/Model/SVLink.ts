@@ -43,9 +43,9 @@ export class SVLink extends SVModel {
             target: this.target.id,
             sourceAnchor,
             targetAnchor,
-            label: options.label,
+            label: this.target.sourceNode.freed ? 'freed' : options.label,
             style: Util.objectClone<Style>(options.style),
-            labelCfg: Util.objectClone<LinkLabelOption>(options.labelOptions),
+            labelCfg: this.target.sourceNode.freed ? {position: 'start', autoRotate: true, refY:5 ,style: { fontSize: 10, opacity: 0.7}} : Util.objectClone<LinkLabelOption>(options.labelOptions),
             curveOffset: options.curveOffset
         };
     }

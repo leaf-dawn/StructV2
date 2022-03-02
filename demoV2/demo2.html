@@ -1,250 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>DEMO</title>
-		<style>
-			* {
-				padding: 0;
-				margin: 0;
-				user-select: none;
-			}
 
-			.container {
-				background-color: #fafafa;
-				border: 1px solid #ccc;
-				position: relative;
-			}
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DEMO</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            user-select: none;
+        }
+        
+        .container {
+            background-color: #fafafa;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        
+        .down {
+            display: flex;
+            margin-top: 20px;
+        }
+        
+        #container {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #leak {
+            position: absolute;
+            left: 0;
+            opacity: 0;
+            top: 100px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 4px;
+            border-top: 1px dashed #000;
+            pointer-events: none;
+            transition: opacity 0.75s ease-in-out;
+        }
+        
+        #leak>span {
+            color: #000;
+        }
+    </style>
+</head>
 
-			.down {
-				display: flex;
-				margin-top: 20px;
-			}
+<body>
+    <div class="container" id="container">
+        <div id="leak">
+            <span>泄漏区</span>
+        </div>
+    </div>
 
-			#container {
-				width: 100%;
-				height: 500px;
-				position: relative;
-				overflow: hidden;
-			}
+    <button id="btn-prev">prev</button>
+    <button id="btn-next">next</button>
+    <button id="resize">resize</button>
+    <button id="relayout">relayout</button>
+    <button id="switch-mode">switch mode</button>
+    <button id="brush-select">brush-select</button>
+    <span id="pos"></span>
 
-			#leak {
-				position: absolute;
-				left: 0;
-				opacity: 0;
-				top: 100px;
-				width: 100%;
-				box-sizing: border-box;
-				padding: 4px;
-				border-top: 1px dashed #000;
-				pointer-events: none;
-				transition: opacity 0.75s ease-in-out;
-			}
+    <script src="./../dist/sv.js"></script>
+    <script>
+        const Group = SV.Group,
+            Bound = SV.Bound,
+            G6 = SV.G6,
+            Vector = SV.Vector;
+    </script>
+    <script src="./Layouter/LinkList.js"></script>
+    <script src="./Layouter/BinaryTree.js"></script>
+    <script src="./Layouter/Stack.js"></script>
+    <script src="./Layouter/LinkQueue.js"></script>
+    <script src="./Layouter/GeneralizedList.js"></script>
+    <script src="./Layouter/ChainHashTable.js"></script>
+    <script src="./Layouter/Array.js"></script>
+    <script src="./Layouter/HashTable.js"></script>
+    <script src="./Layouter/LinkStack.js"></script>
+    <script src="./Layouter/AdjoinMatrixGraph.js"></script>
+    <script src="./Layouter/AdjoinTableGraph.js"></script>
+    <script src="./Layouter/SqQueue.js"></script>
+    <script src="./Layouter/PTree.js"></script>
+    <script src="./Layouter/PCTree.js"></script>
 
-			#leak > span {
-				color: #000;
-			}
-		</style>
-	</head>
+    <script>
+        let cur = SV(document.getElementById('container'), {
+            view: {
+                leakAreaHeight: 130,
+                groupPadding: 40,
+            },
+        });
 
-	<body>
-		<div class="container" id="container">
-			<div id="leak">
-				<span>泄漏区</span>
-			</div>
-		</div>
+        let data = [{
+            "BinaryTree0": {
+                "data": [{
+                    "external": [
+                        "T1",
+                        "r"
+                    ],
+                    "child": [
+                        "0x617ee0",
+                        "0x617f10"
+                    ],
+                    "id": "0x617eb0",
+                    "name": "T1",
+                    "data": "Z",
+                    "root": true,
+                    "type": "default"
+                }, {
+                    "child": [
+                        "0x0",
+                        "0x0"
+                    ],
+                    "id": "0x617ee0",
+                    "name": "T1->lchild",
+                    "data": "A",
+                    "type": "default"
+                }, {
+                    "child": [
+                        "0x0",
+                        "0x617f40"
+                    ],
+                    "id": "0x617f10",
+                    "name": "T1->rchild",
+                    "data": "B",
+                    "type": "default",
+                    "external": [
+                        "t"
+                    ]
+                }, ],
+                "layouter": "BinaryTree"
+            },
+            "isEnterFunction": false
+        }, {
+            "BinaryTree1": {
+                "data": [{
+                    "external": [
+                        "T1",
+                        "r"
+                    ],
+                    "child": [
+                        "0x617ee0",
+                        "0x617f10"
+                    ],
+                    "id": "0x617eb0",
+                    "name": "T1",
+                    "data": "Z",
+                    "root": true,
+                    "type": "default"
+                }, {
+                    "child": [
+                        "0x0",
+                        "0x0"
+                    ],
+                    "id": "0x617ee0",
+                    "name": "T1->lchild",
+                    "data": "A",
+                    freed: 'freed',
+                    "type": "default"
+                }, {
+                    "child": [
+                        "0x0",
+                        "0x617f40"
+                    ],
+                    "id": "0x617f10",
+                    "name": "T1->rchild",
+                    "data": "B",
+                    "type": "default",
+                    "external": [
+                        "t"
+                    ]
+                }, ],
+                "layouter": "BinaryTree"
+            },
+            "isEnterFunction": false
+        }, ];
 
-		<button id="btn-prev">prev</button>
-		<button id="btn-next">next</button>
-		<button id="resize">resize</button>
-		<button id="relayout">relayout</button>
-		<button id="switch-mode">switch mode</button>
-		<button id="brush-select">brush-select</button>
-		<span id="pos"></span>
+        let dataIndex = 0,
+            curData = data[dataIndex];
 
-		<script src="./../dist/sv.js"></script>
-		<script>
-			const Group = SV.Group,
-				Bound = SV.Bound,
-				G6 = SV.G6,
-				Vector = SV.Vector;
-		</script>
-		<script src="./Layouter/LinkList.js"></script>
-		<script src="./Layouter/BinaryTree.js"></script>
-		<script src="./Layouter/Stack.js"></script>
-		<script src="./Layouter/LinkQueue.js"></script>
-		<script src="./Layouter/GeneralizedList.js"></script>
-		<script src="./Layouter/ChainHashTable.js"></script>
-		<script src="./Layouter/Array.js"></script>
-		<script src="./Layouter/HashTable.js"></script>
-		<script src="./Layouter/LinkStack.js"></script>
-		<script src="./Layouter/AdjoinMatrixGraph.js"></script>
-		<script src="./Layouter/AdjoinTableGraph.js"></script>
-		<script src="./Layouter/SqQueue.js"></script>
-		<script src="./Layouter/PTree.js"></script>
-		<script src="./Layouter/PCTree.js"></script>
+        let enableBrushSelect = false;
 
-		<script>
-			let cur = SV(document.getElementById('container'), {
-				view: {
-					leakAreaHeight: 130,
-					groupPadding: 40,
-				},
-			});
+        const container = document.getElementById('container'),
+            pos = document.getElementById('pos');
 
-			let data = [
-				{
-					BinaryTree0: {
-						data: [
-							{
-								external: ['T', 'p'],
-								child: ['0x615f40', '0x0'],
-								id: '0x615f10',
-								name: 'T',
-								data: 'W',
-								root: true,
-								type: 'default',
-							},
-							{
-								child: ['0x615f70', '0x615fa0'],
-								id: '0x615f40',
-								name: 'T->lchild',
-								data: 'Q',
-								type: 'default',
-							},
-							{
-								child: ['0x0', '0x615fd0'],
-								id: '0x615f70',
-								name: '(T->lchild)->lchild',
-								data: 'A',
-								type: 'default',
-							},
-							{
-								child: ['0x0', '0x0'],
-								id: '0x615fd0',
-								name: '((T->lchild)->lchild)->rchild',
-								data: 'D',
-								type: 'default',
-							},
-							{
-								child: ['0x616000', '0x616030'],
-								id: '0x615fa0',
-								name: '(T->lchild)->rchild',
-								data: 'U',
-								type: 'default',
-							},
-							{
-								child: ['0x0', '0x0'],
-								id: '0x616000',
-								name: '((T->lchild)->rchild)->lchild',
-								data: 'S',
-								type: 'default',
-							},
-							{
-								child: ['0x0', '0x0'],
-								id: '0x616030',
-								name: '((T->lchild)->rchild)->rchild',
-								data: 'V',
-								type: 'default',
-							},
-						],
-						layouter: 'BinaryTree',
-					},
-					isEnterFunction: false,
-				},
-                {
-					BinaryTree0: {
-						data: [
-							{
-								external: ['T', 'p'],
-								child: ['0x615f40', '0x0'],
-								id: '0x615f10',
-								name: 'T',
-								data: 'W',
-								root: true,
-								type: 'default',
-							},
-							{
-								child: ['0x615f70', '0x615fa0'],
-								id: '0x615f40',
-								name: 'T->lchild',
-								data: 'Q',
-								type: 'default',
-							},
-							{
-								child: ['0x0', '0x615fd0'],
-								id: '0x615f70',
-								name: '(T->lchild)->lchild',
-								data: 'A',
-								type: 'default',
-							},
-							{
-								child: ['0x0', '0x0'],
-								id: '0x615fd0',
-								name: '((T->lchild)->lchild)->rchild',
-								data: 'D',
-								type: 'default',
-							}
-						],
-						layouter: 'BinaryTree',
-					},
-					isEnterFunction: false,
-				},
-			];
+        const leak = document.getElementById('leak');
 
-			let dataIndex = 0,
-				curData = data[dataIndex];
+        cur.render(curData);
 
-			let enableBrushSelect = false;
+        document.getElementById('btn-next').addEventListener('click', e => {
+            curData = data[++dataIndex];
+            cur.render(curData);
+        });
 
-			const container = document.getElementById('container'),
-				pos = document.getElementById('pos');
+        document.getElementById('btn-prev').addEventListener('click', e => {
+            curData = data[--dataIndex];
+            cur.render(curData);
+        });
 
-			const leak = document.getElementById('leak');
+        document.getElementById('resize').addEventListener('click', e => {
+            container.style.height = 800 + 'px';
+            cur.resize(container.offsetWidth, container.offsetHeight);
+        });
 
-			cur.render(curData);
+        document.getElementById('relayout').addEventListener('click', e => {
+            cur.reLayout();
+        });
 
-			document.getElementById('btn-next').addEventListener('click', e => {
-				curData = data[++dataIndex];
-				cur.render(curData);
-			});
+        document.getElementById('switch-mode').addEventListener('click', e => {
+            cur.updateStyle('Array', newArrayOption);
+        });
 
-			document.getElementById('btn-prev').addEventListener('click', e => {
-				curData = data[--dataIndex];
-				cur.render(curData);
-			});
+        document.getElementById('brush-select').addEventListener('click', e => {
+            enableBrushSelect = !enableBrushSelect;
+            cur.switchBrushSelect(enableBrushSelect);
+        });
 
-			document.getElementById('resize').addEventListener('click', e => {
-				container.style.height = 800 + 'px';
-				cur.resize(container.offsetWidth, container.offsetHeight);
-			});
+        cur.on('onLeakAreaUpdate', payload => {
+            leak.style.opacity = payload.hasLeak ? 1 : 0;
+            leak.style.top = payload.leakAreaY - 40 + 'px';
+        });
 
-			document.getElementById('relayout').addEventListener('click', e => {
-				cur.reLayout();
-			});
+        // -------------------------------------------------------------------------------------------------------
 
-			document.getElementById('switch-mode').addEventListener('click', e => {
-				cur.updateStyle('Array', newArrayOption);
-			});
+        container.addEventListener('mousemove', e => {
+            let x = e.offsetX,
+                y = e.offsetY;
+            pos.innerHTML = `${x},${y}`;
+        });
+    </script>
+</body>
 
-			document.getElementById('brush-select').addEventListener('click', e => {
-				enableBrushSelect = !enableBrushSelect;
-				cur.switchBrushSelect(enableBrushSelect);
-			});
-
-			cur.on('onLeakAreaUpdate', payload => {
-				leak.style.opacity = payload.hasLeak ? 1 : 0;
-				leak.style.top = payload.leakAreaY - 40 + 'px';
-			});
-
-			// -------------------------------------------------------------------------------------------------------
-
-			container.addEventListener('mousemove', e => {
-				let x = e.offsetX,
-					y = e.offsetY;
-				pos.innerHTML = `${x},${y}`;
-			});
-		</script>
-	</body>
 </html>

@@ -97,7 +97,7 @@ export class Renderer {
 		this.shadowG6Instance.clear();
 		this.shadowG6Instance.read(g6Data);
 		renderModelList.forEach(item => {
-            item.G6Item = null;
+			item.G6Item = null;
 			item.shadowG6Item = this.shadowG6Instance.findById(item.id);
 			item.shadowG6Instance = this.shadowG6Instance;
 		});
@@ -106,10 +106,14 @@ export class Renderer {
 	/**
 	 * 渲染函数
 	 * @param renderModelList
-	 * @param isFirstRender
+	 * @param isSameSources
 	 */
 	public render(renderModelList: SVModel[]) {
 		const renderData: GraphData = Util.convertModelList2G6Data(renderModelList);
+
+		renderModelList.forEach(item => {
+			item.beforeRender();
+		});
 
 		this.g6Instance.changeData(renderData);
 

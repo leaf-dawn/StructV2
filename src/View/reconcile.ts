@@ -50,8 +50,7 @@ export class Reconcile {
 	private getAppendModels(
 		prevModelList: SVModel[],
 		modelList: SVModel[],
-		accumulateLeakModels: SVModel[],
-		prevStep: boolean
+		accumulateLeakModels: SVModel[]
 	): SVModel[] {
 		const appendModels = modelList.filter(item => !prevModelList.find(model => model.id === item.id));
 
@@ -273,6 +272,7 @@ export class Reconcile {
 				Animations.APPEND(item.G6Item, {
 					duration,
 					timingFunction,
+                    callback: () => item.afterRender()
 				});
 			}
 		});
@@ -291,6 +291,7 @@ export class Reconcile {
 				timingFunction,
 				callback: () => {
 					this.renderer.removeModel(item);
+					item.afterDestroy();
 				},
 			});
 		});
@@ -323,9 +324,7 @@ export class Reconcile {
 	 */
 	private handleAccumulateLeakModels(accumulateModels: SVModel[]) {
 		accumulateModels.forEach(item => {
-			if (item.generalStyle) {
-				item.set('style', { ...item.generalStyle });
-			}
+			item.restoreHighlight();
 		});
 	}
 
@@ -374,19 +373,7 @@ export class Reconcile {
 		}
 
 		models.forEach(item => {
-			if (item.generalStyle === undefined) {
-				item.generalStyle = Util.objectClone(item.G6ModelProps.style);
-			}
-
-			if (item instanceof SVLink) {
-				item.set('style', {
-					stroke: changeHighlightColor,
-				});
-			} else {
-				item.set('style', {
-					fill: changeHighlightColor,
-				});
-			}
+			item.triggerHighlight(changeHighlightColor);
 		});
 	}
 
@@ -403,14 +390,13 @@ export class Reconcile {
 		prevModelList: SVModel[],
 		modelList: SVModel[],
 		accumulateLeakModels: SVModel[],
-		isEnterFunction: boolean,
-		prevStep: boolean
+		isEnterFunction: boolean
 	): DiffResult {
 		const continuousModels: SVModel[] = this.getContinuousModels(prevModelList, modelList);
 		const leakModels: SVModel[] = isEnterFunction
 			? []
 			: this.getLeakModels(layoutGroupTable, prevModelList, modelList);
-		const appendModels: SVModel[] = this.getAppendModels(prevModelList, modelList, accumulateLeakModels, prevStep);
+		const appendModels: SVModel[] = this.getAppendModels(prevModelList, modelList, accumulateLeakModels);
 		const removeModels: SVModel[] = this.getRemoveModels(prevModelList, modelList, accumulateLeakModels);
 		const updateModels: SVModel[] = [
 			...this.getReTargetMarkers(prevModelList, modelList),

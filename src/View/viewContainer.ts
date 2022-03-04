@@ -140,18 +140,25 @@ export class ViewContainer {
 	 * @param models
 	 * @param layoutFn
 	 */
-	render(layoutGroupTable: LayoutGroupTable, isEnterFunction: boolean, prevStep: boolean) {
-		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable),
-			diffResult = this.reconcile.diff(
+	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, isEnterFunction: boolean) {
+		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
+
+        // 如果数据没变的话
+		if (isSameSources) {
+			modelList.forEach(item => item.restoreHighlight());
+            return;
+		}
+
+		const diffResult = this.reconcile.diff(
 				this.layoutGroupTable,
 				this.prevModelList,
 				modelList,
 				this.accumulateLeakModels,
-				isEnterFunction,
-                prevStep
+				isEnterFunction
 			),
 			renderModelList = [...modelList, ...diffResult.REMOVE, ...diffResult.LEAKED, ...diffResult.ACCUMULATE_LEAK];
 
+		// 从有泄漏区变成无泄漏区
 		if (this.hasLeak === true && this.accumulateLeakModels.length === 0) {
 			this.hasLeak = false;
 			EventBus.emit('onLeakAreaUpdate', {
@@ -160,6 +167,7 @@ export class ViewContainer {
 			});
 		}
 
+		// 从无泄漏区变成有泄漏区
 		if (diffResult.LEAKED.length) {
 			this.hasLeak = true;
 			EventBus.emit('onLeakAreaUpdate', {
@@ -168,7 +176,7 @@ export class ViewContainer {
 			});
 		}
 
-        this.accumulateLeakModels.push(...diffResult.LEAKED); // 对泄漏节点进行向后累积
+		this.accumulateLeakModels.push(...diffResult.LEAKED); // 对泄漏节点进行向后累积
 		this.renderer.build(renderModelList); // 首先在离屏canvas渲染先
 		this.layoutProvider.layoutAll(layoutGroupTable, this.accumulateLeakModels); // 进行布局（设置model的x，y，样式等）
 

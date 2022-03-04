@@ -21,7 +21,7 @@ export class SVModel {
 	public discarded: boolean;
 	public freed: boolean;
 	public leaked: boolean;
-	public generalStyle: Partial<Style>;
+	public originStyle: Partial<Style>; // 用作保存修改前的样式
 
 	private transformMatrix: number[];
 	private modelType: string;
@@ -187,16 +187,33 @@ export class SVModel {
 		return this.modelType;
 	}
 
-	/**
+    triggerHighlight(changeHighlightColor: string) {
+        this.originStyle = Util.objectClone(this.G6ModelProps.style);
+        this.set('style', {
+            fill: changeHighlightColor,
+        });
+    }
+
+    restoreHighlight() {
+        if (this.originStyle) {
+            this.set('style', { ...this.originStyle });
+        }
+    }
+
+    /**
 	 * 判断是否为节点model（SVNode）
 	 */
 	isNode(): boolean {
 		return false;
 	}
 
-    beforeDestroy () {}
+    beforeRender () {
+        this.restoreHighlight();
+    }
+    afterRender() {}
 
-    destroy() {
+    beforeDestroy () {}
+    afterDestroy() {
         this.G6Item = null;
         this.shadowG6Instance = null;
         this.shadowG6Item = null;

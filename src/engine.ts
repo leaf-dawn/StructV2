@@ -51,23 +51,34 @@ export class Engine {
      * @param sources
      * @param prevStep
      */
-    public render(source: Sources, prevStep: boolean = false) {
+    public render(source: Sources) {
+        let isSameSources: boolean = false,
+            layoutGroupTable: LayoutGroupTable,
+            isEnterFunction = source.isEnterFunction;
+
         if (source === undefined || source === null) {
             return;
         }
-        ``
+        
         let stringSource = JSON.stringify(source);
         if (this.prevStringSource === stringSource) {
-            return;
+            isSameSources = true;
         }
 
         this.prevStringSource = stringSource;
 
-        // 1 转换模型（data => model）
-        const layoutGroupTable = this.modelConstructor.construct(source);
+
+        if(isSameSources) {
+            // 若源数据两次一样的，用回上一次的layoutGroupTable
+            layoutGroupTable = this.modelConstructor.getLayoutGroupTable();
+        }
+        else {  
+            // 1 转换模型（data => model）
+            layoutGroupTable = this.modelConstructor.construct(source);
+        }
 
         // 2 渲染（使用g6进行渲染）
-        this.viewContainer.render(layoutGroupTable, source.isEnterFunction as boolean, prevStep);
+        this.viewContainer.render(layoutGroupTable, isSameSources, isEnterFunction);
     }
 
 

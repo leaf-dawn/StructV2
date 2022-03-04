@@ -50,6 +50,13 @@ export class SVLink extends SVModel {
         };
     }
 
+    triggerHighlight(changeHighlightColor: string) {
+        this.originStyle = Util.objectClone(this.G6ModelProps.style);
+        this.set('style', {
+            stroke: changeHighlightColor,
+        });
+    }
+
     beforeDestroy(): void {
         Util.removeFromList(this.target.links.inDegree, item => item.id === this.id);
         Util.removeFromList(this.node.links.outDegree, item => item.id === this.id);

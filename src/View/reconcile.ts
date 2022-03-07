@@ -422,13 +422,13 @@ export class Reconcile {
 	 * @param diffResult
 	 * @param isFirstRender
 	 */
-	public patch(diffResult: DiffResult) {
+	public patch(diffResult: DiffResult,isEnterFunction: boolean) {
 		const { APPEND, REMOVE, FREED, LEAKED, UPDATE, CONTINUOUS, ACCUMULATE_LEAK } = diffResult;
 
 		this.handleAccumulateLeakModels(ACCUMULATE_LEAK);
 
 		// 第一次渲染的时候不高亮变化的元素
-		if (this.isFirstPatch === false) {
+		if (this.isFirstPatch === false && !isEnterFunction) {
 			this.handleChangeModels(UPDATE);
 		}
 

@@ -182,7 +182,7 @@ export class ViewContainer {
 
 		this.beforeRender();
 		this.renderer.render(renderModelList); // 渲染视图
-		this.reconcile.patch(diffResult); // 对视图上的某些变化进行对应的动作，比如：节点创建动画，节点消失动画等
+		this.reconcile.patch(diffResult,isEnterFunction); // 对视图上的某些变化进行对应的动作，比如：节点创建动画，节点消失动画等
 		this.afterRender();
 
 		this.layoutGroupTable = layoutGroupTable;

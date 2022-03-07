@@ -53,14 +53,15 @@ export class Engine {
      */
     public render(source: Sources) {
         let isSameSources: boolean = false,
-            layoutGroupTable: LayoutGroupTable,
-            isEnterFunction = source.isEnterFunction;
+            layoutGroupTable: LayoutGroupTable;
 
         if (source === undefined || source === null) {
             return;
         }
-        
-        let stringSource = JSON.stringify(source);
+
+        let isEnterFunction = source.isEnterFunction,
+            stringSource = JSON.stringify(source);
+            
         if (this.prevStringSource === stringSource) {
             isSameSources = true;
         }

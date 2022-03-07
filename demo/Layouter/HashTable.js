@@ -1,17 +1,14 @@
-
-
-
 SV.registerLayout('HashTable', {
 
     sourcesPreprocess(sources) {
         const firstElement = sources[0];
 
-        if(firstElement.external) {
+        if (firstElement.external) {
             firstElement.headExternal = firstElement.external;
             delete firstElement.external;
         }
 
-        if(firstElement.cursor) {
+        if (firstElement.cursor) {
             firstElement.headCursor = firstElement.cursor;
             delete firstElement.cursor;
         }
@@ -21,9 +18,9 @@ SV.registerLayout('HashTable', {
 
     defineOptions() {
         return {
-            element: { 
+            element: {
                 default: {
-                    type: 'indexed-node',
+                    type: 'array-node',
                     label: '[data]',
                     size: [60, 30],
                     style: {
@@ -71,25 +68,29 @@ SV.registerLayout('HashTable', {
     layout(elements) {
         let arr = elements;
 
-        for(let i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
             let width = arr[i].get('size')[0];
 
-            if(i > 0) {
+            if (i > 0) {
                 arr[i].set('x', arr[i - 1].get('x') + width);
             }
 
-            if(arr[i].empty) {
+            if (arr[i].empty) {
                 arr[i].set('style', {
                     fill: null
                 });
             }
 
-            if(arr[i].disable) {
+            if (arr[i].disable) {
                 arr[i].set('style', {
-                    fill: '#ccc'
+                    fill: null
                 });
+                arr[i].set('labelCfg', {
+                    style: {
+                        opacity: 0.4
+                    }
+                })
             }
         }
     }
-}); 
-
+});

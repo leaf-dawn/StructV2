@@ -41,7 +41,7 @@ export class SVNode extends SVModel {
 
 		this.sourceNode = sourceNode;
 		this.sourceId = sourceNode.id.toString();
-
+    
 		this.links = { inDegree: [], outDegree: [] };
 		this.appendages = {};
 		this.sourceNode = sourceNode;
@@ -64,7 +64,6 @@ export class SVNode extends SVModel {
 			label: this.label as string,
 			style: {
 				...style,
-				fill: this.disable ? '#ccc' : style.fill,
 			},
 			labelCfg: Util.objectClone<NodeLabelOption>(options.labelOptions),
 		};

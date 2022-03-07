@@ -1,120 +1,45 @@
-const SOURCES_DATA = [
-	{
-		LinkList0: {
-			data: [
-				{
-					id: '0x617eb0',
-					data: 'Z',
-					next: '0x617ef0',
-					rootExternal: ['L'],
-					type: 'default',
-				},
-				{
-					id: '0x617ef0',
-					data: 'A',
-					next: '0x617f10',
-					type: 'default',
-				},
-				{
-					id: '0x617f10',
-					data: 'B',
-					next: '0x617f30',
-					type: 'default',
-				},
-				{
-					id: '0x617f30',
-					data: 'C',
-					external: ['r', 't'],
-					next: null,
-					type: 'default',
-				},
-			],
-			layouter: 'LinkList',
-		},
-		LinkList1: {
-			data: [
-				{
-					id: '0x617ed0',
-					data: 'Y',
-					next: '0x617f50',
-					rootExternal: ['L2'],
-					type: 'default',
-				},
-				{
-					id: '0x617f50',
-					data: 'a',
-					next: '0x617f70',
-					type: 'default',
-				},
-				{
-					id: '0x617f70',
-					data: 'b',
-					external: ['r2', 't2'],
-					loopNext: 'LinkList0#0x617f30',
-					type: 'default',
-				},
-			],
-			layouter: 'LinkList',
-		},
-		isEnterFunction: false,
-	},
-	{
-		LinkList0: {
-			data: [
-				{
-					id: '0x617eb0',
-					data: 'Z',
-					next: '0x617ef0',
-					rootExternal: ['L'],
-					type: 'default',
-				},
-				{
-					id: '0x617ef0',
-					data: 'A',
-					next: '0x617f10',
-					type: 'default',
-				},
-				{
-					id: '0x617f10',
-					data: 'B',
-					next: '0x617f30',
-					type: 'default',
-				},
-				{
-					id: '0x617f30',
-					data: 'C',
-					external: ['r', 't'],
-					next: null,
-					type: 'default',
-				},
-			],
-			layouter: 'LinkList',
-		},
-		LinkList1: {
-			data: [
-				{
-					id: '0x617ed0',
-					data: 'Y',
-					next: '0x617f50',
-					rootExternal: ['L2'],
-					type: 'default',
-				},
-				{
-					id: '0x617f50',
-					data: 'a',
-					next: '0x617f70',
-					type: 'default',
-				},
-				{
-					id: '0x617f70',
-					data: 'b',
-					external: ['r2', 't2'],
-					next: null,
-					type: 'default',
-				},
-			],
-			layouter: 'LinkList',
-		},
-		isEnterFunction: false,
-	},
-];
+const SOURCES_DATA = [{
+    "HashTable": {
+        "data": [{
+                "id": "0x616eb0",
+                "index": 0,
+                "external": "H",
+                "data": "",
+                "disable": true,
+                "empty": true
+            },
+            {
+                "id": "0x616ec0",
+                "index": 1,
+                "data": "UV",
+                "disable": true,
+            },
+            {
+                "id": "0x616ed0",
+                "index": 2,
+                "data": "FI"
+            },
+            {
+                "id": "0x616ee0",
+                "index": 3,
+                "data": "",
+                "disable": true,
+                "empty": true
+            },
+            {
+                "id": "0x616ef0",
+                "index": 4,
+                "data": "SO"
+            },
+            {
+                "id": "0x616f00",
+                "index": 5,
+                "data": "",
+                "disable": true,
+                "empty": true
+            }
+        ],
+        "layouter": "HashTable"
+    },
+    "isEnterFunction": false
+}];

@@ -140,7 +140,7 @@ export class ViewContainer {
 	 * @param models
 	 * @param layoutFn
 	 */
-	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, isEnterFunction: boolean) {
+	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, handleUpdata: any) {
 		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
 
         // 如果数据没变的话
@@ -154,7 +154,7 @@ export class ViewContainer {
 				this.prevModelList,
 				modelList,
 				this.accumulateLeakModels,
-				isEnterFunction
+				handleUpdata.isEnterFunction
 			),
 			renderModelList = [...modelList, ...diffResult.REMOVE, ...diffResult.LEAKED, ...diffResult.ACCUMULATE_LEAK];
 
@@ -182,7 +182,7 @@ export class ViewContainer {
 
 		this.beforeRender();
 		this.renderer.render(renderModelList); // 渲染视图
-		this.reconcile.patch(diffResult,isEnterFunction); // 对视图上的某些变化进行对应的动作，比如：节点创建动画，节点消失动画等
+		this.reconcile.patch(diffResult,handleUpdata); // 对视图上的某些变化进行对应的动作，比如：节点创建动画，节点消失动画等
 		this.afterRender();
 
 		this.layoutGroupTable = layoutGroupTable;

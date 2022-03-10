@@ -14,14 +14,19 @@ export interface SourceNode {
     [key: string]: any | sourceLinkData | sourceMarkerData;
 }
 
+export interface handleUpdata {
+  isEnterFunction: boolean,
+  isFirstDebug: boolean
+}
+
 
 export type Sources = {
-    enterFunction: any;
+  
     [key: string]: { 
         data: SourceNode[]; 
         layouter: string; 
     };
-    isEnterFunction?: any;
+    handleUpdata?:any
 };
     
 

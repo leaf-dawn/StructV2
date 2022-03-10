@@ -16,6 +16,7 @@ import {
 	SolveNodeAppendagesDrag,
 	SolveZoomCanvasWithLeak,
 } from '../BehaviorHelper/behaviorIssueHelper';
+import { handleUpdate } from '../sources';
 
 export class ViewContainer {
 	private engine: Engine;
@@ -140,13 +141,18 @@ export class ViewContainer {
 	 * @param models
 	 * @param layoutFn
 	 */
-	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, handleUpdata: any) {
+	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, handleUpdate: handleUpdate) {
 		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
 
-        // 如果数据没变的话
+		// 如果数据没变的话
 		if (isSameSources) {
-			modelList.forEach(item => item.restoreHighlight());
-            return;
+			modelList.forEach(item => {
+                // 不是free节点才进行还原
+                if(!item.freed) {
+                    item.restoreHighlight()
+                }
+            });
+			return;
 		}
 
 		const diffResult = this.reconcile.diff(
@@ -154,7 +160,7 @@ export class ViewContainer {
 				this.prevModelList,
 				modelList,
 				this.accumulateLeakModels,
-				handleUpdata.isEnterFunction
+				handleUpdate?.isEnterFunction
 			),
 			renderModelList = [...modelList, ...diffResult.REMOVE, ...diffResult.LEAKED, ...diffResult.ACCUMULATE_LEAK];
 
@@ -182,7 +188,7 @@ export class ViewContainer {
 
 		this.beforeRender();
 		this.renderer.render(renderModelList); // 渲染视图
-		this.reconcile.patch(diffResult,handleUpdata); // 对视图上的某些变化进行对应的动作，比如：节点创建动画，节点消失动画等
+		this.reconcile.patch(diffResult, handleUpdate); // 对视图上的某些变化进行对应的动作，比如：节点创建动画，节点消失动画等
 		this.afterRender();
 
 		this.layoutGroupTable = layoutGroupTable;

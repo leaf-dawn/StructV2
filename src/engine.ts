@@ -1,4 +1,4 @@
-import { Sources } from "./sources";
+import { handleUpdate, Sources } from "./sources";
 import { LayoutGroupTable, ModelConstructor } from "./Model/modelConstructor";
 import { AnimationOptions, BehaviorOptions, EngineOptions, LayoutGroupOptions, ViewOptions } from "./options";
 import { EventBus } from "./Common/eventBus";
@@ -59,7 +59,7 @@ export class Engine {
             return;
         }
 
-        let handleUpdate = source.handleUpdate,
+        let handleUpdate: handleUpdate = source.handleUpdate,
             stringSource = JSON.stringify(source);
             
         if (this.prevStringSource === stringSource) {

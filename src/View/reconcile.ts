@@ -6,6 +6,7 @@ import { SVLink } from '../Model/SVLink';
 import { SVModel } from '../Model/SVModel';
 import { SVNode } from '../Model/SVNode';
 import { SVAddressLabel, SVMarker, SVNodeAppendage } from '../Model/SVNodeAppendage';
+import { handleUpdate } from '../sources';
 import { Animations } from './animation';
 import { Renderer } from './renderer';
 
@@ -272,7 +273,7 @@ export class Reconcile {
 				Animations.APPEND(item.G6Item, {
 					duration,
 					timingFunction,
-                    callback: () => item.afterRender()
+					callback: () => item.afterRender(),
 				});
 			}
 		});
@@ -422,13 +423,13 @@ export class Reconcile {
 	 * @param diffResult
 	 * @param isFirstRender
 	 */
-	public patch(diffResult: DiffResult,handleUpdata: any) {
+	public patch(diffResult: DiffResult, handleUpdate: handleUpdate) {
 		const { APPEND, REMOVE, FREED, LEAKED, UPDATE, CONTINUOUS, ACCUMULATE_LEAK } = diffResult;
 
 		this.handleAccumulateLeakModels(ACCUMULATE_LEAK);
 
-		// 第一次渲染和进入函数的时候不高亮变化的元素 
-		if (this.isFirstPatch === false && !handleUpdata.isEnterFunction && !handleUpdata.isFirstDebug) {
+		// 第一次渲染和进入函数的时候不高亮变化的元素
+		if (this.isFirstPatch === false && !handleUpdate?.isEnterFunction && !handleUpdate?.isFirstDebug) {
 			this.handleChangeModels(UPDATE);
 		}
 

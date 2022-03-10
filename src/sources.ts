@@ -1,4 +1,3 @@
-
 // 连接目标信息
 export type LinkTarget = number | string;
 
@@ -10,24 +9,19 @@ export type sourceMarkerData = string | string[];
 
 // 源数据单元
 export interface SourceNode {
-    id: string | number;
-    [key: string]: any | sourceLinkData | sourceMarkerData;
+	id: string | number;
+	[key: string]: any | sourceLinkData | sourceMarkerData;
 }
 
-export interface handleUpdata {
-  isEnterFunction: boolean,
-  isFirstDebug: boolean
+export interface handleUpdate {
+	isEnterFunction: boolean;
+	isFirstDebug: boolean;
 }
-
 
 export type Sources = {
-  
-    [key: string]: { 
-        data: SourceNode[]; 
-        layouter: string; 
-    };
-    handleUpdata?:any
+	[key: string]: {
+		data: SourceNode[];
+		layouter: string;
+	};
+	handleUpdate?: handleUpdate | any;
 };
-    
-
-

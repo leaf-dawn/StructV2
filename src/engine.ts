@@ -59,7 +59,7 @@ export class Engine {
             return;
         }
 
-        let isEnterFunction = source.isEnterFunction,
+        let handleUpdate = source.handleUpdate,
             stringSource = JSON.stringify(source);
             
         if (this.prevStringSource === stringSource) {
@@ -79,7 +79,7 @@ export class Engine {
         }
 
         // 2 渲染（使用g6进行渲染）
-        this.viewContainer.render(layoutGroupTable, isSameSources, isEnterFunction);
+        this.viewContainer.render(layoutGroupTable, isSameSources, handleUpdate);
     }
 
 

@@ -1,103 +1,77 @@
 const SOURCES_DATA = [{
-    "LinkList0": {
+    "BinaryTree0": {
         "data": [{
-                "id": "0x616eb0",
-                "data": "Z",
-                "next": "0x616ef0",
-                "loopNext": null,
-                "rootExternal": [
-                    "L"
+                "external": [
+                    "T1"
                 ],
+                "child": [
+                    "0x617ee0",
+                    "0x617f10"
+                ],
+                "id": "0x617eb0",
+                "name": "T1",
+                "data": "Z",
+                "root": true,
                 "type": "default"
             },
             {
-                "freed": true,
-                "id": "0x616ef0",
-                "data": "",
-                "next": "0x605010",
-                "loopNext": null,
+                "child": [
+                    "0x0",
+                    "0x0"
+                ],
+                "id": "0x617ee0",
+                "name": "T1->lchild",
+                "data": "D",
                 "type": "default"
             },
             {
-                "id": "0x605010",
-                "data": "1",
-                "external": [
-                    "t"
+                "child": [
+                    "0x617f70",
+                    "0x617f40"
                 ],
-                "next": null,
-                "loopNext": null,
+                "id": "0x617f10",
+                "name": "T1->rchild",
+                "data": "C",
                 "type": "default"
-            }
-        ],
-        "layouter": "LinkList"
-    },
-    "handleUpdate": {
-        "isEnterFunction": false,
-        "isFirstDebug": false
-    }
-}, {
-    "LinkList0": {
-        "data": [{
-                "id": "0x616eb0",
-                "data": "Z",
-                "external": [
-                    "L"
+            },
+            {
+                "child": [
+                    "0x0",
+                    "0x0"
                 ],
-                "next": "0x616ef0",
-                "loopNext": null
+                "id": "0x617f70",
+                "name": "(T1->rchild)->lchild",
+                "data": "A",
+                "type": "default"
             },
             {
-                "freed": true,
-                "id": "0x616ef0",
-                "data": "",
-                "next": "0x605010",
-                "loopNext": null
-            },
-            {
-                "id": "0x605010",
-                "data": "1",
+                "child": [
+                    "0x0",
+                    "0x617fa0"
+                ],
+                "id": "0x617f40",
+                "name": "(T1->rchild)->rchild",
+                "data": "B",
+                "type": "default",
                 "external": [
                     "t"
-                ],
-                "next": null,
-                "loopNext": null
-            }
-        ],
-        "layouter": "LinkList"
-    },
-    "handleUpdate": {
-        "isEnterFunction": false,
-        "isFirstDebug": false
-    }
-}, {
-    "LinkList0": {
-        "data": [{
-                "id": "0x616eb0",
-                "data": "Z",
-                "external": [
-                    "L"
-                ],
-                "next": "0x616ef0",
-                "loopNext": null
+                ]
             },
             {
-                "freed": true,
-                "id": "0x616ef0",
-                "data": "",
-                "next": "0x605010",
-                "loopNext": null
-            },
-            {
-                "id": "0x605010",
-                "data": "1",
-                "external": [
-                    "t"
+                "child": [
+                    "0x0",
+                    "0x617f40"
                 ],
-                "next": null,
-                "loopNext": null
+                "id": "0x617fa0",
+                "name": "((T1->rchild)->rchild)->rchild",
+                "data": "E",
+                "type": "default",
+                "external": [
+                    "r"
+                ]
             }
         ],
-        "layouter": "LinkList"
+        "layouter": "BinaryTree"
     },
     "handleUpdate": {
         "isEnterFunction": false,

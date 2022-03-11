@@ -379,6 +379,21 @@ export class Reconcile {
 	}
 
 	/**
+	 * 过滤新增model中那些不需要高亮的model（比如target和node都一样的link）
+	 * @param appendModels
+	 */
+	private filterUnChangeModelsOfAppend(appendModels: SVModel[], prevModelList: SVModel[]): SVModel[] {
+		const links: SVLink[] = appendModels.filter(item => item instanceof SVLink) as SVLink[],
+			prevLinks: SVLink[] = prevModelList.filter(item => item instanceof SVLink) as SVLink[],
+			models = appendModels.filter(item => item instanceof SVLink === false),
+			changeLinks: SVLink[] = links.filter(
+				item => !prevLinks.some(prev => prev.targetId === item.targetId && prev.nodeId === item.nodeId)
+			);
+
+		return [...models, ...changeLinks];
+	}
+
+	/**
 	 * 进行diff
 	 * @param layoutGroupTable
 	 * @param prevModelList
@@ -402,7 +417,7 @@ export class Reconcile {
 		const updateModels: SVModel[] = [
 			...this.getReTargetMarkers(prevModelList, modelList),
 			...this.getLabelChangeModels(prevModelList, modelList),
-			...appendModels,
+			...this.filterUnChangeModelsOfAppend(appendModels, prevModelList),
 			...leakModels,
 		];
 		const freedModels: SVNode[] = this.getFreedModels(prevModelList, modelList);

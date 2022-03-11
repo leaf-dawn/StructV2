@@ -12,6 +12,9 @@ export class SVLink extends SVModel {
 	public shadowG6Item: IEdge;
 	public G6Item: IEdge;
 
+    public nodeId: string;
+    public targetId: string;
+
 	constructor(
 		id: string,
 		type: string,
@@ -26,6 +29,8 @@ export class SVLink extends SVModel {
 
 		this.node = node;
 		this.target = target;
+        this.nodeId = node.id;
+        this.targetId = target.id;
 		this.linkIndex = index;
 
 		node.links.outDegree.push(this);

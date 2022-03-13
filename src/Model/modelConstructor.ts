@@ -195,7 +195,7 @@ export class ModelConstructor {
 					let isGeneralLink = ModelConstructor.isGeneralLink(sourceLinkData.toString());
 
 					if (targetNode) {
-						link = this.createLink(name, group, layout, node, targetNode, null, linkOptions[name]);
+						link = this.createLink(name, group, layout, node, targetNode, 0, linkOptions[name]);
 						linkList.push(link);
 					}
 

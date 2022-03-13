@@ -12,8 +12,8 @@ export class SVLink extends SVModel {
 	public shadowG6Item: IEdge;
 	public G6Item: IEdge;
 
-    public nodeId: string;
-    public targetId: string;
+	public nodeId: string;
+	public targetId: string;
 
 	constructor(
 		id: string,
@@ -29,8 +29,8 @@ export class SVLink extends SVModel {
 
 		this.node = node;
 		this.target = target;
-        this.nodeId = node.id;
-        this.targetId = target.id;
+		this.nodeId = node.id;
+		this.targetId = target.id;
 		this.linkIndex = index;
 
 		node.links.outDegree.push(this);
@@ -53,7 +53,7 @@ export class SVLink extends SVModel {
 		let label = this.target.sourceNode.freed ? 'freed' : '',
 			labelCfg = this.target.sourceNode.freed
 				? { position: 'start', autoRotate: true, refY: 7, style: { fontSize: 11, opacity: 0.8 } }
-				: Util.objectClone<LinkLabelOption>(options.labelOptions || {} as LinkLabelOption);
+				: Util.objectClone<LinkLabelOption>(options.labelOptions || ({} as LinkLabelOption));
 
 		return {
 			id: this.id,
@@ -74,6 +74,10 @@ export class SVLink extends SVModel {
 		this.set('style', {
 			stroke: changeHighlightColor,
 		});
+	}
+
+	isEqual(link: SVLink): boolean {
+		return link.targetId === this.targetId && link.nodeId === this.nodeId && link.linkIndex === this.linkIndex;
 	}
 
 	beforeDestroy(): void {

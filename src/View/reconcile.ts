@@ -17,7 +17,6 @@ export interface DiffResult {
 	FREED: SVNode[];
 	LEAKED: SVModel[];
 	UPDATE: SVModel[];
-	ACCUMULATE_LEAK: SVModel[];
 }
 
 export class Reconcile {
@@ -320,16 +319,6 @@ export class Reconcile {
 	}
 
 	/**
-	 * 处理已经堆积的泄漏区 models
-	 * @param accumulateModels
-	 */
-	private handleAccumulateLeakModels(accumulateModels: SVModel[]) {
-		accumulateModels.forEach(item => {
-			item.restoreHighlight();
-		});
-	}
-
-	/**
 	 * 处理被释放的节点 models
 	 * @param freedModes
 	 */
@@ -379,18 +368,11 @@ export class Reconcile {
 	}
 
 	/**
-	 * 过滤新增model中那些不需要高亮的model（比如target和node都一样的link）
+	 * 过滤新增model中那些不需要高亮的model（比如target和node都一样的link，marker等）
 	 * @param appendModels
 	 */
 	private filterUnChangeModelsOfAppend(appendModels: SVModel[], prevModelList: SVModel[]): SVModel[] {
-		const links: SVLink[] = appendModels.filter(item => item instanceof SVLink) as SVLink[],
-			prevLinks: SVLink[] = prevModelList.filter(item => item instanceof SVLink) as SVLink[],
-			models = appendModels.filter(item => item instanceof SVLink === false),
-			changeLinks: SVLink[] = links.filter(
-				item => !prevLinks.some(prev => prev.targetId === item.targetId && prev.nodeId === item.nodeId)
-			);
-
-		return [...models, ...changeLinks];
+		return appendModels.filter(item => !prevModelList.some(prev => item.isEqual(prev)));
 	}
 
 	/**
@@ -429,7 +411,6 @@ export class Reconcile {
 			FREED: freedModels,
 			LEAKED: leakModels,
 			UPDATE: updateModels,
-			ACCUMULATE_LEAK: [...accumulateLeakModels],
 		};
 	}
 
@@ -439,9 +420,7 @@ export class Reconcile {
 	 * @param isFirstRender
 	 */
 	public patch(diffResult: DiffResult, handleUpdate: handleUpdate) {
-		const { APPEND, REMOVE, FREED, LEAKED, UPDATE, CONTINUOUS, ACCUMULATE_LEAK } = diffResult;
-
-		this.handleAccumulateLeakModels(ACCUMULATE_LEAK);
+		const { APPEND, REMOVE, FREED, LEAKED, UPDATE, CONTINUOUS } = diffResult;
 
 		// 第一次渲染和进入函数的时候不高亮变化的元素
 		if (this.isFirstPatch === false && !handleUpdate?.isEnterFunction && !handleUpdate?.isFirstDebug) {

@@ -207,9 +207,11 @@ export class SVModel {
 		return false;
 	}
 
-    beforeRender () {
-        this.restoreHighlight();
+    isEqual(model: SVModel): boolean {
+        return this.id === model.id;
     }
+
+    beforeRender () {}
     afterRender() {}
 
     beforeDestroy () {}

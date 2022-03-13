@@ -136,6 +136,19 @@ export class ViewContainer {
 		});
 	}
 
+    /**
+     * 
+     * @param models 
+     */
+    private restoreHighlight(models: SVModel[]) {
+        models.forEach(item => {
+            // 不是free节点才进行还原
+            if(!item.freed) {
+                item.restoreHighlight()
+            }
+        });
+    }
+
 	/**
 	 * 渲染所有视图
 	 * @param models
@@ -144,14 +157,10 @@ export class ViewContainer {
 	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, handleUpdate: handleUpdate) {
 		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
 
-		// 如果数据没变的话
+        this.restoreHighlight([...modelList, ...this.accumulateLeakModels]);
+
+		// 如果数据没变的话，直接退出
 		if (isSameSources) {
-			modelList.forEach(item => {
-                // 不是free节点才进行还原
-                if(!item.freed) {
-                    item.restoreHighlight()
-                }
-            });
 			return;
 		}
 
@@ -162,7 +171,7 @@ export class ViewContainer {
 				this.accumulateLeakModels,
 				handleUpdate?.isEnterFunction
 			),
-			renderModelList = [...modelList, ...diffResult.REMOVE, ...diffResult.LEAKED, ...diffResult.ACCUMULATE_LEAK];
+			renderModelList = [...modelList, ...diffResult.REMOVE, ...diffResult.LEAKED, ...this.accumulateLeakModels];
 
 		// 从有泄漏区变成无泄漏区
 		if (this.hasLeak === true && this.accumulateLeakModels.length === 0) {

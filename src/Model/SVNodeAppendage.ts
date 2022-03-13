@@ -6,12 +6,16 @@ import { SVModel } from './SVModel';
 import { SVNode } from './SVNode';
 
 export class SVNodeAppendage extends SVModel {
+    public targetId: string;
 	public target: SVNode;
+    public label: string;
 
-	constructor(id: string, type: string, group: string, layout: string, modelType: string, target: SVNode) {
+	constructor(id: string, type: string, group: string, layout: string, modelType: string, target: SVNode, label: string | string[]) {
 		super(id, type, group, layout, modelType);
 
 		this.target = target;
+        this.targetId = target.id;
+        this.label = typeof label === 'string' ? label : label.join(', ');
 
 		if (this.target.appendages[modelType] === undefined) {
 			this.target.appendages[modelType] = [];
@@ -29,6 +33,10 @@ export class SVNodeAppendage extends SVModel {
 
 		this.target = null;
 	}
+
+    isEqual(appendage: SVNodeAppendage): boolean {
+		return appendage.targetId === this.targetId && appendage.label === this.label;
+	}
 }
 
 /**
@@ -36,7 +44,7 @@ export class SVNodeAppendage extends SVModel {
  */
 export class SVFreedLabel extends SVNodeAppendage {
 	constructor(id: string, type: string, group: string, layout: string, target: SVNode) {
-		super(id, type, group, layout, 'freedLabel', target);
+		super(id, type, group, layout, 'freedLabel', target, '已释放');
 		this.G6ModelProps = this.generateG6ModelProps();
 	}
 
@@ -46,7 +54,7 @@ export class SVFreedLabel extends SVNodeAppendage {
 			x: 0,
 			y: 0,
 			type: 'rect',
-			label: '已释放',
+			label: this.label,
 			labelCfg: {
 				style: {
 					fill: '#b83b5e',
@@ -67,12 +75,8 @@ export class SVFreedLabel extends SVNodeAppendage {
  * 被移动到泄漏区的节点上面显示的地址
  */
 export class SVAddressLabel extends SVNodeAppendage {
-	private sourceId: string;
-
 	constructor(id: string, type: string, group: string, layout: string, target: SVNode, options: AddressLabelOption) {
-		super(id, type, group, layout, 'addressLabel', target);
-
-		this.sourceId = target.sourceId;
+		super(id, type, group, layout, 'addressLabel', target, target.sourceId);
 		this.G6ModelProps = this.generateG6ModelProps(options);
 	}
 
@@ -93,7 +97,7 @@ export class SVAddressLabel extends SVNodeAppendage {
 			x: 0,
 			y: 0,
 			type: 'rect',
-			label: this.sourceId,
+			label: this.label,
 			labelCfg: {
 				style: {
 					fill: '#666',
@@ -114,8 +118,6 @@ export class SVAddressLabel extends SVNodeAppendage {
  * 节点的下标文字
  */
 export class SVIndexLabel extends SVNodeAppendage {
-	private value: string;
-
 	constructor(
 		id: string,
 		indexName: string,
@@ -125,8 +127,7 @@ export class SVIndexLabel extends SVNodeAppendage {
 		target: SVNode,
 		options: IndexLabelOption
 	) {
-		super(id, indexName, group, layout, 'indexLabel', target);
-		this.value = value;
+		super(id, indexName, group, layout, 'indexLabel', target, value);
 		this.G6ModelProps = this.generateG6ModelProps(options) as NodeConfig;
 	}
 
@@ -136,7 +137,7 @@ export class SVIndexLabel extends SVNodeAppendage {
 			x: 0,
 			y: 0,
 			type: 'rect',
-			label: this.value,
+			label: this.label,
 			labelCfg: {
 				style: {
 					fill: '#bbb',
@@ -160,7 +161,6 @@ export class SVIndexLabel extends SVNodeAppendage {
  * 外部指针
  */
 export class SVMarker extends SVNodeAppendage {
-	public label: string | string[];
 	public anchor: number;
 
 	public shadowG6Item: INode;
@@ -175,9 +175,7 @@ export class SVMarker extends SVNodeAppendage {
 		target: SVNode,
 		options: MarkerOption
 	) {
-		super(id, type, group, layout, 'marker', target);
-
-		this.label = label;
+		super(id, type, group, layout, 'marker', target, label);
 		this.G6ModelProps = this.generateG6ModelProps(options);
 	}
 
@@ -195,7 +193,7 @@ export class SVMarker extends SVNodeAppendage {
 			type: options.type || 'marker',
 			size: options.size || defaultSize,
 			anchorPoints: null,
-			label: typeof this.label === 'string' ? this.label : this.label.join(', '),
+			label: this.label,
 			style: Util.objectClone<Style>(options.style),
 			labelCfg: Util.objectClone<NodeLabelOption>(options.labelOptions),
 		};

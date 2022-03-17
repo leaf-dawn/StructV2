@@ -1,96 +1,100 @@
 /**
  * 三叉树
  */
- SV.registerLayout('TriTree', {
+SV.registerLayout('TriTree', {
     defineOptions() {
         return {
-            /**
-             * 结点
-             */
-            element: { 
+            node: {
                 default: {
                     type: 'tri-tree-node',
                     size: [60, 30],
                     label: '[data]',
                     style: {
-                        fill: '#ff2e63',
-                        stroke: "#333",
-                        cursor: 'pointer'
+                        fill: '#95e1d3',
+                        stroke: '#333',
+                        cursor: 'pointer',
+                        backgroundFill: '#eee'
+                    },
+                    labelOptions: {
+                        style: { fontSize: 16 }
                     }
                 }
             },
-            /**
-             * 箭头
-             */
             link: {
-                child: { 
-                    type: 'line',
+                child: {
                     sourceAnchor: index => index,
                     targetAnchor: 3,
+                    type: 'line',
                     style: {
                         stroke: '#333',
-                        //边的响应范围
-                        lineAppendWidth: 6,
-                        cursor: 'pointer',
+                        lineAppendWidth: 10,
+                        lineWidth: 1.6,
                         endArrow: 'default',
                         startArrow: {
-                            //参数：半径、偏移量
-                            path: G6.Arrow.circle(2, -1), 
+                            path: G6.Arrow.circle(2, -1),
                             fill: '#333'
                         }
                     }
                 },
-                parent: { 
-                    type: 'line',
+                r_parent: {
+                    type: 'quadratic',
                     sourceAnchor: 4,
-                    targetAnchor: 2,
+                    targetAnchor: 5,
+                    curveOffset: -20,
                     style: {
-                        stroke: '#A9A9A9',
-                        //边的响应范围
-                        lineAppendWidth: 6,
-                        cursor: 'pointer',
+                        stroke: '#999',
+                        lineAppendWidth: 10,
+                        lineWidth: 1.6,
                         endArrow: 'default',
                         startArrow: {
-                            //参数：半径、偏移量
-                            path: G6.Arrow.circle(2, -1), 
-                            fill: '#333'
+                            path: G6.Arrow.circle(2, -1),
+                            fill: '#999'
+                        }
+                    }
+                },
+                l_parent: {
+                    type: 'quadratic',
+                    sourceAnchor: 4,
+                    targetAnchor: 2,
+                    curveOffset: 20,
+                    style: {
+                        stroke: '#999',
+                        lineAppendWidth: 10,
+                        lineWidth: 1.6,
+                        endArrow: 'default',
+                        startArrow: {
+                            path: G6.Arrow.circle(2, -1),
+                            fill: '#999'
                         }
                     }
                 },
             },
-            /**
-             * 指针
-             */
             marker: {
                 external: {
-                    type: "pointer",
+                    type: 'pointer',
                     anchor: 3,
                     offset: 14,
+                    labelOffset: 2,
                     style: {
                         fill: '#f08a5d'
                     },
                     labelOptions: {
                         style: {
-                            // stroke:
+                            fontSize: 15,
+                            fill: '#999'
                         }
                     }
                 }
             },
-            /**
-             * 布局
-             */
+            addressLabel: {
+                style: {
+                    fill: '#999'
+                }
+            },
             layout: {
                 xInterval: 40,
                 yInterval: 40,
-            },
-            /**
-             * 动画
-             */
-            //animation: {
-            //    enable: true,
-            //    duration: 750,
-            //    timingFunction: 'easePolyOut'
-            //}
+            }
         };
     },
 
@@ -99,44 +103,44 @@
      */
     layoutItem(node, parent, index, layoutOptions) {
         // 次双亲不进行布局
-        if(!node) {
+        if (!node) {
             return null;
         }
-        
+
         let bound = node.getBound(), //获取包围盒
             width = bound.width,
             height = bound.height,
             group = new Group(node); //创建分组
-            
+
         //有双亲，设置结点的位置
-        if(parent) {
+        if (parent) {
             // 纵坐标
             node.set('y', parent.get('y') + layoutOptions.yInterval + height);
             // 左节点横坐标
-            if(index === 0) {
+            if (index === 0) {
                 node.set('x', parent.get('x') - layoutOptions.xInterval / 2 - width / 2);
             }
             // 右结点横坐标
-            if(index === 1) {
+            if (index === 1) {
                 node.set('x', parent.get('x') + layoutOptions.xInterval / 2 + width / 2);
             }
         }
         //有孩子
-        if(node.child && (node.child[0] || node.child[1])) {
+        if (node.child && (node.child[0] || node.child[1])) {
             let leftChild = node.child[0],
                 rightChild = node.child[1],
                 leftGroup = this.layoutItem(leftChild, node, 0, layoutOptions),
                 rightGroup = this.layoutItem(rightChild, node, 1, layoutOptions),
                 intersection = null,
                 move = 0;
-            
+
             // 处理左子树中子树相交问题
-            if(leftGroup && rightChild) {
+            if (leftGroup && rightChild) {
                 //求出包围盒相交部分
                 intersection = Bound.intersect(leftGroup.getBound(), rightGroup.getBound());
                 move = 0;
                 //处理
-                if(intersection && intersection.width > 0) {
+                if (intersection && intersection.width > 0) {
                     move = (intersection.width + layoutOptions.xInterval) / 2;
                     // console.log(move,intersection.width,layoutOptions.xInterval);
                     leftGroup.translate(-move, 0);
@@ -145,17 +149,17 @@
             }
 
             //加入分组
-            if(leftGroup) {
+            if (leftGroup) {
                 group.add(leftGroup);
             }
-            if(rightGroup) {
+            if (rightGroup) {
                 group.add(rightGroup)
             }
 
         }
         //返回分组
         return group;
-    },   
+    },
 
     /**
      * 布局函数

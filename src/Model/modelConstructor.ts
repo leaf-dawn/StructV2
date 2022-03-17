@@ -48,6 +48,7 @@ export class ModelConstructor {
 	public construct(sources: Sources): LayoutGroupTable {
 		const layoutGroupTable = new Map<string, LayoutGroup>(),
 			layoutMap: { [key: string]: LayoutCreator } = SV.registeredLayout;
+      
 
 		Object.keys(sources).forEach(group => {
 			let sourceGroup = sources[group],
@@ -301,7 +302,8 @@ export class ModelConstructor {
 				// 若没有指针字段的结点则跳过
 				if (!markerData) continue;
 
-				let id = `${group}[${name}(${Array.isArray(markerData) ? markerData.join('-') : markerData})]`,
+				let id = `[${name}(${Array.isArray(markerData) ? markerData.join('-') : markerData})]`,
+        
 					marker = new SVMarker(id, name, group, layout, markerData, node, markerOptions[name]);
 
 				markerList.push(marker);
@@ -349,6 +351,7 @@ export class ModelConstructor {
 	): SVNode {
 		let label: string | string[] = this.resolveNodeLabel(options.label, sourceNode),
 			id = `${sourceNodeType}(${sourceNode.id.toString()})`,
+      
 			node = new SVNode(id, sourceNodeType, group, layout, sourceNode, label, options);
 
 		if (node.freed) {

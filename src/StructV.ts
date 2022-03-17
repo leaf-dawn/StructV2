@@ -13,6 +13,7 @@ import G6 from '@antv/g6';
 import Pointer from "./RegisteredShape/pointer";
 import LinkListNode from "./RegisteredShape/linkListNode";
 import BinaryTreeNode from "./RegisteredShape/binaryTreeNode";
+import TriTreeNode from "./RegisteredShape/triTreeNode";
 import CLenQueuePointer from "./RegisteredShape/clenQueuePointer";
 import TwoCellNode from "./RegisteredShape/twoCellNode";
 import ThreeCellNode from "./RegisteredShape/threeCellNode";
@@ -65,6 +66,7 @@ SV.registeredShape = [
     Pointer, 
     LinkListNode, 
     BinaryTreeNode, 
+    TriTreeNode,
     TwoCellNode,
     ThreeCellNode,
     Cursor,
@@ -92,5 +94,6 @@ SV.registerLayout = function(name: string, layoutCreator: LayoutCreator) {
     }
     
     SV.registeredLayout[name] = layoutCreator;
+    
 };
 

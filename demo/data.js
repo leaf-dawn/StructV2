@@ -1,16 +1,19 @@
 const SOURCES_DATA = [{
-    "BinaryTree0": {
+    "TriTree0": {
         "data": [{
                 "external": [
-                    "T1"
+                    "T"
+                ],
+                "parent": [
+                    "0x0"
                 ],
                 "child": [
-                    "0x617ee0",
-                    "0x617f10"
+                    "0xb07ee0",
+                    "0xb07f10"
                 ],
-                "id": "0x617eb0",
-                "name": "T1",
-                "data": "Z",
+                "id": "0xb07eb0",
+                "name": "T",
+                "data": "A",
                 "root": true,
                 "type": "default"
             },
@@ -19,19 +22,57 @@ const SOURCES_DATA = [{
                     "0x0",
                     "0x0"
                 ],
-                "id": "0x617ee0",
-                "name": "T1->lchild",
-                "data": "D",
-                "type": "default"
+                "id": "0xb07ee0",
+                "name": "T->lchild",
+                "data": "B",
+                "type": "default",
+                "l_parent": [
+                    "0x0"
+                ],
+                "external": [
+                    "T1"
+                ]
             },
             {
                 "child": [
-                    "0x617f70",
-                    "0x617f40"
+                    "0x0",
+                    "0x0"
                 ],
-                "id": "0x617f10",
-                "name": "T1->rchild",
+                "id": "0xb07f10",
+                "name": "T->rchild",
                 "data": "C",
+                "type": "default",
+                "r_parent": [
+                    "0x0"
+                ],
+                "external": [
+                    "T2"
+                ]
+            }
+        ],
+        "layouter": "TriTree"
+    },
+    "handleUpdate": {
+        "isEnterFunction": false,
+        "isFirstDebug": false
+    }
+}, {
+    "TriTree0": {
+        "data": [{
+                "external": [
+                    "T"
+                ],
+                "parent": [
+                    "0x0"
+                ],
+                "child": [
+                    "0xb07ee0",
+                    "0xb07f10"
+                ],
+                "id": "0xb07eb0",
+                "name": "T",
+                "data": "A",
+                "root": true,
                 "type": "default"
             },
             {
@@ -39,39 +80,93 @@ const SOURCES_DATA = [{
                     "0x0",
                     "0x0"
                 ],
-                "id": "0x617f70",
-                "name": "(T1->rchild)->lchild",
+                "id": "0xb07ee0",
+                "name": "T->lchild",
+                "data": "B",
+                "type": "default",
+                "l_parent": [
+                    "0xb07eb0"
+                ],
+                "external": [
+                    "T1"
+                ]
+            },
+            {
+                "child": [
+                    "0x0",
+                    "0x0"
+                ],
+                "id": "0xb07f10",
+                "name": "T->rchild",
+                "data": "C",
+                "type": "default",
+                "r_parent": [
+                    "0x0"
+                ],
+                "external": [
+                    "T2"
+                ]
+            }
+        ],
+        "layouter": "TriTree"
+    },
+    "handleUpdate": {
+        "isEnterFunction": false,
+        "isFirstDebug": false
+    }
+}, {
+    "TriTree0": {
+        "data": [{
+                "external": [
+                    "T"
+                ],
+                "parent": [
+                    "0x0"
+                ],
+                "child": [
+                    "0xb07ee0",
+                    "0xb07f10"
+                ],
+                "id": "0xb07eb0",
+                "name": "T",
                 "data": "A",
+                "root": true,
                 "type": "default"
             },
             {
                 "child": [
                     "0x0",
-                    "0x617fa0"
+                    "0x0"
                 ],
-                "id": "0x617f40",
-                "name": "(T1->rchild)->rchild",
+                "id": "0xb07ee0",
+                "name": "T->lchild",
                 "data": "B",
                 "type": "default",
+                "l_parent": [
+                    "0xb07eb0"
+                ],
                 "external": [
-                    "t"
+                    "T1"
                 ]
             },
             {
                 "child": [
                     "0x0",
-                    "0x617f40"
+                    "0x0"
                 ],
-                "id": "0x617fa0",
-                "name": "((T1->rchild)->rchild)->rchild",
-                "data": "E",
+                "id": "0xb07f10",
+                "name": "T->rchild",
+                "data": "C",
                 "type": "default",
+                "r_parent": [
+                    "0xb07eb0"
+                ],
                 "external": [
-                    "r"
+                    "T2"
                 ]
             }
         ],
-        "layouter": "BinaryTree"
+        "layouter": "TriTree"
     },
     "handleUpdate": {
         "isEnterFunction": false,

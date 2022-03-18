@@ -36,6 +36,21 @@ SV.registerLayout('TriTree', {
                         }
                     }
                 },
+                parent: {
+                    type: 'line',
+                    sourceAnchor: 4,
+                    targetAnchor: 6,
+                    style: {
+                        stroke: '#999',
+                        lineAppendWidth: 10,
+                        lineWidth: 1.6,
+                        endArrow: 'default',
+                        startArrow: {
+                            path: G6.Arrow.circle(2, -1),
+                            fill: '#999'
+                        }
+                    }
+                },
                 r_parent: {
                     type: 'quadratic',
                     sourceAnchor: 4,

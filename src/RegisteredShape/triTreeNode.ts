@@ -67,12 +67,19 @@ export default Util.registerShape(
                 draggable: true
             });
         }
+        let parent = cfg.parent || cfg.l_parent || cfg.r_parent;
         const isLeftEmpty =
         !cfg.child || cfg.child[0] === undefined || cfg.child[0] === undefined || cfg.child[0] == '0x0',
               isRightEmpty =
         !cfg.child || cfg.child[1] === undefined || cfg.child[1] === undefined || cfg.child[1] == '0x0',
-        isparentEmpty = cfg.parent == "0x0" || cfg.l_parent == "0x0" || cfg.r_parent == "0x0";
-
+        isparentEmpty = parent[0] == "0x0";
+        
+        
+        // console.log(cfg.id);
+        // console.log(parent);
+        
+        // console.log(isparentEmpty);
+        
 
         if (isparentEmpty) {
           {
@@ -140,6 +147,7 @@ export default Util.registerShape(
             [0.5, 0],
             [0.5, 0.125],
             [0.6, 1],
+            [0.5,1]
         ];
     },
 }

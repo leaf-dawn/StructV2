@@ -434,7 +434,7 @@ export class ModelConstructor {
 			sourceNodeType = info.pop();
 			targetGroupName = info.pop();
 		} else {
-			let field = info.pop();
+			let field = info.pop(); 
 			if (layoutGroupTable.get(targetGroupName).node.find(item => item.sourceType === field)) {
 				sourceNodeType = field;
 			} else if (layoutGroupTable.has(field)) {
@@ -444,14 +444,25 @@ export class ModelConstructor {
 			}
 		}
 
-		nodeList = layoutGroupTable.get(targetGroupName).node.filter(item => item.sourceType === sourceNodeType);
+    // 为了可以连接到不同group的结点
+    for (let layoutGroup of layoutGroupTable.values()) {
+      nodeList = layoutGroup.node.filter(item => item.sourceType === sourceNodeType);
+      if (nodeList === undefined) {
+        continue;
+      }
+		  targetNode = nodeList.find(item => item.sourceId === targetId);
+      if (targetNode) {
+        break;
+      }
+    }
+		// nodeList = layoutGroupTable.get(targetGroupName).node.filter(item => item.sourceType === sourceNodeType);
 
-		// 若目标node不存在，返回null
-		if (nodeList === undefined) {
-			return null;
-		}
+		// // 若目标node不存在，返回null
+		// if (nodeList === undefined) {
+		// 	return null;
+		// }
 
-		targetNode = nodeList.find(item => item.sourceId === targetId);
+		// targetNode = nodeList.find(item => item.sourceId === targetId);
 		return targetNode || null;
 	}
 

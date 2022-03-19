@@ -1,4 +1,4 @@
-import { Graph, INode } from "@antv/g6";
+import { G6Event, Graph, INode } from "@antv/g6";
 import { EventBus } from "../Common/eventBus";
 import { LayoutGroupTable } from "../Model/modelConstructor";
 import { SVModel } from "../Model/SVModel";
@@ -136,7 +136,7 @@ export function SolveBrushSelectDrag(viewContainer: ViewContainer) {
     const g6Instance: Graph = viewContainer.getG6Instance();
 
     // 当框选完成后，监听被框选节点的数量变化事件，将被框选的节点添加到 brushSelectedModels 数组里面
-    g6Instance.on('nodeselectchange', event => {
+    g6Instance.on('nodeselectchange' as G6Event, event => {
         const selectedItems = event.selectedItems as { nodes: INode[]; },
             tmpSelectedModelList = [];
 

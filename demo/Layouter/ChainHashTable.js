@@ -64,9 +64,10 @@ SV.registerLayout('ChainHashTable', {
                     }
                 }
             },
-            pointer: {
+            marker: {
                 external: {
-                    anchor: 3,
+                    type: 'pointer',
+                    anchor: 1,
                     offset: 8,
                     style: {
                         fill: '#f08a5d'

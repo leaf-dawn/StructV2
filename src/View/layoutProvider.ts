@@ -155,7 +155,7 @@ export class LayoutProvider {
 			},
 			left: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
 				return {
-					x: nodeBound.x - labelBound.width - offset,
+					x: nodeBound.x - labelBound.width / 2- offset,
 					y: nodeBound.y + nodeBound.height / 2,
 				};
 			},
@@ -164,7 +164,8 @@ export class LayoutProvider {
 		indexLabels.forEach(item => {
 			const options: IndexLabelOption = indexLabelOptions[item.sourceType],
 				nodeBound = item.target.getBound(),
-				labelBound = item.getBound(),
+				// labelBound = item.getBound(),
+				labelBound = item.shadowG6Item.getContainer().getChildren()[1].getBBox(),
 				offset = options.offset ?? 20,
 				position = options.position ?? 'bottom';
 

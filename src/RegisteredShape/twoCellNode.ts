@@ -52,7 +52,7 @@ export default Util.registerShape(
 							fontSize: style.fontSize || 16,
 							cursor: cfg.style.cursor,
 						},
-						name: 'text',
+						name: 'tag',
 						draggable: true,
 					});
 
@@ -67,7 +67,7 @@ export default Util.registerShape(
 							fontSize: style.fontSize || 16,
 							cursor: cfg.style.cursor,
 						},
-						name: 'text',
+						name: 'data',
 						draggable: true,
 					});
 				} else {
@@ -82,7 +82,7 @@ export default Util.registerShape(
 							fontSize: style.fontSize || 16,
 							cursor: cfg.style.cursor,
 						},
-						name: 'text',
+						name: 'label',
 						draggable: true,
 					});
 				}
@@ -101,7 +101,7 @@ export default Util.registerShape(
 						fontSize: 20,
 						cursor: cfg.style.cursor,
 					},
-					name: 'text',
+					name: 'null-headNext',
 					draggable: true,
 				});
 			}
@@ -119,7 +119,7 @@ export default Util.registerShape(
 						fontSize: 20,
 						cursor: cfg.style.cursor,
 					},
-					name: 'text',
+					name: 'null-start',
 					draggable: true,
 				});
 			}
@@ -137,7 +137,7 @@ export default Util.registerShape(
 						fontSize: 20,
 						cursor: cfg.style.cursor,
 					},
-					name: 'text',
+					name: 'null-headNext2',
 					draggable: true,
 				});
 			}

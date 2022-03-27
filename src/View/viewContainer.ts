@@ -30,6 +30,7 @@ export class ViewContainer {
 
 	public hasLeak: boolean;
 	public leakAreaY: number;
+    public lastLeakAreaTranslateY: number;
 	public brushSelectedModels: SVModel[]; // 保存框选过程中被选中的节点
 	public clickSelectNode: SVNode; // 点击选中的节点
 
@@ -49,10 +50,11 @@ export class ViewContainer {
 
 		const g6Instance = this.renderer.getG6Instance(),
 			leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
-			height = this.getG6Instance().getHeight(),
+			height = g6Instance.getHeight(),
 			{ drag, zoom } = this.engine.behaviorOptions;
 
 		this.leakAreaY = height - leakAreaHeight;
+        this.lastLeakAreaTranslateY = 0;
 
 		SolveNodeAppendagesDrag(this);
 		SolveBrushSelectDrag(this);
@@ -68,17 +70,33 @@ export class ViewContainer {
 	reLayout() {
 		const g6Instance = this.getG6Instance(),
 			group = g6Instance.getGroup(),
-			matrix = group.getMatrix();
+			matrix = group.getMatrix(),
+			bound = group.getCanvasBBox();
+
+		const { duration, enable, timingFunction } = this.engine.animationOptions;
 
 		if (matrix) {
 			let dx = matrix[6],
 				dy = matrix[7];
 
-			g6Instance.translate(-dx, -dy);
+			g6Instance.moveTo(bound.minX - dx, bound.minY - dy, enable, {
+				duration,
+				easing: timingFunction,
+			});
 		}
 
+		const leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
+			height = g6Instance.getHeight();
+
+		this.leakAreaY = height - leakAreaHeight;
+        this.lastLeakAreaTranslateY = 0;
 		this.layoutProvider.layoutAll(this.layoutGroupTable, this.accumulateLeakModels);
 		g6Instance.refresh();
+
+        EventBus.emit('onLeakAreaUpdate', {
+            leakAreaY: this.leakAreaY,
+            hasLeak: this.hasLeak,
+        });
 	}
 
 	/**
@@ -136,18 +154,18 @@ export class ViewContainer {
 		});
 	}
 
-    /**
-     * 
-     * @param models 
-     */
-    private restoreHighlight(models: SVModel[]) {
-        models.forEach(item => {
-            // 不是free节点才进行还原
-            if(!item.freed) {
-                item.restoreHighlight()
-            }
-        });
-    }
+	/**
+	 *
+	 * @param models
+	 */
+	private restoreHighlight(models: SVModel[]) {
+		models.forEach(item => {
+			// 不是free节点才进行还原
+			if (!item.freed) {
+				item.restoreHighlight();
+			}
+		});
+	}
 
 	/**
 	 * 渲染所有视图
@@ -157,7 +175,7 @@ export class ViewContainer {
 	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, handleUpdate: handleUpdate) {
 		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
 
-        this.restoreHighlight([...modelList, ...this.accumulateLeakModels]);
+		this.restoreHighlight([...modelList, ...this.accumulateLeakModels]);
 
 		// 如果数据没变的话，直接退出
 		if (isSameSources) {

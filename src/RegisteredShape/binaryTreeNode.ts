@@ -50,7 +50,7 @@ export default Util.registerShape(
 						fontSize: style.fontSize || 16,
 						cursor: cfg.style.cursor,
 					},
-					name: 'text',
+					name: 'label',
 					draggable: true,
 				});
 			}
@@ -73,7 +73,7 @@ export default Util.registerShape(
 						fontSize: 16,
 						cursor: cfg.style.cursor,
 					},
-					name: 'text',
+					name: 'null-left',
 					draggable: true,
 				});
 			}
@@ -90,7 +90,7 @@ export default Util.registerShape(
 						fontSize: 16,
 						cursor: cfg.style.cursor,
 					},
-					name: 'text',
+					name: 'null-right',
 					draggable: true,
 				});
 			}

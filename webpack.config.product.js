@@ -1,6 +1,6 @@
 
-
 module.exports = {
+    mode: 'production',
     entry: './src/StructV.ts',
     output: {
         filename: './sv.js',

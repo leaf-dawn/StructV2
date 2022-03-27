@@ -35,8 +35,12 @@ SV.registerLayout('PTree', {
                 data: sources[i].parent
             });
         }
-        sources[0].indexLeft = 'data';
-        parentNodes[0].indexLeft = 'parent';
+        if(sources[0]){
+            sources[0].indexLeft = 'data';
+        }
+        if(parentNodes[0]){
+            parentNodes[0].indexLeft = 'parent';
+        }
 
         sources.push(...parentNodes);
 
@@ -70,14 +74,17 @@ SV.registerLayout('PTree', {
 
 
     layout(elements) {
-        let nodeLength = elements.length,
-            halfLength = nodeLength / 2,
+        let nodeLength = elements.length;
+
+        if(nodeLength == 0) return;
+        
+        let halfLength = nodeLength / 2,
             size = elements[0].get('size')[0],
             i;
         
             
         for (i = 0; i < nodeLength; i++) {
-            let x = (i % halfLength) * size;
+            let x = (i % halfLength) * size,
                 y = Math.floor(i / halfLength) * size;
 
             elements[i].set({ x, y });

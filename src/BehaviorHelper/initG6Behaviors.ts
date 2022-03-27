@@ -53,8 +53,13 @@ export function InitG6Behaviors(engine: Engine, viewContainer: ViewContainer): M
     };
 
     const selectNodeFilter = event => {
-        let g6Item = event.item,
-            node: SVNode = g6Item.SVModel;
+        let g6Item = event.item;
+
+        if(g6Item === null) {
+            return false
+        }
+
+        let node: SVNode = g6Item.SVModel;
 
         if (g6Item === null || node.isNode() === false) {
             return false;

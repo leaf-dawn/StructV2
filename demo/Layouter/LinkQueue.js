@@ -72,6 +72,20 @@ SV.registerLayout('LinkQueue', {
                             fill: '#333'
                         }
                     }
+                },
+                loopNext: {
+                    type: 'quadratic',
+                    curveOffset: -100,
+                    sourceAnchor: 2,
+                    targetAnchor: 7,
+                    style: {
+                        stroke: '#333',
+                        endArrow: 'default',
+                        startArrow: {
+                            path: G6.Arrow.circle(2, -1),
+                            fill: '#333'
+                        }
+                    }
                 }
             },
             marker: {
@@ -85,7 +99,7 @@ SV.registerLayout('LinkQueue', {
             },
             layout: {
                 xInterval: 50,
-                yInterval: 50
+                yInterval: 58
             },
             behavior: {
                 dragNode: ['node']

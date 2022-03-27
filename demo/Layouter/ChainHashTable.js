@@ -13,7 +13,7 @@ SV.registerLayout('ChainHashTable', {
             element: { 
                 head: {
                     type: 'two-cell-node',
-                    label: '[id]',
+                    label: '[data]',
                     size: [70, 40],
                     style: {
                         stroke: '#333',
@@ -22,7 +22,7 @@ SV.registerLayout('ChainHashTable', {
                 },
                 node: {
                     type: 'link-list-node',
-                    label: '[id]',
+                    label: '[data]',
                     size: [60, 30],
                     style: {
                         stroke: '#333',
@@ -64,12 +64,13 @@ SV.registerLayout('ChainHashTable', {
                     }
                 }
             },
-            pointer: {
+            marker: {
                 external: {
-                    anchor: 3,
+                    type: 'pointer',
+                    anchor: 1,
                     offset: 8,
                     style: {
-                        fill: '#f08a5d'
+                        fill: '#f08a5d' 
                     }
                 }
             },

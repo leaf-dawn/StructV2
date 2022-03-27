@@ -57,7 +57,7 @@ export default Util.registerShape(
 						fill: style.fill || '#000',
 						fontSize: style.fontSize || 16,
 					},
-					name: 'text',
+					name: 'label',
 					draggable: true,
 				});
 			}
@@ -75,7 +75,7 @@ export default Util.registerShape(
 						fontSize: 16,
 						cursor: cfg.style.cursor,
 					},
-					name: 'text',
+					name: 'null',
 					draggable: true,
 				});
 			}

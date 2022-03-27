@@ -69,7 +69,7 @@ export default registerNode('three-cell', {
 					fontStyle: 'italic',
 					cursor: cfg.style.cursor,
 				},
-				name: 'text',
+				name: 'rootLabel0',
 				draggable: true,
 			});
 
@@ -85,7 +85,7 @@ export default registerNode('three-cell', {
 					fontStyle: 'italic',
 					cursor: cfg.style.cursor,
 				},
-				name: 'text',
+				name: 'rootLabel1',
 				draggable: true,
 			});
 
@@ -101,7 +101,7 @@ export default registerNode('three-cell', {
 					fontStyle: 'italic',
 					cursor: cfg.style.cursor,
 				},
-				name: 'text',
+				name: 'rootLabel2',
 				draggable: true,
 			});
 		}
@@ -120,7 +120,7 @@ export default registerNode('three-cell', {
 					fontStyle: 'italic',
 					cursor: cfg.style.cursor,
 				},
-				name: 'text',
+				name: 'index',
 				draggable: true,
 			});
 		}
@@ -137,7 +137,7 @@ export default registerNode('three-cell', {
 					fontSize: style.fontSize || 16,
 					cursor: cfg.style.cursor,
 				},
-				name: 'text',
+				name: 'label1',
 				draggable: true,
 			});
 
@@ -152,7 +152,7 @@ export default registerNode('three-cell', {
 					fontSize: style.fontSize || 16,
 					cursor: cfg.style.cursor,
 				},
-				name: 'text',
+				name: 'label2',
 				draggable: true,
 			});
 		}
@@ -170,7 +170,7 @@ export default registerNode('three-cell', {
 					fontSize: 22,
 					cursor: cfg.style.cursor,
 				},
-				name: 'text',
+				name: 'null',
 				draggable: true,
 			});
 		}

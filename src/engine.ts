@@ -6,6 +6,7 @@ import { ViewContainer } from "./View/viewContainer";
 import { SVNode } from "./Model/SVNode";
 import { Util } from "./Common/util";
 import { SVModel } from "./Model/SVModel";
+import { G6Event } from "@antv/g6";
 
 
 export class Engine {
@@ -204,7 +205,7 @@ export class Engine {
             return;
         }
 
-        this.viewContainer.getG6Instance().on(eventName, event => {
+        this.viewContainer.getG6Instance().on(eventName as G6Event, event => {
             callback(event.item['SVModel']);
         });
     }

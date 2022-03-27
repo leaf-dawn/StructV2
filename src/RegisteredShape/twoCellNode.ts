@@ -52,7 +52,7 @@ export default Util.registerShape(
 							fontSize: style.fontSize || 16,
 							cursor: cfg.style.cursor,
 						},
-						name: 'text',
+						name: 'tag',
 						draggable: true,
 					});
 
@@ -67,7 +67,7 @@ export default Util.registerShape(
 							fontSize: style.fontSize || 16,
 							cursor: cfg.style.cursor,
 						},
-						name: 'text',
+						name: 'data',
 						draggable: true,
 					});
 				} else {
@@ -82,7 +82,7 @@ export default Util.registerShape(
 							fontSize: style.fontSize || 16,
 							cursor: cfg.style.cursor,
 						},
-						name: 'text',
+						name: 'label',
 						draggable: true,
 					});
 				}
@@ -101,7 +101,7 @@ export default Util.registerShape(
 						fontSize: 20,
 						cursor: cfg.style.cursor,
 					},
-					name: 'text',
+					name: 'null-headNext',
 					draggable: true,
 				});
 			}
@@ -119,11 +119,28 @@ export default Util.registerShape(
 						fontSize: 20,
 						cursor: cfg.style.cursor,
 					},
-					name: 'text',
+					name: 'null-start',
 					draggable: true,
 				});
 			}
 
+			//pctree 数据结构中没有后续指针
+			if (cfg.id.includes('PCTreeHead') && !cfg.headNext) {
+				group.addShape('text', {
+					attrs: {
+						x: width * (5 / 4),
+						y: height * (8 / 7),
+						textAlign: 'center',
+						textBaseline: 'middle',
+						text: '^',
+						fill: style.fill || '#000',
+						fontSize: 20,
+						cursor: cfg.style.cursor,
+					},
+					name: 'null-headNext2',
+					draggable: true,
+				});
+			}
 			return wrapperRect;
 		},
 

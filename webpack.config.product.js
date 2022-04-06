@@ -1,6 +1,6 @@
 
-
 module.exports = {
+    mode: 'production',
     entry: './src/StructV.ts',
     output: {
         filename: './sv.js',
@@ -17,6 +17,5 @@ module.exports = {
                 loader: 'ts-loader'
             }
         ]
-    },
-    // devtool: 'eval-source-map'
+    }
 };

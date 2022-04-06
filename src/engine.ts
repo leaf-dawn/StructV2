@@ -1,4 +1,4 @@
-import { Sources } from "./sources";
+import { handleUpdate, Sources } from "./sources";
 import { LayoutGroupTable, ModelConstructor } from "./Model/modelConstructor";
 import { AnimationOptions, BehaviorOptions, EngineOptions, LayoutGroupOptions, ViewOptions } from "./options";
 import { EventBus } from "./Common/eventBus";
@@ -6,6 +6,7 @@ import { ViewContainer } from "./View/viewContainer";
 import { SVNode } from "./Model/SVNode";
 import { Util } from "./Common/util";
 import { SVModel } from "./Model/SVModel";
+import { G6Event } from "@antv/g6";
 
 
 export class Engine {
@@ -49,9 +50,10 @@ export class Engine {
     /**
      * 输入数据进行渲染
      * @param sources
-     * @param force
+     * @param prevStep
      */
     public render(source: Sources) {
+<<<<<<< HEAD
         if (source === undefined || source === null) {
             return;
         }
@@ -59,15 +61,36 @@ export class Engine {
         let stringSource = JSON.stringify(source);
         if (this.prevStringSource === stringSource) {
             return;
+=======
+        let isSameSources: boolean = false,
+            layoutGroupTable: LayoutGroupTable;
+
+        if (source === undefined || source === null) {
+            return;
+        }
+
+        let handleUpdate: handleUpdate = source.handleUpdate,
+            stringSource = JSON.stringify(source);
+            
+        if (this.prevStringSource === stringSource) {
+            isSameSources = true;
+>>>>>>> eac9d007bcc1b52fe573ddf6cb97030c9b2d3a6d
         }
 
         this.prevStringSource = stringSource;
 
-        // 1 转换模型（data => model）
-        const layoutGroupTable = this.modelConstructor.construct(source);
+
+        if(isSameSources) {
+            // 若源数据两次一样的，用回上一次的layoutGroupTable
+            layoutGroupTable = this.modelConstructor.getLayoutGroupTable();
+        }
+        else {  
+            // 1 转换模型（data => model）
+            layoutGroupTable = this.modelConstructor.construct(source);
+        }
 
         // 2 渲染（使用g6进行渲染）
-        this.viewContainer.render(layoutGroupTable);
+        this.viewContainer.render(layoutGroupTable, isSameSources, handleUpdate);
     }
 
 
@@ -192,7 +215,7 @@ export class Engine {
             return;
         }
 
-        this.viewContainer.getG6Instance().on(eventName, event => {
+        this.viewContainer.getG6Instance().on(eventName as G6Event, event => {
             callback(event.item['SVModel']);
         });
     }

@@ -4,16 +4,14 @@ import { Util } from '../Common/util';
 import { Tooltip, Graph, GraphData, Modes } from '@antv/g6';
 import { InitG6Behaviors } from '../BehaviorHelper/initG6Behaviors';
 
-
-
 export interface RenderModelPack {
-    leaKModels: SVModel[];
-    generalModel: SVModel[];
+	leaKModels: SVModel[];
+	generalModel: SVModel[];
 }
 
-
-export type g6Behavior = string | { type: string; shouldBegin?: Function; shouldUpdate?: Function; shouldEnd?: Function; };
-
+export type g6Behavior =
+	| string
+	| { type: string; shouldBegin?: Function; shouldUpdate?: Function; shouldEnd?: Function };
 
 export class Renderer {
     private engine: Engine;

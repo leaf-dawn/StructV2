@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2022-01-26 01:58:25
+ * @LastEditTime: 2022-01-26 02:06:16
+ * @LastEditors: your name
+ * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @FilePath: \测试数据c:\Users\13127\Desktop\最近的前端文件\可视化0126\StructV2\src\StructV.ts
+ */
 import { Engine } from "./engine";
 import { Bound } from "./Common/boundingRect";
 import { Group } from "./Common/group";
@@ -6,15 +14,16 @@ import Pointer from "./RegisteredShape/pointer";
 import LinkListNode from "./RegisteredShape/linkListNode";
 import BinaryTreeNode from "./RegisteredShape/binaryTreeNode";
 import ForceNode from "./RegisteredShape/force";
+import TriTreeNode from "./RegisteredShape/triTreeNode";
 import CLenQueuePointer from "./RegisteredShape/clenQueuePointer";
 import TwoCellNode from "./RegisteredShape/twoCellNode";
+import ThreeCellNode from "./RegisteredShape/threeCellNode";
 import ArrayNode from "./RegisteredShape/arrayNode";
 import Cursor from "./RegisteredShape/cursor";
 import { Vector } from "./Common/vector";
 import { EngineOptions, LayoutCreator } from "./options";
 import { SourceNode } from "./sources";
 import { Util } from "./Common/util";
-import { SVModel } from "./Model/SVModel";
 import { SVNode } from "./Model/SVNode";
 
 
@@ -58,7 +67,9 @@ SV.registeredShape = [
     Pointer, 
     LinkListNode, 
     BinaryTreeNode, 
+    TriTreeNode,
     TwoCellNode,
+    ThreeCellNode,
     Cursor,
     ArrayNode,
     CLenQueuePointer,
@@ -85,5 +96,6 @@ SV.registerLayout = function(name: string, layoutCreator: LayoutCreator) {
     }
     
     SV.registeredLayout[name] = layoutCreator;
+    
 };
 

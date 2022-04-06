@@ -19,7 +19,6 @@ import {
 import { handleUpdate } from '../sources';
 
 export class ViewContainer {
-<<<<<<< HEAD
     private engine: Engine;
     private layoutProvider: LayoutProvider;
     private reconcile: Reconcile;
@@ -31,9 +30,9 @@ export class ViewContainer {
 
     public hasLeak: boolean;
     public leakAreaY: number;
+	public lastLeakAreaTranslateY: number;
     public brushSelectedModels: SVModel[]; // 保存框选过程中被选中的节点
     public clickSelectNode: SVNode; // 点击选中的节点 
-
 
     constructor(engine: Engine, DOMContainer: HTMLElement, isForce: boolean) {
         const behaviorsModes: Modes = InitG6Behaviors(engine, this);
@@ -51,7 +50,7 @@ export class ViewContainer {
 
         const g6Instance = this.renderer.getG6Instance(),
             leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
-            height = this.getG6Instance().getHeight(),
+            height = g6Instance.getHeight(),
             { drag, zoom } = this.engine.behaviorOptions;
 
         this.leakAreaY = height - leakAreaHeight;
@@ -70,18 +69,34 @@ export class ViewContainer {
      */
     reLayout() {
         const g6Instance = this.getG6Instance(),
-            group = g6Instance.getGroup(),
-            matrix = group.getMatrix();
+			group = g6Instance.getGroup(),
+			matrix = group.getMatrix(),
+			bound = group.getCanvasBBox();
+
+		const { duration, enable, timingFunction } = this.engine.animationOptions;
 
         if (matrix) {
             let dx = matrix[6],
                 dy = matrix[7];
 
-            g6Instance.translate(-dx, -dy);
+			g6Instance.moveTo(bound.minX - dx, bound.minY - dy, enable, {
+				duration,
+				easing: timingFunction,
+			});
         }
 
-        this.layoutProvider.layoutAll(this.layoutGroupTable, this.accumulateLeakModels, []);
-        g6Instance.refresh();
+        const leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
+			height = g6Instance.getHeight();
+
+		this.leakAreaY = height - leakAreaHeight;
+		this.lastLeakAreaTranslateY = 0;
+		this.layoutProvider.layoutAll(this.layoutGroupTable, this.accumulateLeakModels);
+		g6Instance.refresh();
+
+		EventBus.emit('onLeakAreaUpdate', {
+            leakAreaY: this.leakAreaY,
+            hasLeak: this.hasLeak,
+        });
     }
 
 
@@ -134,141 +149,10 @@ export class ViewContainer {
         this.renderer.refresh();
 
         this.leakAreaY += dy;
-=======
-	private engine: Engine;
-	private layoutProvider: LayoutProvider;
-	private reconcile: Reconcile;
-	public renderer: Renderer;
-
-	private layoutGroupTable: LayoutGroupTable;
-	private prevModelList: SVModel[];
-	private accumulateLeakModels: SVModel[];
-
-	public hasLeak: boolean;
-	public leakAreaY: number;
-    public lastLeakAreaTranslateY: number;
-	public brushSelectedModels: SVModel[]; // 保存框选过程中被选中的节点
-	public clickSelectNode: SVNode; // 点击选中的节点
-
-	constructor(engine: Engine, DOMContainer: HTMLElement) {
-		const behaviorsModes: Modes = InitG6Behaviors(engine, this);
-
-		this.engine = engine;
-		this.layoutProvider = new LayoutProvider(engine, this);
-		this.renderer = new Renderer(engine, DOMContainer, behaviorsModes);
-		this.reconcile = new Reconcile(engine, this.renderer);
-		this.layoutGroupTable = new Map();
-		this.prevModelList = [];
-		this.accumulateLeakModels = [];
-		this.hasLeak = false; // 判断是否已经发生过泄漏
-		this.brushSelectedModels = [];
-		this.clickSelectNode = null;
-
-		const g6Instance = this.renderer.getG6Instance(),
-			leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
-			height = g6Instance.getHeight(),
-			{ drag, zoom } = this.engine.behaviorOptions;
-
-		this.leakAreaY = height - leakAreaHeight;
-        this.lastLeakAreaTranslateY = 0;
-
-		SolveNodeAppendagesDrag(this);
-		SolveBrushSelectDrag(this);
-		drag && SolveDragCanvasWithLeak(this);
-		zoom && SolveZoomCanvasWithLeak(this);
-	}
-
-	// ----------------------------------------------------------------------------------------------
-
-	/**
-	 * 对主视图进行重新布局
-	 */
-	reLayout() {
-		const g6Instance = this.getG6Instance(),
-			group = g6Instance.getGroup(),
-			matrix = group.getMatrix(),
-			bound = group.getCanvasBBox();
-
-		const { duration, enable, timingFunction } = this.engine.animationOptions;
-
-		if (matrix) {
-			let dx = matrix[6],
-				dy = matrix[7];
-
-			g6Instance.moveTo(bound.minX - dx, bound.minY - dy, enable, {
-				duration,
-				easing: timingFunction,
-			});
-		}
-
-		const leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
-			height = g6Instance.getHeight();
-
-		this.leakAreaY = height - leakAreaHeight;
-        this.lastLeakAreaTranslateY = 0;
-		this.layoutProvider.layoutAll(this.layoutGroupTable, this.accumulateLeakModels);
-		g6Instance.refresh();
-
->>>>>>> eac9d007bcc1b52fe573ddf6cb97030c9b2d3a6d
         EventBus.emit('onLeakAreaUpdate', {
             leakAreaY: this.leakAreaY,
             hasLeak: this.hasLeak,
         });
-	}
-
-	/**
-	 * 获取 g6 实例
-	 */
-	getG6Instance(): Graph {
-		return this.renderer.getG6Instance();
-	}
-
-	/**
-	 * 获取泄漏区里面的元素
-	 * @returns
-	 */
-	getAccumulateLeakModels(): SVModel[] {
-		return this.accumulateLeakModels;
-	}
-
-	/**
-	 *
-	 */
-	getLayoutGroupTable(): LayoutGroupTable {
-		return this.layoutGroupTable;
-	}
-
-	/**
-	 * 刷新视图
-	 */
-	refresh() {
-		this.renderer.getG6Instance().refresh();
-	}
-
-	/**
-	 * 重新调整容器尺寸
-	 * @param width
-	 * @param height
-	 */
-	resize(width: number, height: number) {
-		const g6Instance = this.getG6Instance(),
-			prevContainerHeight = g6Instance.getHeight(),
-			globalGroup: Group = new Group();
-
-		globalGroup.add(...this.prevModelList, ...this.accumulateLeakModels);
-		this.renderer.changeSize(width, height);
-
-		const containerHeight = g6Instance.getHeight(),
-			dy = containerHeight - prevContainerHeight;
-
-		globalGroup.translate(0, dy);
-		this.renderer.refresh();
-
-		this.leakAreaY += dy;
-		EventBus.emit('onLeakAreaUpdate', {
-			leakAreaY: this.leakAreaY,
-			hasLeak: this.hasLeak,
-		});
 	}
 
 	/**

@@ -30,12 +30,12 @@ export class ViewContainer {
     public clickSelectNode: SVNode; // 点击选中的节点 
 
 
-    constructor(engine: Engine, DOMContainer: HTMLElement) {
+    constructor(engine: Engine, DOMContainer: HTMLElement, isForce: boolean) {
         const behaviorsModes: Modes = InitG6Behaviors(engine, this);
 
         this.engine = engine;
         this.layoutProvider = new LayoutProvider(engine, this);
-        this.renderer = new Renderer(engine, DOMContainer, behaviorsModes);
+        this.renderer = new Renderer(engine, DOMContainer, behaviorsModes, isForce);
         this.reconcile = new Reconcile(engine, this.renderer);
         this.layoutGroupTable = new Map();
         this.prevModelList = [];

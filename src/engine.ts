@@ -18,7 +18,7 @@ export class Engine {
     public animationOptions: AnimationOptions;
     public behaviorOptions: BehaviorOptions;
 
-    constructor(DOMContainer: HTMLElement, engineOptions: EngineOptions) {
+    constructor(DOMContainer: HTMLElement, engineOptions: EngineOptions, isForce: boolean) {
         this.engineOptions = Object.assign({}, engineOptions);
 
         this.viewOptions = Object.assign({
@@ -43,7 +43,7 @@ export class Engine {
         }, engineOptions.behavior);
 
         this.modelConstructor = new ModelConstructor(this);
-        this.viewContainer = new ViewContainer(this, DOMContainer);
+        this.viewContainer = new ViewContainer(this, DOMContainer, isForce);
     }
 
     /**
@@ -51,13 +51,13 @@ export class Engine {
      * @param sources
      * @param force
      */
-    public render(source: Sources, force: boolean = false) {
+    public render(source: Sources) {
         if (source === undefined || source === null) {
             return;
         }
         ``
         let stringSource = JSON.stringify(source);
-        if (force === false && this.prevStringSource === stringSource) {
+        if (this.prevStringSource === stringSource) {
             return;
         }
 

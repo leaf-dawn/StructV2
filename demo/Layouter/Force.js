@@ -62,10 +62,7 @@ SV.registerLayout('Force', {
     },
 
     layout(e) {
-        console.log("here is the layout of Force")
-        // e.forEach((item, index) => {
-        //     console.log(item.getBound());
-        // })
+        
     }
 });
 

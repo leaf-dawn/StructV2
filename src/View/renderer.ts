@@ -38,7 +38,7 @@ export class Renderer {
         this.shadowG6Instance = new Graph({
             container: DOMContainer.cloneNode() as HTMLElement
         });
-
+        // 力导向的配置选项
         const forceOption = {
             type: 'force',
             linkDistance: 100,         // 边长
@@ -51,6 +51,7 @@ export class Renderer {
             },
             center: [DOMContainer.offsetWidth / 2, DOMContainer.offsetHeight / 3],
         };
+        // 布局配置
         const layout = isForce ? forceOption : null;
         // 初始化g6实例
         this.g6Instance = new Graph({
@@ -65,7 +66,7 @@ export class Renderer {
             },
             modes: behaviorsModes,
             plugins: [tooltip],
-            layout,
+            layout, // 布局配置
         });
         /**
          * 固定被拖拽节点

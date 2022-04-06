@@ -86,18 +86,24 @@
     <script src="./Layouter/SqQueue.js"></script>
     <script src="./Layouter/PTree.js"></script>
     <script src="./Layouter/PCTree.js"></script>
+    <script src="./Layouter/Force.js"></script>
     <script src="./data.js"></script>
 
     <script>
+        let isForce = false;
+
+        let dataIndex = 3;
+        curData = SOURCES_DATA[dataIndex];
+        // 判断是否需要力导向布局
+        Object.keys(curData).forEach(key => {
+            if(curData[key].layouter === "Force")    isForce = true;
+        });
         let cur = SV(document.getElementById('container'), {
             view: {
                 leakAreaHeight: 130,
                 groupPadding: 40,
             },
-        });
-
-        let dataIndex = 0,
-            curData = SOURCES_DATA[dataIndex];
+        }, isForce);
 
         let enableBrushSelect = false;
 

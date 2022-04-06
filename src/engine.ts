@@ -53,15 +53,6 @@ export class Engine {
      * @param prevStep
      */
     public render(source: Sources) {
-<<<<<<< HEAD
-        if (source === undefined || source === null) {
-            return;
-        }
-        ``
-        let stringSource = JSON.stringify(source);
-        if (this.prevStringSource === stringSource) {
-            return;
-=======
         let isSameSources: boolean = false,
             layoutGroupTable: LayoutGroupTable;
 
@@ -74,7 +65,6 @@ export class Engine {
             
         if (this.prevStringSource === stringSource) {
             isSameSources = true;
->>>>>>> eac9d007bcc1b52fe573ddf6cb97030c9b2d3a6d
         }
 
         this.prevStringSource = stringSource;

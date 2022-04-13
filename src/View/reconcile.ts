@@ -256,20 +256,24 @@ export class Reconcile {
 		let { duration, timingFunction } = this.engine.animationOptions;
 
 		appendModels.forEach(item => {
+            const G6Item = item.G6Item;
+
 			if (item instanceof SVNodeAppendage) {
+                G6Item.enableCapture(false);
+
 				// 先不显示泄漏区节点上面的地址文本
 				if (item instanceof SVAddressLabel) {
 					// 先将透明度改为0，隐藏掉
-					const AddressLabelG6Group = item.G6Item.getContainer();
+					const AddressLabelG6Group = G6Item.getContainer();
 					AddressLabelG6Group.attr({ opacity: 0 });
 				} else {
-					Animations.FADE_IN(item.G6Item, {
+					Animations.FADE_IN(G6Item, {
 						duration,
 						timingFunction,
 					});
 				}
 			} else {
-				Animations.APPEND(item.G6Item, {
+				Animations.APPEND(G6Item, {
 					duration,
 					timingFunction,
 					callback: () => item.afterRender(),

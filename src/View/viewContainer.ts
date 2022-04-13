@@ -47,6 +47,7 @@ export class ViewContainer {
         this.hasLeak = false; // 判断是否已经发生过泄漏
         this.brushSelectedModels = [];
         this.clickSelectNode = null;
+        this.lastLeakAreaTranslateY = 0;
 
         const g6Instance = this.renderer.getG6Instance(),
             leakAreaHeight = this.engine.viewOptions.leakAreaHeight,

@@ -174,7 +174,7 @@ export class ViewContainer {
 	 * @param models
 	 * @param layoutFn
 	 */
-	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, handleUpdate: handleUpdate) {
+	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, handleUpdate: handleUpdate,hasTriggerLastStep: boolean) {
 		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
 
 		this.restoreHighlight([...modelList, ...this.accumulateLeakModels]);
@@ -184,12 +184,16 @@ export class ViewContainer {
 			return;
 		}
 
+    // 判断是否需要进行泄漏区的比较
+    let isDiffLeak = handleUpdate.isEnterFunction || hasTriggerLastStep;
+    
 		const diffResult = this.reconcile.diff(
 				this.layoutGroupTable,
 				this.prevModelList,
 				modelList,
 				this.accumulateLeakModels,
-				handleUpdate?.isEnterFunction
+				// handleUpdate?.isEnterFunction
+        isDiffLeak
 			),
 			renderModelList = [...modelList, ...diffResult.REMOVE, ...diffResult.LEAKED, ...this.accumulateLeakModels];
 

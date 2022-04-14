@@ -392,10 +392,10 @@ export class Reconcile {
 		prevModelList: SVModel[],
 		modelList: SVModel[],
 		accumulateLeakModels: SVModel[],
-		isEnterFunction: boolean
+		isDiffLeak: boolean
 	): DiffResult {
 		const continuousModels: SVModel[] = this.getContinuousModels(prevModelList, modelList);
-		const leakModels: SVModel[] = isEnterFunction
+		const leakModels: SVModel[] = isDiffLeak
 			? []
 			: this.getLeakModels(layoutGroupTable, prevModelList, modelList);
 		const appendModels: SVModel[] = this.getAppendModels(prevModelList, modelList, accumulateLeakModels);

@@ -52,7 +52,7 @@ export class Engine {
      * @param sources
      * @param prevStep
      */
-    public render(source: Sources) {
+    public render(source: Sources, hasTriggerLastStep: boolean) {
         let isSameSources: boolean = false,
             layoutGroupTable: LayoutGroupTable;
 
@@ -80,7 +80,7 @@ export class Engine {
         }
 
         // 2 渲染（使用g6进行渲染）
-        this.viewContainer.render(layoutGroupTable, isSameSources, handleUpdate);
+        this.viewContainer.render(layoutGroupTable, isSameSources, handleUpdate, hasTriggerLastStep);
     }
 
 

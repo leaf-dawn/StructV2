@@ -77,7 +77,7 @@ export class SVLink extends SVModel {
 	}
 
 	isEqual(link: SVLink): boolean {
-		return (link.sourceType.includes(this.sourceType.toLocaleLowerCase())|| this.sourceType.includes(link.sourceType.toLowerCase())) && link.targetId === this.targetId && link.nodeId === this.nodeId && link.linkIndex === this.linkIndex;
+		return (link.sourceType.toLowerCase().includes(this.sourceType.toLocaleLowerCase())|| this.sourceType.toLowerCase().includes(link.sourceType.toLowerCase())) && link.targetId === this.targetId && link.nodeId === this.nodeId && link.linkIndex === this.linkIndex;
 	}
 
 	beforeDestroy(): void {

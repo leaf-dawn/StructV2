@@ -1,6 +1,7 @@
 import { SVModel } from "./Model/SVModel";
 import { SVNode } from "./Model/SVNode";
 import { SourceNode } from "./sources";
+import { ELayoutMode } from "./View/layoutProvider";
 
 
 export interface Style {
@@ -104,6 +105,7 @@ export interface ViewOptions {
     groupPadding: number;
     updateHighlight: string;
     leakAreaHeight: number;
+    layoutMode: ELayoutMode;
 }
 
 

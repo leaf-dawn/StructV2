@@ -1,5 +1,5 @@
 import { Engine } from '../engine';
-import { LayoutProvider } from './layoutProvider';
+import { ELayoutMode, LayoutProvider } from './layoutProvider';
 import { LayoutGroupTable } from '../Model/modelConstructor';
 import { Util } from '../Common/util';
 import { SVModel } from '../Model/SVModel';
@@ -19,141 +19,140 @@ import {
 import { handleUpdate } from '../sources';
 
 export class ViewContainer {
-    private engine: Engine;
-    private layoutProvider: LayoutProvider;
-    private reconcile: Reconcile;
-    public renderer: Renderer;
+	private engine: Engine;
+	private layoutProvider: LayoutProvider;
+	private reconcile: Reconcile;
+	public renderer: Renderer;
 
-    private layoutGroupTable: LayoutGroupTable;
-    private prevModelList: SVModel[];
-    private accumulateLeakModels: SVModel[];
+	private layoutGroupTable: LayoutGroupTable;
+	private prevModelList: SVModel[];
+	private accumulateLeakModels: SVModel[];
 
-    public hasLeak: boolean;
-    public leakAreaY: number;
+	public hasLeak: boolean;
+	public leakAreaY: number;
 	public lastLeakAreaTranslateY: number;
-    public brushSelectedModels: SVModel[]; // 保存框选过程中被选中的节点
-    public clickSelectNode: SVNode; // 点击选中的节点 
+	public brushSelectedModels: SVModel[]; // 保存框选过程中被选中的节点
+	public clickSelectNode: SVNode; // 点击选中的节点
 
-    constructor(engine: Engine, DOMContainer: HTMLElement, isForce: boolean) {
-        const behaviorsModes: Modes = InitG6Behaviors(engine, this);
+	constructor(engine: Engine, DOMContainer: HTMLElement, isForce: boolean) {
+		const behaviorsModes: Modes = InitG6Behaviors(engine, this);
 
-        this.engine = engine;
-        this.layoutProvider = new LayoutProvider(engine, this);
-        this.renderer = new Renderer(engine, DOMContainer, behaviorsModes, isForce);
-        this.reconcile = new Reconcile(engine, this.renderer);
-        this.layoutGroupTable = new Map();
-        this.prevModelList = [];
-        this.accumulateLeakModels = [];
-        this.hasLeak = false; // 判断是否已经发生过泄漏
-        this.brushSelectedModels = [];
-        this.clickSelectNode = null;
-        this.lastLeakAreaTranslateY = 0;
+		this.engine = engine;
+		this.layoutProvider = new LayoutProvider(engine, this);
+		this.renderer = new Renderer(engine, DOMContainer, behaviorsModes, isForce);
+		this.reconcile = new Reconcile(engine, this.renderer);
+		this.layoutGroupTable = new Map();
+		this.prevModelList = [];
+		this.accumulateLeakModels = [];
+		this.hasLeak = false; // 判断是否已经发生过泄漏
+		this.brushSelectedModels = [];
+		this.clickSelectNode = null;
+		this.lastLeakAreaTranslateY = 0;
 
-        const g6Instance = this.renderer.getG6Instance(),
-            leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
-            height = g6Instance.getHeight(),
-            { drag, zoom } = this.engine.behaviorOptions;
+		const g6Instance = this.renderer.getG6Instance(),
+			leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
+			height = g6Instance.getHeight(),
+			{ drag, zoom } = this.engine.behaviorOptions;
 
-        this.leakAreaY = height - leakAreaHeight;
+		this.leakAreaY = height - leakAreaHeight;
 
-        SolveNodeAppendagesDrag(this);
-        SolveBrushSelectDrag(this);
-        drag && SolveDragCanvasWithLeak(this);
-        zoom && SolveZoomCanvasWithLeak(this);
-    }
+		SolveNodeAppendagesDrag(this);
+		SolveBrushSelectDrag(this);
+		drag && SolveDragCanvasWithLeak(this);
+		zoom && SolveZoomCanvasWithLeak(this);
+	}
 
+	// ----------------------------------------------------------------------------------------------
 
-    // ----------------------------------------------------------------------------------------------
-
-    /**
-     * 对主视图进行重新布局
-     */
-    reLayout() {
-        const g6Instance = this.getG6Instance(),
+	/**
+	 * 对主视图进行重新布局
+	 */
+	reLayout(layoutMode: ELayoutMode) {
+		const g6Instance = this.getG6Instance(),
 			group = g6Instance.getGroup(),
 			matrix = group.getMatrix(),
 			bound = group.getCanvasBBox();
 
 		const { duration, enable, timingFunction } = this.engine.animationOptions;
 
-        if (matrix) {
-            let dx = matrix[6],
-                dy = matrix[7];
+		if (matrix) {
+			let dx = matrix[6],
+				dy = matrix[7];
 
 			g6Instance.moveTo(bound.minX - dx, bound.minY - dy, enable, {
 				duration,
 				easing: timingFunction,
 			});
-        }
+		}
 
-        const leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
+		const leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
 			height = g6Instance.getHeight();
 
 		this.leakAreaY = height - leakAreaHeight;
 		this.lastLeakAreaTranslateY = 0;
-		this.layoutProvider.layoutAll(this.layoutGroupTable, this.accumulateLeakModels);
+		this.layoutProvider.layoutAll(this.layoutGroupTable, this.accumulateLeakModels, layoutMode);
 		g6Instance.refresh();
 
 		EventBus.emit('onLeakAreaUpdate', {
-            leakAreaY: this.leakAreaY,
-            hasLeak: this.hasLeak,
-        });
-    }
+			leakAreaY: this.leakAreaY,
+			hasLeak: this.hasLeak,
+		});
+	}
+ 
 
+	/**
+	 * 获取 g6 实例
+	 */
+	getG6Instance(): Graph {
+		return this.renderer.getG6Instance();
+	}
 
-    /**
-     * 获取 g6 实例
-     */
-    getG6Instance(): Graph {
-        return this.renderer.getG6Instance();
-    }
+	/**
+	 * 获取泄漏区里面的元素
+	 * @returns
+	 */
+	getAccumulateLeakModels(): SVModel[] {
+		return this.accumulateLeakModels;
+	}
 
-    /**
-     * 获取泄漏区里面的元素
-     * @returns 
-     */
-    getAccumulateLeakModels(): SVModel[] {
-        return this.accumulateLeakModels;
-    }
+	/**
+	 *
+	 */
+	getLayoutGroupTable(): LayoutGroupTable {
+		return this.layoutGroupTable;
+	}
 
-    /**
-     * 
-     */
-    getLayoutGroupTable(): LayoutGroupTable {
-        return this.layoutGroupTable;
-    }
+	/**
+	 * 刷新视图
+	 */
+	refresh() {
+		this.renderer.getG6Instance().refresh();
+	}
 
-    /**
-     * 刷新视图
-     */
-    refresh() {
-        this.renderer.getG6Instance().refresh();
-    }
+	/**
+	 * 重新调整容器尺寸
+	 * @param width
+	 * @param height
+	 */
+	resize(width: number, height: number) {
+		const g6Instance = this.getG6Instance(),
+			prevContainerHeight = g6Instance.getHeight(),
+			globalGroup: Group = new Group();
 
-    /**
-     * 重新调整容器尺寸
-     * @param width 
-     * @param height 
-     */
-    resize(width: number, height: number) {
-        const g6Instance = this.getG6Instance(),
-            prevContainerHeight = g6Instance.getHeight(),
-            globalGroup: Group = new Group();
+		globalGroup.add(...this.prevModelList, ...this.accumulateLeakModels);
+		this.renderer.changeSize(width, height);
 
-        globalGroup.add(...this.prevModelList, ...this.accumulateLeakModels);
-        this.renderer.changeSize(width, height);
+		const containerHeight = g6Instance.getHeight(),
+			dy = containerHeight - prevContainerHeight;
 
-        const containerHeight = g6Instance.getHeight(),
-            dy = containerHeight - prevContainerHeight;
+		globalGroup.translate(0, dy);
+		this.renderer.refresh();
 
-        globalGroup.translate(0, dy);
-        this.renderer.refresh();
-
-        this.leakAreaY += dy;
-        EventBus.emit('onLeakAreaUpdate', {
-            leakAreaY: this.leakAreaY,
-            hasLeak: this.hasLeak,
-        });
+		this.leakAreaY += dy;
+		EventBus.emit('onLeakAreaUpdate', {
+			leakAreaY: this.leakAreaY,
+			hasLeak: this.hasLeak,
+		});
 	}
 
 	/**
@@ -174,7 +173,11 @@ export class ViewContainer {
 	 * @param models
 	 * @param layoutFn
 	 */
-	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, handleUpdate: handleUpdate,hasTriggerLastStep: boolean) {
+	render(
+		layoutGroupTable: LayoutGroupTable,
+		isSameSources: boolean,
+		handleUpdate: handleUpdate
+	) {
 		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
 
 		this.restoreHighlight([...modelList, ...this.accumulateLeakModels]);
@@ -184,16 +187,16 @@ export class ViewContainer {
 			return;
 		}
 
-    // 判断是否需要进行泄漏区的比较
-    let isDiffLeak = handleUpdate.isEnterFunction || hasTriggerLastStep;
-    
+		// 判断是否需要进行泄漏区的比较
+		let isDiffLeak = handleUpdate?.isEnterFunction || handleUpdate?.hasTriggerLastStep;
+
 		const diffResult = this.reconcile.diff(
 				this.layoutGroupTable,
 				this.prevModelList,
 				modelList,
 				this.accumulateLeakModels,
 				// handleUpdate?.isEnterFunction
-        isDiffLeak
+				isDiffLeak
 			),
 			renderModelList = [...modelList, ...diffResult.REMOVE, ...diffResult.LEAKED, ...this.accumulateLeakModels];
 
@@ -215,9 +218,10 @@ export class ViewContainer {
 			});
 		}
 
+        const layoutMode = this.engine.viewOptions.layoutMode;
 		this.accumulateLeakModels.push(...diffResult.LEAKED); // 对泄漏节点进行向后累积
 		this.renderer.build(renderModelList); // 首先在离屏canvas渲染先
-		this.layoutProvider.layoutAll(layoutGroupTable, this.accumulateLeakModels); // 进行布局（设置model的x，y，样式等）
+		this.layoutProvider.layoutAll(layoutGroupTable, this.accumulateLeakModels, layoutMode); // 进行布局（设置model的x，y，样式等）
 
 		this.beforeRender();
 		this.renderer.render(renderModelList); // 渲染视图

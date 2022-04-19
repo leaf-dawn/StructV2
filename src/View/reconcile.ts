@@ -256,10 +256,10 @@ export class Reconcile {
 		let { duration, timingFunction } = this.engine.animationOptions;
 
 		appendModels.forEach(item => {
-            const G6Item = item.G6Item;
+			const G6Item = item.G6Item;
 
 			if (item instanceof SVNodeAppendage) {
-                G6Item.enableCapture(false);
+				G6Item.enableCapture(false);
 
 				// 先不显示泄漏区节点上面的地址文本
 				if (item instanceof SVAddressLabel) {
@@ -395,9 +395,7 @@ export class Reconcile {
 		isDiffLeak: boolean
 	): DiffResult {
 		const continuousModels: SVModel[] = this.getContinuousModels(prevModelList, modelList);
-		const leakModels: SVModel[] = isDiffLeak
-			? []
-			: this.getLeakModels(layoutGroupTable, prevModelList, modelList);
+		const leakModels: SVModel[] = isDiffLeak ? [] : this.getLeakModels(layoutGroupTable, prevModelList, modelList);
 		const appendModels: SVModel[] = this.getAppendModels(prevModelList, modelList, accumulateLeakModels);
 		const removeModels: SVModel[] = this.getRemoveModels(prevModelList, modelList, accumulateLeakModels);
 		const updateModels: SVModel[] = [

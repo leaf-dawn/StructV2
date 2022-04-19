@@ -48,7 +48,6 @@ export class ModelConstructor {
 	public construct(sources: Sources): LayoutGroupTable {
 		const layoutGroupTable = new Map<string, LayoutGroup>(),
 			layoutMap: { [key: string]: LayoutCreator } = SV.registeredLayout;
-      
 
 		Object.keys(sources).forEach(group => {
 			let sourceGroup = sources[group],
@@ -303,7 +302,6 @@ export class ModelConstructor {
 				if (!markerData) continue;
 
 				let id = `[${name}(${Array.isArray(markerData) ? markerData.join('-') : markerData})]`,
-        
 					marker = new SVMarker(id, name, group, layout, markerData, node, markerOptions[name]);
 
 				markerList.push(marker);
@@ -351,7 +349,6 @@ export class ModelConstructor {
 	): SVNode {
 		let label: string | string[] = this.resolveNodeLabel(options.label, sourceNode),
 			id = `${sourceNodeType}(${sourceNode.id.toString()})`,
-      
 			node = new SVNode(id, sourceNodeType, group, layout, sourceNode, label, options);
 
 		if (node.freed) {
@@ -434,7 +431,7 @@ export class ModelConstructor {
 			sourceNodeType = info.pop();
 			targetGroupName = info.pop();
 		} else {
-			let field = info.pop(); 
+			let field = info.pop();
 			if (layoutGroupTable.get(targetGroupName).node.find(item => item.sourceType === field)) {
 				sourceNodeType = field;
 			} else if (layoutGroupTable.has(field)) {
@@ -444,17 +441,17 @@ export class ModelConstructor {
 			}
 		}
 
-    // 为了可以连接到不同group的结点
-    for (let layoutGroup of layoutGroupTable.values()) {
-      nodeList = layoutGroup.node.filter(item => item.sourceType === sourceNodeType);
-      if (nodeList === undefined) {
-        continue;
-      }
-		  targetNode = nodeList.find(item => item.sourceId === targetId);
-      if (targetNode) {
-        break;
-      }
-    }
+		// 为了可以连接到不同group的结点
+		for (let layoutGroup of layoutGroupTable.values()) {
+			nodeList = layoutGroup.node.filter(item => item.sourceType === sourceNodeType);
+			if (nodeList === undefined) {
+				continue;
+			}
+			targetNode = nodeList.find(item => item.sourceId === targetId);
+			if (targetNode) {
+				break;
+			}
+		}
 		// nodeList = layoutGroupTable.get(targetGroupName).node.filter(item => item.sourceType === sourceNodeType);
 
 		// // 若目标node不存在，返回null
@@ -509,25 +506,25 @@ export class ModelConstructor {
 		return node1.group === node2.group;
 	}
 
-    /**
-     * 获取簇
-     * - 什么为一个簇？有边相连的一堆节点，再加上这些节点各自的appendages，共同组成了一个簇
-     * @param models 
-     * @returns 
-     */
+	/**
+	 * 获取簇
+	 * - 什么为一个簇？有边相连的一堆节点，再加上这些节点各自的appendages，共同组成了一个簇
+	 * @param models
+	 * @returns
+	 */
 	static getClusters(models: SVModel[]): Group[] {
 		const clusterGroupList = [],
 			idMap = {},
-            idName = '__clusterId';
+			idName = '__clusterId';
 
 		models.forEach(item => {
 			idMap[item.id] = item;
 		});
 
 		const DFS = (model: SVModel, clusterId: number, idMap): SVModel[] => {
-            if(model === null) {
-                return [];
-            }
+			if (model === null) {
+				return [];
+			}
 
 			if (idMap[model.id] === undefined) {
 				return [];
@@ -560,7 +557,7 @@ export class ModelConstructor {
 			}
 
 			if (model instanceof SVNodeAppendage) {
-                list.push(...DFS(model.target, clusterId, idMap));
+				list.push(...DFS(model.target, clusterId, idMap));
 			}
 
 			return list;
@@ -570,7 +567,7 @@ export class ModelConstructor {
 			const model = models[i];
 
 			if (model[idName] !== undefined) {
-                delete model[idName];
+				delete model[idName];
 				continue;
 			}
 
@@ -580,9 +577,9 @@ export class ModelConstructor {
 			clusterList.forEach(item => {
 				group.add(item);
 			});
-            
+
 			clusterGroupList.push(group);
-            delete model[idName];
+			delete model[idName];
 		}
 
 		return clusterGroupList;

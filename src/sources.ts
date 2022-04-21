@@ -16,6 +16,7 @@ export interface SourceNode {
 export interface handleUpdate {
 	isEnterFunction: boolean;
 	isFirstDebug: boolean;
+    hasTriggerLastStep: boolean;
 }
 
 export type Sources = {

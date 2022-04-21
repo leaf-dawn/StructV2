@@ -18,7 +18,7 @@ export class Renderer {
 	private g6Instance: Graph; // g6 实例
 	private shadowG6Instance: Graph;
 
-	constructor(engine: Engine, DOMContainer: HTMLElement, behaviorsModes: Modes) {
+	constructor(engine: Engine, DOMContainer: HTMLElement, behaviorsModes: Modes, isForce: boolean) {
 		this.engine = engine;
 
 		const enable: boolean = this.engine.animationOptions.enable,
@@ -38,7 +38,22 @@ export class Renderer {
 		this.shadowG6Instance = new Graph({
 			container: DOMContainer.cloneNode() as HTMLElement,
 		});
-
+		// 力导向的配置选项
+		const forceOption = {
+			type: 'force',
+			linkDistance: 100, // 边长
+			preventOverlap: true, // boolean，防止节点重叠
+			// alphaDecay: 0, // 迭代阈值的衰减率。范围 [0, 1]。默认值0.028
+			workEnabled: true, // 启用以防布局计算时间过长阻塞页面交互
+			nodeStrength: -1, // 节点作用力，正数标识引力，负数表示斥力
+			nodeSpacing: d => {
+				// 设置了防止重叠后，节点边缘间距的最小值
+				return 20;
+			},
+			center: [DOMContainer.offsetWidth / 2, DOMContainer.offsetHeight / 3],
+		};
+		// 布局配置
+		const layout = isForce ? forceOption : null;
 		// 初始化g6实例
 		this.g6Instance = new Graph({
 			container: DOMContainer,
@@ -50,10 +65,32 @@ export class Renderer {
 				duration: duration,
 				easing: timingFunction,
 			},
-			fitView: false,
 			modes: behaviorsModes,
 			plugins: [tooltip],
+			layout, // 布局配置
 		});
+		/**
+		 * 固定被拖拽节点
+		 */
+		function refreshDragedNodePosition(e) {
+			const model = e.item.get('model');
+			model.fx = e.x;
+			model.fy = e.y;
+		}
+		this.g6Instance.on('node:dragstart', e => {
+			this.g6Instance.layout();
+			refreshDragedNodePosition(e);
+		});
+		this.g6Instance.on('node:drag', e => {
+			refreshDragedNodePosition(e);
+		});
+		if (typeof window !== 'undefined') {
+			window.onresize = () => {
+				if (!this.g6Instance || this.g6Instance.get('destroyed')) return;
+				if (!DOMContainer || !DOMContainer.scrollWidth || !DOMContainer.scrollHeight) return;
+				this.g6Instance.changeSize(DOMContainer.scrollWidth, DOMContainer.scrollHeight);
+			};
+		}
 	}
 
 	/**
@@ -73,16 +110,10 @@ export class Renderer {
 			let value = model[items[key]];
 			if (value !== undefined && value !== null) {
 				let item = document.createElement('div');
-				item.innerHTML = `${key}：${value !== '' ? value : model.G6ModelProps['label']}`;
+				item.innerHTML = `${key}：${value}`;
 				wrapper.appendChild(item);
 			}
 		});
-
-		if (model.freed) {
-			let item = document.createElement('div');
-			item.innerHTML = '(freed)';
-			wrapper.appendChild(item);
-		}
 
 		return wrapper;
 	}
@@ -106,14 +137,10 @@ export class Renderer {
 	/**
 	 * 渲染函数
 	 * @param renderModelList
-	 * @param isSameSources
+	 * @param isFirstRender
 	 */
 	public render(renderModelList: SVModel[]) {
 		const renderData: GraphData = Util.convertModelList2G6Data(renderModelList);
-
-		renderModelList.forEach(item => {
-			item.beforeRender();
-		});
 
 		this.g6Instance.changeData(renderData);
 

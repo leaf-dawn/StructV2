@@ -182,7 +182,7 @@ export function SolveDragCanvasWithLeak(viewContainer: ViewContainer) {
 		let translateY = event.matrix[7],
 			dy = translateY - viewContainer.lastLeakAreaTranslateY;
 
-        viewContainer.lastLeakAreaTranslateY = translateY;
+		viewContainer.lastLeakAreaTranslateY = translateY;
 
 		viewContainer.leakAreaY = viewContainer.leakAreaY + dy;
 		if (viewContainer.hasLeak) {

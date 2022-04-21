@@ -1,5 +1,5 @@
 import { Engine } from '../engine';
-import { LayoutProvider } from './layoutProvider';
+import { ELayoutMode, LayoutProvider } from './layoutProvider';
 import { LayoutGroupTable } from '../Model/modelConstructor';
 import { Util } from '../Common/util';
 import { SVModel } from '../Model/SVModel';
@@ -30,16 +30,16 @@ export class ViewContainer {
 
 	public hasLeak: boolean;
 	public leakAreaY: number;
-    public lastLeakAreaTranslateY: number;
+	public lastLeakAreaTranslateY: number;
 	public brushSelectedModels: SVModel[]; // 保存框选过程中被选中的节点
 	public clickSelectNode: SVNode; // 点击选中的节点
 
-	constructor(engine: Engine, DOMContainer: HTMLElement) {
+	constructor(engine: Engine, DOMContainer: HTMLElement, isForce: boolean) {
 		const behaviorsModes: Modes = InitG6Behaviors(engine, this);
 
 		this.engine = engine;
 		this.layoutProvider = new LayoutProvider(engine, this);
-		this.renderer = new Renderer(engine, DOMContainer, behaviorsModes);
+		this.renderer = new Renderer(engine, DOMContainer, behaviorsModes, isForce);
 		this.reconcile = new Reconcile(engine, this.renderer);
 		this.layoutGroupTable = new Map();
 		this.prevModelList = [];
@@ -47,6 +47,7 @@ export class ViewContainer {
 		this.hasLeak = false; // 判断是否已经发生过泄漏
 		this.brushSelectedModels = [];
 		this.clickSelectNode = null;
+		this.lastLeakAreaTranslateY = 0;
 
 		const g6Instance = this.renderer.getG6Instance(),
 			leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
@@ -54,7 +55,6 @@ export class ViewContainer {
 			{ drag, zoom } = this.engine.behaviorOptions;
 
 		this.leakAreaY = height - leakAreaHeight;
-        this.lastLeakAreaTranslateY = 0;
 
 		SolveNodeAppendagesDrag(this);
 		SolveBrushSelectDrag(this);
@@ -67,7 +67,7 @@ export class ViewContainer {
 	/**
 	 * 对主视图进行重新布局
 	 */
-	reLayout() {
+	reLayout(layoutMode: ELayoutMode) {
 		const g6Instance = this.getG6Instance(),
 			group = g6Instance.getGroup(),
 			matrix = group.getMatrix(),
@@ -89,15 +89,16 @@ export class ViewContainer {
 			height = g6Instance.getHeight();
 
 		this.leakAreaY = height - leakAreaHeight;
-        this.lastLeakAreaTranslateY = 0;
-		this.layoutProvider.layoutAll(this.layoutGroupTable, this.accumulateLeakModels);
+		this.lastLeakAreaTranslateY = 0;
+		this.layoutProvider.layoutAll(this.layoutGroupTable, this.accumulateLeakModels, layoutMode);
 		g6Instance.refresh();
 
-        EventBus.emit('onLeakAreaUpdate', {
-            leakAreaY: this.leakAreaY,
-            hasLeak: this.hasLeak,
-        });
+		EventBus.emit('onLeakAreaUpdate', {
+			leakAreaY: this.leakAreaY,
+			hasLeak: this.hasLeak,
+		});
 	}
+ 
 
 	/**
 	 * 获取 g6 实例
@@ -172,7 +173,11 @@ export class ViewContainer {
 	 * @param models
 	 * @param layoutFn
 	 */
-	render(layoutGroupTable: LayoutGroupTable, isSameSources: boolean, handleUpdate: handleUpdate) {
+	render(
+		layoutGroupTable: LayoutGroupTable,
+		isSameSources: boolean,
+		handleUpdate: handleUpdate
+	) {
 		const modelList = Util.convertGroupTable2ModelList(layoutGroupTable);
 
 		this.restoreHighlight([...modelList, ...this.accumulateLeakModels]);
@@ -182,12 +187,16 @@ export class ViewContainer {
 			return;
 		}
 
+		// 判断是否需要进行泄漏区的比较
+		let isDiffLeak = handleUpdate?.isEnterFunction || handleUpdate?.hasTriggerLastStep;
+
 		const diffResult = this.reconcile.diff(
 				this.layoutGroupTable,
 				this.prevModelList,
 				modelList,
 				this.accumulateLeakModels,
-				handleUpdate?.isEnterFunction
+				// handleUpdate?.isEnterFunction
+				isDiffLeak
 			),
 			renderModelList = [...modelList, ...diffResult.REMOVE, ...diffResult.LEAKED, ...this.accumulateLeakModels];
 
@@ -209,9 +218,10 @@ export class ViewContainer {
 			});
 		}
 
+        const layoutMode = this.engine.viewOptions.layoutMode;
 		this.accumulateLeakModels.push(...diffResult.LEAKED); // 对泄漏节点进行向后累积
 		this.renderer.build(renderModelList); // 首先在离屏canvas渲染先
-		this.layoutProvider.layoutAll(layoutGroupTable, this.accumulateLeakModels); // 进行布局（设置model的x，y，样式等）
+		this.layoutProvider.layoutAll(layoutGroupTable, this.accumulateLeakModels, layoutMode); // 进行布局（设置model的x，y，样式等）
 
 		this.beforeRender();
 		this.renderer.render(renderModelList); // 渲染视图

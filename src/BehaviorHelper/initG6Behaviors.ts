@@ -61,7 +61,7 @@ export function InitG6Behaviors(engine: Engine, viewContainer: ViewContainer): M
 
         let node: SVNode = g6Item.SVModel;
 
-        if (g6Item === null || node.isNode() === false) {
+        if (node.isNode() === false) {
             return false;
         }
 

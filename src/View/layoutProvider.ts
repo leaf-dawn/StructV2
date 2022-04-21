@@ -10,6 +10,11 @@ import { SVAddressLabel, SVFreedLabel, SVIndexLabel, SVMarker } from '../Model/S
 import { AddressLabelOption, IndexLabelOption, LayoutOptions, MarkerOption, ViewOptions } from '../options';
 import { ViewContainer } from './viewContainer';
 
+export enum ELayoutMode {
+	HORIZONTAL = 'hor',
+	VERTICAL = 'ver',
+}
+
 export class LayoutProvider {
 	private engine: Engine;
 	private viewOptions: ViewOptions;
@@ -155,7 +160,7 @@ export class LayoutProvider {
 			},
 			left: (nodeBound: BoundingRect, labelBound: BoundingRect, offset: number) => {
 				return {
-					x: nodeBound.x - labelBound.width / 2- offset,
+					x: nodeBound.x - labelBound.width / 2 - offset,
 					y: nodeBound.y + nodeBound.height / 2,
 				};
 			},
@@ -253,7 +258,7 @@ export class LayoutProvider {
 
 		const clusters = ModelConstructor.getClusters(accumulateLeakModels);
 
-        // 每一个簇从左往右布局就完事了，比之前的方法简单稳定很多
+		// 每一个簇从左往右布局就完事了，比之前的方法简单稳定很多
 		clusters.forEach(item => {
 			const bound = item.getBound(),
 				x = prevBound ? prevBound.x + prevBound.width + this.leakClusterXInterval : this.leakAreaXoffset,
@@ -268,29 +273,48 @@ export class LayoutProvider {
 
 	/**
 	 * 对所有组进行相互布局
-	 * @param modelGroupTable
+	 * @param modelGroupList
+	 * @param layoutMode 水平/垂直
 	 */
-	private layoutGroups(modelGroupList: Group[]): Group {
+	private layoutGroups(modelGroupList: Group[], layoutMode: ELayoutMode): Group {
 		let wrapperGroup: Group = new Group(),
 			group: Group,
 			prevBound: BoundingRect,
 			bound: BoundingRect,
 			boundList: BoundingRect[] = [],
-			dx = 0;
+            groupPadding = this.viewOptions.groupPadding,
+			dx = 0,
+            dy = 0;
 
-		// 左往右布局
+		
 		for (let i = 0; i < modelGroupList.length; i++) {
 			group = modelGroupList[i];
-			bound = group.getPaddingBound(this.viewOptions.groupPadding);
+			bound = group.getPaddingBound(groupPadding);
 
-			if (prevBound) {
-				dx = prevBound.x + prevBound.width - bound.x;
-			} else {
-				dx = bound.x;
+            // 左往右水平布局
+			if (layoutMode === ELayoutMode.HORIZONTAL) {
+				if (prevBound) {
+					dx = prevBound.x + prevBound.width - bound.x;
+				} else {
+					dx = bound.x;
+				}
+
+				group.translate(dx, 0);
+				Bound.translate(bound, dx, 0);
 			}
 
-			group.translate(dx, 0);
-			Bound.translate(bound, dx, 0);
+            // 上到下垂直布局
+			if (layoutMode === ELayoutMode.VERTICAL) {
+				if (prevBound) {
+					dy = prevBound.y + prevBound.height - bound.y - groupPadding;
+				} else {
+					dy = bound.y;
+				}
+
+				group.translate(0, dy);
+				Bound.translate(bound, 0, dy);
+			}
+
 			boundList.push(bound);
 			wrapperGroup.add(group);
 			prevBound = bound;
@@ -333,11 +357,11 @@ export class LayoutProvider {
 	 * @param layoutGroupTable
 	 * @param accumulateLeakModels
 	 */
-	public layoutAll(layoutGroupTable: LayoutGroupTable, accumulateLeakModels: SVModel[]) {
+	public layoutAll(layoutGroupTable: LayoutGroupTable, accumulateLeakModels: SVModel[], layoutMode: ELayoutMode) {
 		this.preLayoutProcess(layoutGroupTable);
 
 		const modelGroupList: Group[] = this.layoutModels(layoutGroupTable);
-		const generalGroup: Group = this.layoutGroups(modelGroupList);
+		const generalGroup: Group = this.layoutGroups(modelGroupList, layoutMode);
 
 		this.layoutLeakArea(accumulateLeakModels);
 

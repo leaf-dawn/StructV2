@@ -13,6 +13,7 @@ import G6 from '@antv/g6';
 import Pointer from "./RegisteredShape/pointer";
 import LinkListNode from "./RegisteredShape/linkListNode";
 import BinaryTreeNode from "./RegisteredShape/binaryTreeNode";
+import ForceNode from "./RegisteredShape/force";
 import TriTreeNode from "./RegisteredShape/triTreeNode";
 import CLenQueuePointer from "./RegisteredShape/clenQueuePointer";
 import TwoCellNode from "./RegisteredShape/twoCellNode";
@@ -29,7 +30,7 @@ import { SVNode } from "./Model/SVNode";
 
 
 export interface StructV {
-    (DOMContainer: HTMLElement, engineOptions: EngineOptions): Engine;
+    (DOMContainer: HTMLElement, engineOptions: EngineOptions, isForce: boolean): Engine;
     Group: typeof Group;
     Bound: typeof Bound;
     Vector: typeof Vector,
@@ -51,8 +52,8 @@ export interface StructV {
 }
 
 
-export const SV: StructV = function(DOMContainer: HTMLElement, engineOptions: EngineOptions = { }) {
-    return new Engine(DOMContainer, engineOptions);
+export const SV: StructV = function(DOMContainer: HTMLElement, engineOptions: EngineOptions = { }, isForce: boolean) {
+    return new Engine(DOMContainer, engineOptions, isForce);
 }
 
 SV.Group = Group;
@@ -72,6 +73,7 @@ SV.registeredShape = [
     Cursor,
     ArrayNode,
     CLenQueuePointer,
+    ForceNode
 ];
 
 SV.registerShape = Util.registerShape;

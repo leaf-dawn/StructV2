@@ -13,11 +13,25 @@ SV.registerLayout('PCTree', {
                 data: headNodes[i].preData,
                 indexLeft: headNodes[i].index,
                 root: headNodes[i].root
-            }
-            
+            };
+            let externalNode = {
+                type: 'structureExteral',
+                id: headNodes[0].id + '_1',
+            };
+
             if(dataNode.root){
                 dataNode.indexTop = 'data';
-                headNodes[i].indexTop = ' parent  firstChild'
+                headNodes[i].indexTop = ' parent  firstChild';
+
+                if(headNodes[i].cursor){
+                    externalNode.cursor = headNodes[i].cursor;
+                    delete headNodes[i].cursor;
+                }else{
+                    externalNode.external = headNodes[i].external;
+                    delete headNodes[i].external;
+                }
+
+                sources.push(externalNode)
             }
             sources.push(dataNode)
         }
@@ -58,6 +72,10 @@ SV.registerLayout('PCTree', {
                         stroke: '#333',
                         fill: '#00AF92'
                     }
+                },
+                structureExteral: {
+                    type: 'rect',
+                    size: [0, 0]
                 }
             },
             indexLabel: {
@@ -94,6 +112,20 @@ SV.registerLayout('PCTree', {
                             fill: '#333'
                         }
                     }
+                },
+                loopNext: {
+                    type: 'quadratic',
+                    curveOffset: -100,
+                    sourceAnchor: 2,
+                    targetAnchor: 7,
+                    style: {
+                        stroke: '#333',
+                        endArrow: 'default',
+                        startArrow: {
+                            path: G6.Arrow.circle(2, -1),
+                            fill: '#333'
+                        }
+                    }
                 }
             },
             marker: {
@@ -101,6 +133,13 @@ SV.registerLayout('PCTree', {
                     type: 'pointer',
                     anchor: 0,
                     offset: 8,
+                    style: {
+                        fill: '#f08a5d'
+                    }
+                },
+                cursor: {
+                    type: 'cursor',
+                    anchor: 0,
                     style: {
                         fill: '#f08a5d'
                     }
@@ -127,7 +166,7 @@ SV.registerLayout('PCTree', {
      * @param node 
      * @param parent 
      */
-    layoutItem(node, prev, layoutOptions, allNodeId) {
+    layoutItem(node, prev, layoutOptions, allNodeId, isRootNode) {
         if(!node) {
             return null;
         }
@@ -141,10 +180,14 @@ SV.registerLayout('PCTree', {
                 node.set('x', prev.get('x') + layoutOptions.xInterval + width);
             }
     
-            allNodeId.value += idValue;
+            //如果是有root标识的和其后续节点，则不用记录id
+            //方便重更新布局
+            if(!isRootNode){
+                allNodeId.value += idValue;
+            }
     
             if(node.next) {
-                this.layoutItem(node.next, node, layoutOptions, allNodeId);
+                this.layoutItem(node.next, node, layoutOptions, allNodeId, isRootNode);
             }
         }
     },  
@@ -152,6 +195,7 @@ SV.registerLayout('PCTree', {
     layout(elements, layoutOptions) {
         let headNode = elements.filter(item => item.type === 'PCTreeHead'),
             preHeadNode =  elements.filter(item => item.type === 'PCTreePreHead'),
+            externalNode =  elements.filter(item => item.type === 'structureExteral'),
             roots = elements.filter(item => item.type === 'PCTreeNode' && item.root),
             height = headNode[0].get('size')[1],
             width = headNode[0].get('size')[0],
@@ -177,8 +221,15 @@ SV.registerLayout('PCTree', {
                     x = width + layoutOptions.xInterval * 2;
 
                 node.headNext.set({ x, y });
-                this.layoutItem(node.headNext, null, layoutOptions, allNodeId);
+                this.layoutItem(node.headNext, null, layoutOptions, allNodeId, false);
             }
+        }
+
+        if(externalNode.length > 0){
+            externalNode[0].set({
+                x:  -25,
+                y: i / 2 * height
+            });
         }
 
         for(i = 0; i < roots.length; i++) {
@@ -189,6 +240,8 @@ SV.registerLayout('PCTree', {
                 x: headNode[0].get('x') + width + layoutOptions.xInterval * 2 + nodeInternalSum, 
                 y: headNode[0].get('y') - layoutOptions.yInterval 
             })
+
+            this.layoutItem(roots[i], null, layoutOptions, allNodeId, true);
         }
     }
 });

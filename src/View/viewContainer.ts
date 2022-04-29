@@ -168,6 +168,10 @@ export class ViewContainer {
 		});
 	}
 
+  private setPrevUpdateId(prevUpdataId: string[]) {
+    this.reconcile.setPrevUpdataId(prevUpdataId)
+  }
+
 	/**
 	 * 渲染所有视图
 	 * @param models
@@ -184,6 +188,7 @@ export class ViewContainer {
 
 		// 如果数据没变的话，直接退出
 		if (isSameSources) {
+      this.setPrevUpdateId([])
 			return;
 		}
 
@@ -196,7 +201,8 @@ export class ViewContainer {
 				modelList,
 				this.accumulateLeakModels,
 				// handleUpdate?.isEnterFunction
-				isDiffLeak
+				isDiffLeak,
+        handleUpdate?.hasTriggerLastStep
 			),
 			renderModelList = [...modelList, ...diffResult.REMOVE, ...diffResult.LEAKED, ...this.accumulateLeakModels];
 

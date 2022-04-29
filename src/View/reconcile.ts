@@ -23,6 +23,7 @@ export class Reconcile {
 	private engine: Engine;
 	private renderer: Renderer;
 	private isFirstPatch: boolean;
+  private prevUpdate: string[][] = [];
 
 	constructor(engine: Engine, renderer: Renderer) {
 		this.engine = engine;
@@ -167,6 +168,14 @@ export class Reconcile {
 		return removedModels;
 	}
 
+  private getModelsById(ids: string[], modelList: SVModel[]): SVModel[] {
+		return modelList.filter(item =>
+			ids?.find(id => {
+				return id === item.id;
+			})
+		);
+  }
+
 	/**
 	 * 找出重新指向的外部指针
 	 * @param prevModelList
@@ -230,6 +239,10 @@ export class Reconcile {
 
 		return freedNodes;
 	}
+
+  public setPrevUpdataId(prevUpdataId: string[]) {
+    this.prevUpdate.push(prevUpdataId);
+  }
 
 	// ------------------------------------------------------------------------------------------------
 
@@ -392,18 +405,29 @@ export class Reconcile {
 		prevModelList: SVModel[],
 		modelList: SVModel[],
 		accumulateLeakModels: SVModel[],
-		isDiffLeak: boolean
+		isDiffLeak: boolean,
+    hasTriggerLastStep: boolean
 	): DiffResult {
+  if (hasTriggerLastStep) {
+    this.prevUpdate.pop();
+  }
 		const continuousModels: SVModel[] = this.getContinuousModels(prevModelList, modelList);
 		const leakModels: SVModel[] = isDiffLeak ? [] : this.getLeakModels(layoutGroupTable, prevModelList, modelList);
 		const appendModels: SVModel[] = this.getAppendModels(prevModelList, modelList, accumulateLeakModels);
 		const removeModels: SVModel[] = this.getRemoveModels(prevModelList, modelList, accumulateLeakModels);
-		const updateModels: SVModel[] = [
+		const updateModels: SVModel[] = hasTriggerLastStep ? [...this.getModelsById(this.prevUpdate.pop(), modelList)]: [
 			...this.getReTargetMarkers(prevModelList, modelList),
 			...this.getLabelChangeModels(prevModelList, modelList),
 			...this.filterUnChangeModelsOfAppend(appendModels, prevModelList),
 			...leakModels,
 		];
+
+    let UpdataModelsId: string [] =[];
+    for (let model of updateModels) {
+      UpdataModelsId.push(model.id);
+    }
+    this.prevUpdate?.push(UpdataModelsId);
+
 		const freedModels: SVNode[] = this.getFreedModels(prevModelList, modelList);
 
 		return {

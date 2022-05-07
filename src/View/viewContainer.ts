@@ -168,8 +168,8 @@ export class ViewContainer {
 		});
 	}
 
-  private setPrevUpdateId(prevUpdataId: string[]) {
-    this.reconcile.setPrevUpdataId(prevUpdataId)
+  private setPrevUpdateId(prevUpdateId: string[]) {
+    this.reconcile.setPrevUpdateId(prevUpdateId)
   }
 
 	/**
@@ -186,8 +186,8 @@ export class ViewContainer {
 
 		this.restoreHighlight([...modelList, ...this.accumulateLeakModels]);
 
-		// 如果数据没变的话，直接退出
-		if (isSameSources) {
+		// 如果数据没变的话并且不是上一步调试时，直接退出，因为上一步调试可能虽然数据没变，但是高亮的model需要和原本的顺序执行时一致
+		if (isSameSources && !handleUpdate?.hasTriggerLastStep) {
       this.setPrevUpdateId([])
 			return;
 		}

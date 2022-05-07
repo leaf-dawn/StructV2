@@ -240,8 +240,8 @@ export class Reconcile {
 		return freedNodes;
 	}
 
-  public setPrevUpdataId(prevUpdataId: string[]) {
-    this.prevUpdate.push(prevUpdataId);
+  public setPrevUpdateId(prevUpdateId: string[]) {
+    this.prevUpdate.push(prevUpdateId);
   }
 
 	// ------------------------------------------------------------------------------------------------
@@ -422,11 +422,13 @@ export class Reconcile {
 			...leakModels,
 		];
 
-    let UpdataModelsId: string [] =[];
+    let UpdateModelsId: string [] =[];
     for (let model of updateModels) {
-      UpdataModelsId.push(model.id);
+      UpdateModelsId.push(model.id);
     }
-    this.prevUpdate?.push(UpdataModelsId);
+    this.prevUpdate?.push(UpdateModelsId);
+    console.log(this.prevUpdate);
+    
 
 		const freedModels: SVNode[] = this.getFreedModels(prevModelList, modelList);
 

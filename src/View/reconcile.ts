@@ -23,7 +23,7 @@ export class Reconcile {
 	private engine: Engine;
 	private renderer: Renderer;
 	private isFirstPatch: boolean;
-  private prevUpdate: string[][] = [];
+	private prevUpdate: string[][] = [];
 
 	constructor(engine: Engine, renderer: Renderer) {
 		this.engine = engine;
@@ -168,13 +168,13 @@ export class Reconcile {
 		return removedModels;
 	}
 
-  private getModelsById(ids: string[], modelList: SVModel[]): SVModel[] {
+	private getModelsById(ids: string[], modelList: SVModel[]): SVModel[] {
 		return modelList.filter(item =>
 			ids?.find(id => {
 				return id === item.id;
 			})
 		);
-  }
+	}
 
 	/**
 	 * 找出重新指向的外部指针
@@ -240,9 +240,9 @@ export class Reconcile {
 		return freedNodes;
 	}
 
-  public setPrevUpdateId(prevUpdateId: string[]) {
-    this.prevUpdate.push(prevUpdateId);
-  }
+	public setPrevUpdateId(prevUpdateId: string[]) {
+		this.prevUpdate.push(prevUpdateId);
+	}
 
 	// ------------------------------------------------------------------------------------------------
 
@@ -406,29 +406,29 @@ export class Reconcile {
 		modelList: SVModel[],
 		accumulateLeakModels: SVModel[],
 		isDiffLeak: boolean,
-    hasTriggerLastStep: boolean
+		hasTriggerLastStep: boolean
 	): DiffResult {
-  if (hasTriggerLastStep) {
-    this.prevUpdate.pop();
-  }
+		if (hasTriggerLastStep) {
+			this.prevUpdate.pop();
+		}
 		const continuousModels: SVModel[] = this.getContinuousModels(prevModelList, modelList);
 		const leakModels: SVModel[] = isDiffLeak ? [] : this.getLeakModels(layoutGroupTable, prevModelList, modelList);
 		const appendModels: SVModel[] = this.getAppendModels(prevModelList, modelList, accumulateLeakModels);
 		const removeModels: SVModel[] = this.getRemoveModels(prevModelList, modelList, accumulateLeakModels);
-		const updateModels: SVModel[] = hasTriggerLastStep ? [...this.getModelsById(this.prevUpdate.pop(), modelList)]: [
-			...this.getReTargetMarkers(prevModelList, modelList),
-			...this.getLabelChangeModels(prevModelList, modelList),
-			...this.filterUnChangeModelsOfAppend(appendModels, prevModelList),
-			...leakModels,
-		];
+		const updateModels: SVModel[] = hasTriggerLastStep
+			? [...this.getModelsById(this.prevUpdate.pop(), modelList)]
+			: [
+					...this.getReTargetMarkers(prevModelList, modelList),
+					...this.getLabelChangeModels(prevModelList, modelList),
+					...this.filterUnChangeModelsOfAppend(appendModels, prevModelList),
+					...leakModels,
+			  ];
 
-    let UpdateModelsId: string [] =[];
-    for (let model of updateModels) {
-      UpdateModelsId.push(model.id);
-    }
-    this.prevUpdate?.push(UpdateModelsId);
-    console.log(this.prevUpdate);
-    
+		let UpdateModelsId: string[] = [];
+		for (let model of updateModels) {
+			UpdateModelsId.push(model.id);
+		}
+		this.prevUpdate?.push(UpdateModelsId);
 
 		const freedModels: SVNode[] = this.getFreedModels(prevModelList, modelList);
 

@@ -16,7 +16,6 @@ export class SVNode extends SVModel {
 	};
 
 	private label: string | string[];
-	private disable: boolean;
 	public appendages: { [key: string]: SVNodeAppendage[] };
 
 	constructor(

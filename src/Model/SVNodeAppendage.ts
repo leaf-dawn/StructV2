@@ -196,6 +196,7 @@ export class SVMarker extends SVNodeAppendage {
 			label: this.label,
 			style: Util.objectClone<Style>(options.style),
 			labelCfg: Util.objectClone<NodeLabelOption>(options.labelOptions),
+            targetSourceNode: this.target.sourceNode
 		};
 	}
 

@@ -168,12 +168,18 @@ export class Reconcile {
 		return removedModels;
 	}
 
-	private getModelsById(ids: string[], modelList: SVModel[]): SVModel[] {
-		return modelList.filter(item =>
+  // 在视图上所有model中根据id查找model
+	private getModelsById(ids: string[], modelList: SVModel[], accumulateLeakModels: SVModel[]): SVModel[] {
+		const updateModels = modelList.filter(item =>
 			ids?.find(id => {
 				return id === item.id;
 			})
 		);
+    const updateLeakModels = accumulateLeakModels.filter(item =>
+			ids?.find(id => {
+				return id === item.id;
+			}));
+    return [ ...updateModels,...updateLeakModels];
 	}
 
 	/**
@@ -416,7 +422,7 @@ export class Reconcile {
 		const appendModels: SVModel[] = this.getAppendModels(prevModelList, modelList, accumulateLeakModels);
 		const removeModels: SVModel[] = this.getRemoveModels(prevModelList, modelList, accumulateLeakModels);
 		const updateModels: SVModel[] = hasTriggerLastStep
-			? [...this.getModelsById(this.prevUpdate.pop(), modelList)]
+			? [...this.getModelsById(this.prevUpdate.pop(), modelList,accumulateLeakModels)]
 			: [
 					...this.getReTargetMarkers(prevModelList, modelList),
 					...this.getLabelChangeModels(prevModelList, modelList),

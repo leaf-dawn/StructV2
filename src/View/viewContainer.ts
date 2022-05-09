@@ -226,6 +226,7 @@ export class ViewContainer {
 
         const layoutMode = this.engine.viewOptions.layoutMode;
 		this.accumulateLeakModels.push(...diffResult.LEAKED); // 对泄漏节点进行向后累积
+
 		this.renderer.build(renderModelList); // 首先在离屏canvas渲染先
 		this.layoutProvider.layoutAll(layoutGroupTable, this.accumulateLeakModels, layoutMode); // 进行布局（设置model的x，y，样式等）
 

@@ -282,37 +282,44 @@ export class LayoutProvider {
 			prevBound: BoundingRect,
 			bound: BoundingRect,
 			boundList: BoundingRect[] = [],
-            groupPadding = this.viewOptions.groupPadding,
+			groupPadding = this.viewOptions.groupPadding,
 			dx = 0,
-            dy = 0;
+			dy = 0,
+			prevCenterX = 0,
+			prevCenterY = 0;
 
-		
 		for (let i = 0; i < modelGroupList.length; i++) {
 			group = modelGroupList[i];
 			bound = group.getPaddingBound(groupPadding);
 
-            // 左往右水平布局
+			// 左往右水平布局
 			if (layoutMode === ELayoutMode.HORIZONTAL) {
 				if (prevBound) {
 					dx = prevBound.x + prevBound.width - bound.x;
+					dy = prevCenterY - (bound.y + bound.height / 2);
 				} else {
 					dx = bound.x;
 				}
 
-				group.translate(dx, 0);
-				Bound.translate(bound, dx, 0);
+				group.translate(dx, dy);
+				Bound.translate(bound, dx, dy);
+
+				prevCenterY = bound.y + bound.height / 2;
 			}
 
-            // 上到下垂直布局
+			// 上到下垂直布局
 			if (layoutMode === ELayoutMode.VERTICAL) {
 				if (prevBound) {
+					dx = prevCenterX - (bound.x + bound.width / 2);
 					dy = prevBound.y + prevBound.height - bound.y - groupPadding;
 				} else {
 					dy = bound.y;
 				}
 
-				group.translate(0, dy);
-				Bound.translate(bound, 0, dy);
+				group.translate(dx, dy);
+				Bound.translate(bound, dx, dy);
+
+				prevCenterX = bound.x + bound.width / 2;
 			}
 
 			boundList.push(bound);

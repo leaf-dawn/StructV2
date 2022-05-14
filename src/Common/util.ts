@@ -145,8 +145,11 @@ export const Util = {
     },
 
     registerShape(shapeName: string, shapeDefinition, extendShapeType?: string) {
-        // 不定义update，g6的自定义节点里面的update好像有bug
-        shapeDefinition.update = undefined;
+        if(!shapeDefinition.update) {
+            // 因为大多数节点继承了rect，rect的update有时候会和选定高亮功能有冲突，所以打个补丁
+            shapeDefinition.update = undefined;
+        }
+
         return registerNode(shapeName, shapeDefinition, extendShapeType);
     }
 };

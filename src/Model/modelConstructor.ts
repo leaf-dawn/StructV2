@@ -1,3 +1,4 @@
+import { Graph } from '@antv/g6';
 import { Group } from '../Common/group';
 import { Util } from '../Common/util';
 import { Engine } from '../engine';
@@ -67,13 +68,15 @@ export class ModelConstructor {
 				return;
 			}
 
+      
 			const options: LayoutGroupOptions = layoutCreator.defineOptions(sourceGroup.data),
-				sourceData = layoutCreator.sourcesPreprocess(sourceGroup.data, options),
+				sourceData = layoutCreator.sourcesPreprocess(sourceGroup.data, options, group),
 				nodeOptions = options.node || options['element'] || {},
 				markerOptions = options.marker || {},
 				indexLabelOptions = options.indexLabel || {},
 				addressLabelOption = options.addressLabel || {};
-
+        
+        
 			nodeList = this.constructNodes(group, layout, nodeOptions, sourceData);
 			appendageList.push(...this.constructMarkers(group, layout, markerOptions, nodeList));
 			appendageList.push(...this.constructIndexLabel(group, layout, indexLabelOptions, nodeList));
@@ -230,7 +233,7 @@ export class ModelConstructor {
 				// 若没有指针字段的结点则跳过
 				if (value === undefined || value === null) continue;
 
-				let id = `${group}[${name}(${value})]`,
+				let id = `${group}[${name}(${value}-${node.id})]`,
 					indexLabel = new SVIndexLabel(
 						id,
 						name,
@@ -378,7 +381,13 @@ export class ModelConstructor {
 		index: number,
 		options: LinkOption
 	): SVLink {
-		let id = `${linkName}{${node.id}-${target.id}}#${index}`;
+    let id;
+    // 如果数据结构是图，则不需要index来区分是哪条边
+    if (layout.indexOf('Graph') !== -1) {
+      id = `${linkName}{${node.id}-${target.id}}`;
+    } else {
+      id = `${linkName}{${node.id}-${target.id}}#${index}`;
+    }
 		return new SVLink(id, linkName, group, layout, node, target, index, options);
 	}
 

@@ -202,17 +202,17 @@ export class ViewContainer {
 		let isDiffLeak = handleUpdate?.isEnterFunction || handleUpdate?.hasTriggerLastStep;
 
 
-    if (!handleUpdate?.hasTriggerLastStep) {
-      this.preCount++;
-    } else {
-      this.preCount--;
-    }
-    //preCount用来判断是否是第一次进入调试，因为刚开始调试后点击下一步再点上一步，后端给回的isFirstDebug = false，因改为true
-    if (this.preCount === 1 || this.preCount === 2) {
-      console.log(this.preCount);
+    // if (!handleUpdate?.hasTriggerLastStep) {
+    //   this.preCount++;
+    // } else {
+    //   this.preCount--;
+    // }
+    // //preCount用来判断是否是第一次进入调试，因为刚开始调试后点击下一步再点上一步，后端给回的isFirstDebug = false，因改为true
+    // if (this.preCount === 1 || this.preCount === 2) {
+    //   console.log(this.preCount);
       
-      handleUpdate.isFirstDebug = true;
-    }  
+    //   handleUpdate.isFirstDebug = true;
+    // }  
 		const diffResult = this.reconcile.diff(
 				this.layoutGroupTable,
 				this.prevModelList,

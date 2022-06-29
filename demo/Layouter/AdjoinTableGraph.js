@@ -1,95 +1,93 @@
-
-
-
 SV.registerLayout('AdjoinTableGraph', {
 
-    sourcesPreprocess(sources, options) {
-        let dataLength = sources.length;
-        let tableHeadNodes = [];
-        let nodeMap = {};
-        let i;
+    sourcesPreprocess(sources, options, group) {
         
+        // let dataLength = sources.length;
+        // let tableHeadNodes = [];
+        // let nodeMap = {};
+        // let i;
 
-        for (i = 0; i < dataLength; i++) {
-            let graphNode = sources[i];
 
-            tableHeadNodes.push({
-                id: `table-head-node-${i}`,
-                type: 'tableHeadNode',
-                data: graphNode.id
-            });
+        // for (i = 0; i < dataLength; i++) {
+        //     let graphNode = sources[i];
 
-            nodeMap[graphNode.id] = {
-                node: graphNode,
-                order: i,
-                neighbor: []
-            };
-        }
+        //     tableHeadNodes.push({
+        //         id: `table-head-node-${i}`,
+        //         type: 'tableHeadNode',
+        //         data: graphNode.id
+        //     });
 
-        Object.keys(nodeMap).map(key => {
-            let nodeData = nodeMap[key],
-                neighbor = nodeData.node.neighbor;
+        //     nodeMap[graphNode.id] = {
+        //         node: graphNode,
+        //         order: i,
+        //         neighbor: []
+        //     };
+        // }
 
-            if (neighbor === undefined) {
-                return;
-            }
+        // Object.keys(nodeMap).map(key => {
+        //     let nodeData = nodeMap[key],
+        //         neighbor = nodeData.node.neighbor;
 
-            neighbor.forEach((item, index) => {
-                let targetNodeData = nodeMap[item];
+        //     if (neighbor === undefined) {
+        //         return;
+        //     }
 
-                nodeData.neighbor.push({
-                    id: `${key}-table-node-${item}`,
-                    type: 'tableNode',
-                    data: item.toString(),
-                    order: targetNodeData.order
-                });
+        //     neighbor.forEach((item, index) => {
+        //         let targetNodeData = nodeMap[item];
 
-                targetNodeData.neighbor.push({
-                    id: `${item}-table-node-${key}`,
-                    type: 'tableNode',
-                    data: key.toString(),
-                    order: nodeData.order
-                });
-            });
+        //         nodeData.neighbor.push({
+        //             id: `${key}-table-node-${item}`,
+        //             type: 'tableNode',
+        //             data: item.toString(),
+        //             order: targetNodeData.order
+        //         });
 
-            Object.keys(nodeMap).map(key => {
-                let nodeData = nodeMap[key],
-                    neighbor = nodeData.neighbor;
+        //         targetNodeData.neighbor.push({
+        //             id: `${item}-table-node-${key}`,
+        //             type: 'tableNode',
+        //             data: key.toString(),
+        //             order: nodeData.order
+        //         });
+        //     });
 
-                if (neighbor === undefined) {
-                    return;
-                }
+        //     Object.keys(nodeMap).map(key => {
+        //         let nodeData = nodeMap[key],
+        //             neighbor = nodeData.neighbor;
 
-                neighbor.sort((n1, n2) => {
-                    return n1.order - n2.order;
-                });
+        //         if (neighbor === undefined) {
+        //             return;
+        //         }
 
-                for(let i = 0; i < neighbor.length; i++) {
-                    if(neighbor[i + 1]) {
-                        neighbor[i].next = `tableNode#${neighbor[i + 1].id}`;
-                    }
-                }
-            });
+        //         neighbor.sort((n1, n2) => {
+        //             return n1.order - n2.order;
+        //         });
 
-            tableHeadNodes.forEach(item => {
-                let nodeData = nodeMap[item.data],
-                    neighbor = nodeData.neighbor;
+        //         for (let i = 0; i < neighbor.length; i++) {
+        //             if (neighbor[i + 1]) {
+        //                 neighbor[i].next = `tableNode#${neighbor[i + 1].id}`;
+        //             }
+        //         }
+        //     });
 
-                if(neighbor.length) {
-                    item.headNext = `tableNode#${neighbor[0].id}`;
-                }
-            });
-        });
+        //     tableHeadNodes.forEach(item => {
+        //         let nodeData = nodeMap[item.data],
+        //             neighbor = nodeData.neighbor;
 
-        sources.push(...tableHeadNodes);
-        Object.keys(nodeMap).map(key => {
-            let nodeData = nodeMap[key],
-                neighbor = nodeData.neighbor;
-            
-            sources.push(...neighbor);
-        });
+        //         if (neighbor.length) {
+        //             item.headNext = `tableNode#${neighbor[0].id}`;
+        //         }
+        //     });
+        // });
 
-        return sources;
+        // sources.push(...tableHeadNodes);
+        // Object.keys(nodeMap).map(key => {
+        //     let nodeData = nodeMap[key],
+        //         neighbor = nodeData.neighbor;
+
+        //     sources.push(...neighbor);
+        // });
+
+        // return sources;
     },
 
     defineOptions() {
@@ -129,17 +127,17 @@ SV.registerLayout('AdjoinTableGraph', {
                         stroke: '#333'
                     }
                 },
-                headNext: { 
+                headNext: {
                     sourceAnchor: 1,
                     targetAnchor: 6,
                     style: {
                         stroke: '#333',
                         endArrow: {
-                            path: G6.Arrow.triangle(8, 6, 0), 
+                            path: G6.Arrow.triangle(8, 6, 0),
                             fill: '#333'
                         },
                         startArrow: {
-                            path: G6.Arrow.circle(2, -1), 
+                            path: G6.Arrow.circle(2, -1),
                             fill: '#333'
                         }
                     }
@@ -150,11 +148,11 @@ SV.registerLayout('AdjoinTableGraph', {
                     style: {
                         stroke: '#333',
                         endArrow: {
-                            path: G6.Arrow.triangle(8, 6, 0), 
+                            path: G6.Arrow.triangle(8, 6, 0),
                             fill: '#333'
                         },
                         startArrow: {
-                            path: G6.Arrow.circle(2, -1), 
+                            path: G6.Arrow.circle(2, -1),
                             fill: '#333'
                         }
                     }
@@ -177,22 +175,22 @@ SV.registerLayout('AdjoinTableGraph', {
      * @param node 
      * @param parent 
      */
-     layoutItem(node, prev, layoutOptions) {
-        if(!node) {
+    layoutItem(node, prev, layoutOptions) {
+        if (!node) {
             return null;
         }
 
         let width = node.get('size')[0];
 
-        if(prev) {
+        if (prev) {
             node.set('y', prev.get('y'));
             node.set('x', prev.get('x') + layoutOptions.xInterval + width);
         }
 
-        if(node.next) {
+        if (node.next) {
             this.layoutItem(node.next, node, layoutOptions);
         }
-    },  
+    },
 
     layout(elements, layoutOptions) {
         let nodes = elements.filter(item => item.type === 'default'),
@@ -209,9 +207,9 @@ SV.registerLayout('AdjoinTableGraph', {
         }
 
         const tableY = -radius,
-              tableX = radius + 20;
+            tableX = radius + 20;
 
-        for(i = 0; i < tableHeadNode.length; i++) {
+        for (i = 0; i < tableHeadNode.length; i++) {
             let node = tableHeadNode[i],
                 height = node.get('size')[1];
 
@@ -220,7 +218,7 @@ SV.registerLayout('AdjoinTableGraph', {
                 y: tableY + node.get('y') + i * height
             });
 
-            if(node.headNext) {
+            if (node.headNext) {
                 let y = node.get('y') + height - node.headNext.get('size')[1],
                     x = tableX + layoutOptions.xInterval * 2.5;
 
@@ -231,6 +229,3 @@ SV.registerLayout('AdjoinTableGraph', {
 
     }
 });
-
-
-

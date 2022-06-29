@@ -66,6 +66,7 @@ export class SVLink extends SVModel {
 			style: Util.objectClone<Style>(options.style),
 			labelCfg,
 			curveOffset: options.curveOffset,
+      loopCfg: options.loopCfg,
 		};
 	}
 

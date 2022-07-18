@@ -65,6 +65,7 @@ export interface LinkOption extends ModelOption {
     label: string;
     curveOffset: number;
     labelOptions: LinkLabelOption;
+    loopCfg: Object;
 }
 
 
@@ -130,7 +131,7 @@ export interface EngineOptions {
 
 export interface LayoutCreator {
     defineOptions(sourceData: SourceNode[]): LayoutGroupOptions;
-    sourcesPreprocess?(sourceData: SourceNode[], options: LayoutGroupOptions): SourceNode[];
+    sourcesPreprocess?(sourceData: SourceNode[], options: LayoutGroupOptions, group: string): SourceNode[];
     defineLeakRule?(models: SVNode[]): SVNode[];
     layout(nodes: SVNode[], layoutOptions: LayoutOptions);
     [key: string]: any;

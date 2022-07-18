@@ -1,5 +1,4 @@
-
-const isNeighbor = function (itemA, itemB) {
+const isNeighbor = function(itemA, itemB) {
     let neighborA = itemA.neighbor,
         neighborB = itemB.neighbor;
 
@@ -21,33 +20,33 @@ const isNeighbor = function (itemA, itemB) {
 
 SV.registerLayout('AdjoinMatrixGraph', {
     sourcesPreprocess(sources) {
-        let dataLength = sources.length;
-        let matrixNodeLength = dataLength * dataLength;
-        let matrixNodes = [];
-        let i, j;
+        // let dataLength = sources.length;
+        // let matrixNodeLength = dataLength * dataLength;
+        // let matrixNodes = [];
+        // let i, j;
 
-        for (i = 0; i < matrixNodeLength; i++) {
-            matrixNodes.push({
-                id: `mn-${i}`,
-                type: 'matrixNode',
-                indexTop: i < dataLength ? sources[i].id : undefined,
-                indexLeft: i % dataLength === 0?  sources[i / dataLength].id : undefined,
-                data: 0
-            });
-        }
+        // for (i = 0; i < matrixNodeLength; i++) {
+        //     matrixNodes.push({
+        //         id: `mn-${i}`,
+        //         type: 'matrixNode',
+        //         indexTop: i < dataLength ? sources[i].id : undefined,
+        //         indexLeft: i % dataLength === 0?  sources[i / dataLength].id : undefined,
+        //         data: 0
+        //     });
+        // }
 
-        for (i = 0; i < dataLength; i++) {
-            for (j = 0; j < dataLength; j++) {
-                let itemI = sources[i],
-                    itemJ = sources[j];
+        // for (i = 0; i < dataLength; i++) {
+        //     for (j = 0; j < dataLength; j++) {
+        //         let itemI = sources[i],
+        //             itemJ = sources[j];
 
-                if (itemI.id !== itemJ.id && isNeighbor(itemI, itemJ)) {
-                    matrixNodes[i * dataLength + j].data = 1;
-                }
-            }
-        }
+        //         if (itemI.id !== itemJ.id && isNeighbor(itemI, itemJ)) {
+        //             matrixNodes[i * dataLength + j].data = 1;
+        //         }
+        //     }
+        // }
 
-        sources.push(...matrixNodes);
+        // sources.push(...matrixNodes);
 
         return sources;
     },
@@ -106,7 +105,7 @@ SV.registerLayout('AdjoinMatrixGraph', {
             i;
 
         const matrixY = -radius,
-              matrixX = interval;
+            matrixX = interval;
 
         for (i = 0; i < nodeLength; i++) {
             let [x, y] = Vector.rotation(-intervalAngle * i, [0, -radius]);
@@ -116,12 +115,9 @@ SV.registerLayout('AdjoinMatrixGraph', {
 
         for (i = 0; i < matrixNodeLength; i++) {
             let x = matrixX + (i % nodeLength) * matrixNodeSize;
-                y = matrixY + Math.floor(i / nodeLength) * matrixNodeSize;
+            y = matrixY + Math.floor(i / nodeLength) * matrixNodeSize;
 
             matrixNodes[i].set({ x, y });
         }
     }
 });
-
-
-

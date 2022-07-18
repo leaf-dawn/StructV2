@@ -87,6 +87,8 @@ export class Engine {
 			layoutGroupTable = this.modelConstructor.construct(source);
 		}
 
+  
+    
 		// 2 渲染（使用g6进行渲染）
 		this.viewContainer.render(layoutGroupTable, isSameSources, handleUpdate);
 	}

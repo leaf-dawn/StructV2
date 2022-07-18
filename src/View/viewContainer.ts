@@ -28,6 +28,10 @@ export class ViewContainer {
 	private prevModelList: SVModel[];
 	private accumulateLeakModels: SVModel[];
 
+  private preIsFirstDebug: boolean[]; //存储以前的handleUpdate
+  private stackAddress: number //指向preHandleUpdate的栈地址
+  private preCount: number; //点击上一步的次数
+
 	public hasLeak: boolean;
 	public leakAreaY: number;
 	public lastLeakAreaTranslateY: number;
@@ -48,6 +52,9 @@ export class ViewContainer {
 		this.brushSelectedModels = [];
 		this.clickSelectNode = null;
 		this.lastLeakAreaTranslateY = 0;
+    this.preIsFirstDebug = [];
+    this.preCount = 0;
+    this.stackAddress = 0;
 
 		const g6Instance = this.renderer.getG6Instance(),
 			leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
@@ -191,10 +198,21 @@ export class ViewContainer {
       this.setPrevUpdateId([])
 			return;
 		}
-
 		// 判断是否需要进行泄漏区的比较
 		let isDiffLeak = handleUpdate?.isEnterFunction || handleUpdate?.hasTriggerLastStep;
 
+
+    // if (!handleUpdate?.hasTriggerLastStep) {
+    //   this.preCount++;
+    // } else {
+    //   this.preCount--;
+    // }
+    // //preCount用来判断是否是第一次进入调试，因为刚开始调试后点击下一步再点上一步，后端给回的isFirstDebug = false，因改为true
+    // if (this.preCount === 1 || this.preCount === 2) {
+    //   console.log(this.preCount);
+      
+    //   handleUpdate.isFirstDebug = true;
+    // }  
 		const diffResult = this.reconcile.diff(
 				this.layoutGroupTable,
 				this.prevModelList,

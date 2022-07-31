@@ -7,6 +7,7 @@ import { SVNode } from './SVNode';
 export class SVLink extends SVModel {
 	public node: SVNode;
 	public target: SVNode;
+  public label: string; //边的权值
 	public linkIndex: number;
 
 	public shadowG6Item: IEdge;
@@ -23,15 +24,19 @@ export class SVLink extends SVModel {
 		node: SVNode,
 		target: SVNode,
 		index: number,
-		options: LinkOption
+		options: LinkOption,
+    label: string,
 	) {
 		super(id, type, group, layout, 'link');
 
+    console.log(id);
+    
 		this.node = node;
 		this.target = target;
 		this.nodeId = node.id;
 		this.targetId = target.id;
 		this.linkIndex = index;
+    this.label = label; //边的权值
 
 		node.links.outDegree.push(this);
 		target.links.inDegree.push(this);
@@ -49,11 +54,14 @@ export class SVLink extends SVModel {
 		if (options.targetAnchor && typeof options.targetAnchor === 'function' && this.linkIndex !== null) {
 			targetAnchor = options.targetAnchor(this.linkIndex);
 		}
+    let labelCfg = this.label? { position: 'middle', autoRotate: true, refY: 7, style: { fontSize: 20, opacity: 0.8 } }
+    : Util.objectClone<LinkLabelOption>(options.labelOptions || ({} as LinkLabelOption));
+    
 
-		let label = this.target.sourceNode.freed ? 'freed' : '',
-			labelCfg = this.target.sourceNode.freed
-				? { position: 'start', autoRotate: true, refY: 7, style: { fontSize: 11, opacity: 0.8 } }
-				: Util.objectClone<LinkLabelOption>(options.labelOptions || ({} as LinkLabelOption));
+		// let label = this.target.sourceNode.freed ? 'freed' : '',
+		// 	labelCfg = this.target.sourceNode.freed
+		// 		? { position: 'start', autoRotate: true, refY: 7, style: { fontSize: 11, opacity: 0.8 } }
+		// 		: Util.objectClone<LinkLabelOption>(options.labelOptions || ({} as LinkLabelOption));
 
 		return {
 			id: this.id,
@@ -62,7 +70,7 @@ export class SVLink extends SVModel {
 			target: this.target.id,
 			sourceAnchor,
 			targetAnchor,
-			label,
+			label:this.label,
 			style: Util.objectClone<Style>(options.style),
 			labelCfg,
 			curveOffset: options.curveOffset,

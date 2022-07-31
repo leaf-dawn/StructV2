@@ -17,7 +17,7 @@ export const Animations = {
 	 * @param animationConfig
 	 */
 	APPEND(G6Item: Item, animationConfig: animationConfig) {
-		const type = G6Item.getType(),
+		const type = G6Item.getType(), 
 			group = G6Item.getContainer(),
 			Mat3 = Util.mat3,
 			animateCfg = {
@@ -27,12 +27,14 @@ export const Animations = {
 			};
 
 		if (type === 'node') {
-			let matrix = group.getMatrix(),
+			let matrix = group.getMatrix(), 
 				targetMatrix = Mat3.clone(matrix);
 
-			Mat3.scale(matrix, matrix, [0, 0]);
+      // 让结点大小从0到1出现
+			Mat3.scale(matrix, matrix, [0, 0]);//第一个参数的matrix是你要更改的矩阵,第二个参数是更改之后的新矩阵,第三个参数就是缩放系数，分别对应xy
 			Mat3.scale(targetMatrix, targetMatrix, [1, 1]);
 
+      // 让结点透明度从0到1
 			group.attr({ matrix, opacity: 0 });
 			group.animate({ matrix: targetMatrix, opacity: 1 }, animateCfg);
 		}

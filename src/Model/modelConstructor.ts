@@ -169,8 +169,10 @@ export class ModelConstructor {
 			linkNames = Object.keys(linkOptions);
 
 		linkNames.forEach(name => {
+      
 			for (let i = 0; i < nodes.length; i++) {
 				let node: SVNode = nodes[i],
+        value,
 					sourceLinkData: sourceLinkData = node.sourceNode[name],
 					targetNode: SVNode | SVNode[] = null,
 					link: SVLink = null;
@@ -183,11 +185,18 @@ export class ModelConstructor {
 				//  ------------------- 将连接声明字段 sourceLinkData 从 id 变为 SVNode -------------------
 				if (Array.isArray(sourceLinkData)) {
 					node[name] = sourceLinkData.map((item, index) => {
+            // 提取权值
+            if (typeof item === 'string' && item.includes('/')) {
+              value = item.split('/')[1];
+              item = item.split('/')[0];
+            }
+            
 						targetNode = this.fetchTargetNodes(layoutGroupTable, node, item);
 						let isGeneralLink = ModelConstructor.isGeneralLink(sourceLinkData.toString());
-
+            
 						if (targetNode) {
-							link = this.createLink(name, group, layout, node, targetNode, index, linkOptions[name]);
+							link = this.createLink(name, group, layout, node, targetNode, index, linkOptions[name],value);
+              
 							linkList.push(link);
 						}
 
@@ -198,7 +207,7 @@ export class ModelConstructor {
 					let isGeneralLink = ModelConstructor.isGeneralLink(sourceLinkData.toString());
 
 					if (targetNode) {
-						link = this.createLink(name, group, layout, node, targetNode, 0, linkOptions[name]);
+						link = this.createLink(name, group, layout, node, targetNode, 0, linkOptions[name],value);
 						linkList.push(link);
 					}
 
@@ -379,7 +388,8 @@ export class ModelConstructor {
 		node: SVNode,
 		target: SVNode,
 		index: number,
-		options: LinkOption
+		options: LinkOption,
+    label: string
 	): SVLink {
     let id;
     // 如果数据结构是图，则不需要index来区分是哪条边
@@ -388,7 +398,7 @@ export class ModelConstructor {
     } else {
       id = `${linkName}{${node.id}-${target.id}}#${index}`;
     }
-		return new SVLink(id, linkName, group, layout, node, target, index, options);
+		return new SVLink(id, linkName, group, layout, node, target, index, options,label);
 	}
 
 	/**
@@ -427,6 +437,8 @@ export class ModelConstructor {
 		if (linkTarget === null || linkTarget === undefined) {
 			return null;
 		}
+
+
 
 		if (typeof linkTarget === 'number' || (typeof linkTarget === 'string' && !linkTarget.includes('#'))) {
 			linkTarget = 'default#' + linkTarget;

@@ -394,7 +394,7 @@ export class ModelConstructor {
     let id;
     // 如果数据结构是图，则不需要index来区分是哪条边
     if (layout.indexOf('Graph') !== -1) {
-      id = `${linkName}{${node.id}-${target.id}}`;
+      id = `{${node.id}-${target.id}}`;
     } else {
       id = `${linkName}{${node.id}-${target.id}}#${index}`;
     }

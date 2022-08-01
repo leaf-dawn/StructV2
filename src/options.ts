@@ -5,15 +5,15 @@ import { ELayoutMode } from "./View/layoutProvider";
 
 
 export interface Style {
-    fill: string; // 填充颜色
-    text: string; // 图形文本
-    textFill: string; // 文本颜色
-    fontSize: number; // 字体大小
-    fontWeight: number; // 字重
-    stroke: string; // 描边样式
-    opacity: number; // 透明度
-    lineWidth: number; // 线宽
-    matrix: number[]; // 变换矩阵
+    fill?: string; // 填充颜色
+    text?: string; // 图形文本
+    textFill?: string; // 文本颜色
+    fontSize?: number; // 字体大小
+    fontWeight?: number; // 字重
+    stroke?: string; // 描边样式
+    opacity?: number; // 透明度
+    lineWidth?: number; // 线宽
+    matrix?: number[]; // 变换矩阵
 };
 
 

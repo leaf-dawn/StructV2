@@ -28,8 +28,6 @@ export class SVLink extends SVModel {
     label: string,
 	) {
 		super(id, type, group, layout, 'link');
-
-    console.log(id);
     
 		this.node = node;
 		this.target = target;
@@ -54,14 +52,23 @@ export class SVLink extends SVModel {
 		if (options.targetAnchor && typeof options.targetAnchor === 'function' && this.linkIndex !== null) {
 			targetAnchor = options.targetAnchor(this.linkIndex);
 		}
-    let labelCfg = this.label? { position: 'middle', autoRotate: true, refY: 7, style: { fontSize: 20, opacity: 0.8 } }
-    : Util.objectClone<LinkLabelOption>(options.labelOptions || ({} as LinkLabelOption));
+    let labelCfg = Util.objectClone<LinkLabelOption>(options.labelOptions || ({} as LinkLabelOption));
+    // let labelCfg = this.label? { position: 'middle', autoRotate: true, refY: 7, style: { fontSize: 20, opacity: 0.8 } }
+    // : Util.objectClone<LinkLabelOption>(options.labelOptions || ({} as LinkLabelOption));
     
-
-		// let label = this.target.sourceNode.freed ? 'freed' : '',
-		// 	labelCfg = this.target.sourceNode.freed
-		// 		? { position: 'start', autoRotate: true, refY: 7, style: { fontSize: 11, opacity: 0.8 } }
-		// 		: Util.objectClone<LinkLabelOption>(options.labelOptions || ({} as LinkLabelOption));
+    let freed = this.target.sourceNode.freed;
+    // 简陋版：解决图的权值问题和freed结点的问题（因为结点freed后边需要显示‘freed’文本，边的权值也边也需要显示权值文本，这两个的样式有冲突），更好的解决方法（freed自己写实现逻辑，而不是用label的方案显示）
+    let label;
+    if (freed && this.label) {
+      label = this.label + '(freed)';
+    } else if(!freed && this.label) {
+      label = this.label;
+    } else if (freed && !this.label) {
+      label = 'freed'
+      labelCfg ={ position: 'start', autoRotate: true, refY: 7, refX: 0, style: { fontSize: 11, opacity: 0.8 } }
+      console.log(labelCfg);
+      
+    }
 
 		return {
 			id: this.id,
@@ -70,7 +77,7 @@ export class SVLink extends SVModel {
 			target: this.target.id,
 			sourceAnchor,
 			targetAnchor,
-			label:this.label,
+			label:label,
 			style: Util.objectClone<Style>(options.style),
 			labelCfg,
 			curveOffset: options.curveOffset,

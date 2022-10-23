@@ -82,15 +82,22 @@ export class Reconcile {
 		prevModelList: SVModel[],
 		modelList: SVModel[]
 	): SVModel[] {
+
 		let potentialLeakModels: SVModel[] = prevModelList.filter(
-			item => !modelList.find(model => model.id === item.id) && !item.freed
+			item => !modelList.find(model => {
+				//老师说广义表泄露区比较不用在意类型，只关心id
+				if(model.layout === 'GeneralizedList'){
+					return model.id.split('(')[1] === item.id.split('(')[1];
+				}
+				return model.id === item.id;
+			}) && !item.freed
 		);
 		const leakModels: SVModel[] = [];
 
 		// 先把节点拿出来
 		const potentialLeakNodes = potentialLeakModels.filter(item => item.isNode()) as SVNode[],
 			groups = Util.groupBy<SVNode>(potentialLeakNodes, 'group');
-
+		
 		// 再把非节点的model拿出来
 		potentialLeakModels = potentialLeakModels.filter(item => item.isNode() === false);
 
@@ -429,7 +436,7 @@ export class Reconcile {
 					...this.filterUnChangeModelsOfAppend(appendModels, prevModelList),
 					...leakModels,
 			  ];
-
+		
 		let UpdateModelsId: string[] = [];
 		for (let model of updateModels) {
 			UpdateModelsId.push(model.id);

@@ -1,5 +1,6 @@
 import { Engine } from '../engine';
 import { SVModel } from '../Model/SVModel';
+import { SVMarker } from '../Model/SVNodeAppendage'
 import { Util } from '../Common/util';
 import { Tooltip, Graph, GraphData, Modes } from '@antv/g6';
 import { InitG6Behaviors } from '../BehaviorHelper/initG6Behaviors';
@@ -150,7 +151,14 @@ export class Renderer {
 			item.G6Item['SVModel'] = item;
 		});
 
+		//外部指针在结点图层上方
+		this.g6Instance.getNodes().forEach(item => {
+			if (item['SVModel'] instanceof SVMarker) {
+				item.toFront()
+			}
+		})
 		this.g6Instance.getEdges().forEach(item => item.toFront());
+
 		this.g6Instance.paint();
 	}
 

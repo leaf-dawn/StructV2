@@ -15,6 +15,7 @@ import LinkListNode from "./RegisteredShape/linkListNode";
 import BinaryTreeNode from "./RegisteredShape/binaryTreeNode";
 import ForceNode from "./RegisteredShape/force";
 import TriTreeNode from "./RegisteredShape/triTreeNode";
+import IntendedTreeNode from "./RegisteredShape/intendedTreeNode";
 import CLenQueuePointer from "./RegisteredShape/clenQueuePointer";
 import TwoCellNode from "./RegisteredShape/twoCellNode";
 import ThreeCellNode from "./RegisteredShape/threeCellNode";
@@ -73,7 +74,8 @@ SV.registeredShape = [
     Cursor,
     ArrayNode,
     CLenQueuePointer,
-    ForceNode
+    ForceNode,
+    IntendedTreeNode
 ];
 
 SV.registerShape = Util.registerShape;

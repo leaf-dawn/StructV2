@@ -1,4 +1,6 @@
 {
+    "name": "StructV2",
+    "version": "0.0.1",
     "compilerOptions": {
         "target": "ES2015",
         "module": "commonJS",

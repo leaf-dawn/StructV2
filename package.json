@@ -1,4 +1,6 @@
 {
+  "name": "structv",
+  "version": "0.0.1",
   "scripts": {
     "build": "webpack --config webpack.config.product.js",
     "dep": "webpack --config webpack.config.product.js && node copyDist2Anyview.js",

@@ -1,6 +1,6 @@
 node_modules
 test
-dist
+dist\sv.js*
 资料
 \copyDist2Anyview.js
 g6Test

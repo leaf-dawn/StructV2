@@ -1,6 +1,13 @@
 {
   "name": "structv2",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/structv.common.ts"
+      }
+    }
+  },
   "scripts": {
     "build": "webpack --config webpack.config.product.js",
     "dep": "webpack --config webpack.config.product.js && node copyDist2Anyview.js",

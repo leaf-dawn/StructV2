@@ -18,9 +18,9 @@ export interface Style {
 
 
 export interface NodeLabelOption {
-    position: string;
-    offset: number;
-    style: Style;
+    position?: string;
+    offset?: number;
+    style?: Style;
 };
 
 

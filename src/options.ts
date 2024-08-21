@@ -36,13 +36,13 @@ export interface IndexLabelOption extends NodeLabelOption {
     position: 'top' | 'right' | 'bottom' | 'left';
 }
 
-
+// 链接线的标题的样式
 export interface LinkLabelOption {
-    refX: number;
-    refY: number;
-    position: string;
-    autoRotate: boolean;
-    style: Style;
+    refX?: number; // 参考点的 X 和 Y 坐标偏移量
+    refY?: number; 
+    position?: string; //标签的位置，left, right, center等
+    autoRotate?: boolean; // 是否自动旋转标签。如果设置为 true，当节点或边旋转时，标签也会自动调整角度
+    style?: Style;
 };
 
 
@@ -60,16 +60,15 @@ export interface NodeOption extends ModelOption {
     labelOptions?: NodeLabelOption; // 标签样式
 }
 
-
+// 链接线样式
 export interface LinkOption extends ModelOption {
-    sourceAnchor?: number | ((index: number) => number);
-    targetAnchor: number | ((index: number) => number);
-    label: string;
-    curveOffset: number;
-    labelOptions: LinkLabelOption;
+    sourceAnchor?: number | ((index: number) => number); // 源锚点
+    targetAnchor?: number | ((index: number) => number);  // 目标锚点
+    label?: string; // 链接线标签，暂时没有作用
+    curveOffset?: number; // 设置曲线偏移量
+    labelOptions?: LinkLabelOption; // 链接线标题样式
     loopCfg: Object;
 }
-
 
 export interface MarkerOption extends NodeOption {
     type: 'pointer' | 'cursor' | 'clen-queue-pointer';

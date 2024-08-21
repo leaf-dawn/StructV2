@@ -67,14 +67,14 @@ export interface LinkOption extends ModelOption {
     label?: string; // 链接线标签，暂时没有作用
     curveOffset?: number; // 设置曲线偏移量
     labelOptions?: LinkLabelOption; // 链接线标题样式
-    loopCfg: Object;
+    loopCfg?: Object; // 控制自循环的链接线的样式
 }
 
 export interface MarkerOption extends NodeOption {
-    type: 'pointer' | 'cursor' | 'clen-queue-pointer';
-    anchor: number;
-    offset: number;
-    labelOffset: number;
+    type?: 'pointer' | 'cursor' | 'clen-queue-pointer';
+    anchor?: number;
+    offset?: number;
+    labelOffset?: number;
 };
 
 

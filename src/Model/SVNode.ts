@@ -14,6 +14,8 @@ export class SVNode extends SVModel {
 		inDegree: SVLink[];
 		outDegree: SVLink[];
 	};
+	// SourceNode的属性
+	[key: string]: any;
 
 	private label: string | string[];
 	public appendages: { [key: string]: SVNodeAppendage[] };

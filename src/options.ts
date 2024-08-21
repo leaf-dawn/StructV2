@@ -14,6 +14,8 @@ export interface Style {
     opacity?: number; // 透明度
     lineWidth?: number; // 线宽
     matrix?: number[]; // 变换矩阵
+    // 传递给G6的其他属性
+    [key: string]: any;
 };
 
 
@@ -60,7 +62,7 @@ export interface NodeOption extends ModelOption {
 
 
 export interface LinkOption extends ModelOption {
-    sourceAnchor: number | ((index: number) => number);
+    sourceAnchor?: number | ((index: number) => number);
     targetAnchor: number | ((index: number) => number);
     label: string;
     curveOffset: number;

@@ -47,17 +47,17 @@ export interface LinkLabelOption {
 
 
 export interface ModelOption {
-    type: string;
-    style: Style;
+    type?: string;
+    style?: Style;
 }
 
-
+// 节点样式
 export interface NodeOption extends ModelOption {
-    size: number | [number, number];
-    rotation: number;
-    label: string | string[];
-    anchorPoints: number[][];
-    labelOptions: NodeLabelOption;
+    size?: number | [number, number]; // 节点大小
+    rotation?: number;  // 旋转角度
+    label?: string | string[]; // 标签格式
+    anchorPoints?: number[][]; // 锚点位置
+    labelOptions?: NodeLabelOption; // 标签样式
 }
 
 

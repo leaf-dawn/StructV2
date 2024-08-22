@@ -84,7 +84,7 @@ export interface LayoutOptions {
 
 
 export interface LayoutGroupOptions {
-    node: { [key: string]: NodeOption };
+    node?: { [key: string]: NodeOption };
     link?: { [key: string]: LinkOption };
     marker?: { [key: string]: MarkerOption };
     addressLabel?: AddressLabelOption;
@@ -103,24 +103,24 @@ export interface LayoutGroupOptions {
  */
 
 export interface ViewOptions {
-    fitCenter: boolean;
-    groupPadding: number;
-    updateHighlight: string;
-    leakAreaHeight: number;
-    layoutMode: ELayoutMode;
+    fitCenter?: boolean;
+    groupPadding?: number;
+    updateHighlight?: string;
+    leakAreaHeight?: number;
+    layoutMode?: ELayoutMode;
 }
 
 
 export interface AnimationOptions {
-    enable: boolean;
-    duration: number;
-    timingFunction: string;
+    enable?: boolean;
+    duration?: number;
+    timingFunction?: string;
 };
 
 
 export interface BehaviorOptions {
-    drag: boolean;
-    zoom: boolean;
+    drag?: boolean;
+    zoom?: boolean;
 }
 
 export interface EngineOptions {

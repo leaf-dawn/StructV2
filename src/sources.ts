@@ -20,9 +20,11 @@ export interface handleUpdate {
 }
 
 export type Sources = {
-	[key: string]: {
-		data: SourceNode[];
-		layouter: string;
-	};
+	[key: string]: Source;
 	handleUpdate?: handleUpdate | any;
-};
+}
+
+export type Source = {
+	data: SourceNode[];
+	layouter: string;
+}

@@ -222,15 +222,6 @@ export class Engine {
 	}
 
 	/**
-	 * 开启/关闭框选模式
-	 * @param enable
-	 */
-	public switchBrushSelect(enable: boolean) {
-		const g6Instance = this.viewContainer.getG6Instance();
-		enable ? g6Instance.setMode('brush') : g6Instance.setMode('default');
-	}
-
-	/**
 	 * 销毁引擎
 	 */
 	public destroy() {

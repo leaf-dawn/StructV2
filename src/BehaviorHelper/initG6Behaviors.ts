@@ -106,13 +106,12 @@ export function InitG6Behaviors(engine: Engine, viewContainer: ViewContainer): M
 
     const brushSelect = {
         type: 'brush-select',
-        trigger: 'drag',
+        trigger: 'contextmenu',
         includeEdges: false,
-        shouldUpdate: brushSelectNodeFilter
+        shouldUpdate: brushSelectNodeFilter,
     }
 
     return {
-        default: [dragNode, dragCanvas, clickSelect],
-        brush: [brushSelect, dragNode]
+        default: [dragNode, dragCanvas, clickSelect, brushSelect],
     };
 }

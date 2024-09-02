@@ -25,6 +25,7 @@ export type Sources = {
 }
 
 export type Source = {
+	isForce?: boolean;
 	data: SourceNode[];
 	layouter: string;
 }

@@ -143,7 +143,6 @@ export class Renderer {
 	public render(renderModelList: SVModel[]) {
 		const renderData: GraphData = Util.convertModelList2G6Data(renderModelList);
 
-		this.g6Instance.destroyLayout();
 		this.g6Instance.changeData(renderData);
 
 		renderModelList.forEach(item => {

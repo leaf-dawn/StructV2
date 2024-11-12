@@ -74,7 +74,7 @@ export function InitG6Behaviors(engine: Engine, viewContainer: ViewContainer): M
         const model: SVModel = G6Item.SVModel;
 
         // 泄漏的元素不能被框选
-        if (model.leaked || model.isNode() === false) {
+        if (model.isNode() === false) {
             return false;
         }
 

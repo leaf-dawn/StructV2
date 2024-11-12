@@ -14,10 +14,6 @@ SV.registerLayout('Array', {
         return sources;
     },
 
-    defineLeakRule(nodes) {
-        return [];
-    },
-
     defineOptions() {
         return {
             node: {

@@ -13,10 +13,6 @@ SV.registerLayout('Stack', {
         return sources;
     },
 
-    defineLeakRule(nodes) {
-        return [];
-    },
-
     defineOptions() {
         return {
             element: { 

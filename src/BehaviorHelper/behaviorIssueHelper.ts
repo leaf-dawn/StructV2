@@ -166,37 +166,4 @@ export function SolveBrushSelectDrag(viewContainer: ViewContainer) {
 	});
 }
 
-/**
- * 解决泄漏区随着视图拖动的问题
- * @param g6Instance
- * @param hasLeak
- */
-export function SolveDragCanvasWithLeak(viewContainer: ViewContainer) {
-	let g6Instance = viewContainer.getG6Instance();
 
-	g6Instance.on('viewportchange', event => {
-		if (event.action !== 'translate') {
-			return false;
-		}
-
-		let translateY = event.matrix[7],
-			dy = translateY - viewContainer.lastLeakAreaTranslateY;
-
-		viewContainer.lastLeakAreaTranslateY = translateY;
-
-		viewContainer.leakAreaY = viewContainer.leakAreaY + dy;
-		if (viewContainer.hasLeak) {
-			EventBus.emit('onLeakAreaUpdate', {
-				leakAreaY: viewContainer.leakAreaY,
-				hasLeak: viewContainer.hasLeak,
-			});
-		}
-	});
-}
-
-/**
- * 解决泄漏区随着视图缩放的问题（这里搞不出来，尽力了）
- * @param g6Instance
- * @param generalModelsGroup
- */
-export function SolveZoomCanvasWithLeak(viewContainer: ViewContainer) {}

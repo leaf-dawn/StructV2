@@ -6,7 +6,6 @@ import { Tooltip, Graph, GraphData, Modes } from '@antv/g6';
 import { InitG6Behaviors } from '../BehaviorHelper/initG6Behaviors';
 
 export interface RenderModelPack {
-	leaKModels: SVModel[];
 	generalModel: SVModel[];
 }
 

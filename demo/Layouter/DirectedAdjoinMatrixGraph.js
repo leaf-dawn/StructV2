@@ -103,11 +103,6 @@ SV.registerLayout('DirectedAdjoinMatrixGraph', {
                     }
                 }
             },
-            addressLabel: {
-                style: {
-                    fill: '#999'
-                }
-            },
             layout: {
                 radius: 150,
                 interval: 250

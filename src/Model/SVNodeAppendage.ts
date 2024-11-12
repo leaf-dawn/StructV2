@@ -1,7 +1,7 @@
 import { INode, NodeConfig, EdgeConfig } from '@antv/g6-core';
 import { Bound, BoundingRect } from '../Common/boundingRect';
 import { Util } from '../Common/util';
-import { AddressLabelOption, IndexLabelOption, MarkerOption, NodeLabelOption, Style } from '../options';
+import { IndexLabelOption, MarkerOption, NodeLabelOption, Style } from '../options';
 import { SVModel } from './SVModel';
 import { SVNode } from './SVNode';
 
@@ -71,48 +71,6 @@ export class SVFreedLabel extends SVNodeAppendage {
 	}
 }
 
-/**
- * 被移动到泄漏区的节点上面显示的地址
- */
-export class SVAddressLabel extends SVNodeAppendage {
-	constructor(id: string, type: string, group: string, layout: string, target: SVNode, options: AddressLabelOption) {
-		super(id, type, group, layout, 'addressLabel', target, target.sourceId);
-		this.G6ModelProps = this.generateG6ModelProps(options);
-	}
-
-	getBound(): BoundingRect {
-		const textBound = this.shadowG6Item.getContainer().getChildren()[1].getBBox(),
-			keyBound = this.shadowG6Item.getBBox();
-		return {
-			x: keyBound.x + textBound.x,
-			y: keyBound.y + textBound.y,
-			width: textBound.width,
-			height: textBound.height,
-		};
-	}
-
-	generateG6ModelProps(options: AddressLabelOption) {
-		return {
-			id: this.id,
-			x: 0,
-			y: 0,
-			type: 'rect',
-			label: this.label,
-			labelCfg: {
-				style: {
-					fill: '#666',
-					fontSize: 16,
-					...options.style,
-				},
-			},
-			size: [0, 0],
-			style: {
-				stroke: null,
-				fill: 'transparent',
-			},
-		};
-	}
-}
 
 /**
  * 节点的下标文字

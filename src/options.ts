@@ -26,12 +26,6 @@ export interface NodeLabelOption {
 };
 
 
-export interface AddressLabelOption {
-    offset?: number;
-    style?: Style;
-}
-
-
 export interface IndexLabelOption extends NodeLabelOption {
     position: 'top' | 'right' | 'bottom' | 'left';
 }
@@ -87,7 +81,6 @@ export interface LayoutGroupOptions {
     node?: { [key: string]: NodeOption };
     link?: { [key: string]: LinkOption };
     marker?: { [key: string]: MarkerOption };
-    addressLabel?: AddressLabelOption;
     indexLabel?: { [key: string]: IndexLabelOption };
     layout?: LayoutOptions;
     behavior?: {

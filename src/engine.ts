@@ -159,13 +159,9 @@ export class Engine {
 				optionsType = layoutGroup.options[modelType];
 
 			if (optionsType) {
-				if (modelType === 'addressLabel') {
-					item.updateG6ModelStyle(item.generateG6ModelProps(optionsType));
-				} else {
-					const targetModelOption = optionsType[item.sourceType];
-					if (targetModelOption) {
-						item.updateG6ModelStyle(item.generateG6ModelProps(targetModelOption));
-					}
+				const targetModelOption = optionsType[item.sourceType];
+				if (targetModelOption) {
+					item.updateG6ModelStyle(item.generateG6ModelProps(targetModelOption));
 				}
 			}
 		});

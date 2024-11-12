@@ -5,7 +5,7 @@ import { LayoutGroupTable } from '../Model/modelConstructor';
 import { SVLink } from '../Model/SVLink';
 import { SVModel } from '../Model/SVModel';
 import { SVNode } from '../Model/SVNode';
-import { SVAddressLabel, SVMarker, SVNodeAppendage } from '../Model/SVNodeAppendage';
+import { SVMarker, SVNodeAppendage } from '../Model/SVNodeAppendage';
 import { handleUpdate } from '../sources';
 import { Animations } from './animation';
 import { Renderer } from './renderer';
@@ -190,18 +190,6 @@ export class Reconcile {
 			if (item instanceof SVNodeAppendage) {
 				G6Item.enableCapture(false);
 
-				// 先不显示泄漏区节点上面的地址文本
-				if (item instanceof SVAddressLabel) {
-					// 先将透明度改为0，隐藏掉
-					const AddressLabelG6Group = G6Item.getContainer();
-					AddressLabelG6Group.attr({ opacity: 0 });
-				} else {
-					Animations.FADE_IN(G6Item, {
-						duration,
-						timingFunction,
-					});
-				}
-			} else {
 				Animations.APPEND(G6Item, {
 					duration,
 					timingFunction,

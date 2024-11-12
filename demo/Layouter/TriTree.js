@@ -101,11 +101,6 @@ SV.registerLayout('TriTree', {
                     }
                 }
             },
-            addressLabel: {
-                style: {
-                    fill: '#999'
-                }
-            },
             layout: {
                 xInterval: 40,
                 yInterval: 40,

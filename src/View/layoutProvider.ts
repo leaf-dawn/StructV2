@@ -6,8 +6,8 @@ import { Vector } from '../Common/vector';
 import { Engine } from '../engine';
 import { LayoutGroupTable, ModelConstructor } from '../Model/modelConstructor';
 import { SVModel } from '../Model/SVModel';
-import { SVAddressLabel, SVFreedLabel, SVIndexLabel, SVMarker } from '../Model/SVNodeAppendage';
-import { AddressLabelOption, IndexLabelOption, LayoutOptions, MarkerOption, ViewOptions } from '../options';
+import { SVFreedLabel, SVIndexLabel, SVMarker } from '../Model/SVNodeAppendage';
+import { IndexLabelOption, LayoutOptions, MarkerOption, ViewOptions } from '../options';
 import { ViewContainer } from './viewContainer';
 
 export enum ELayoutMode {
@@ -205,7 +205,6 @@ export class LayoutProvider {
 
 			const indexLabel = group.appendage.filter(item => item instanceof SVIndexLabel) as SVIndexLabel[],
 				freedLabel = group.appendage.filter(item => item instanceof SVFreedLabel) as SVFreedLabel[],
-				addressLabel = group.appendage.filter(item => item instanceof SVAddressLabel) as SVAddressLabel[],
 				marker = group.appendage.filter(item => item instanceof SVMarker) as SVMarker[];
 
 			this.layoutIndexLabel(indexLabel, indexLabelOptions);

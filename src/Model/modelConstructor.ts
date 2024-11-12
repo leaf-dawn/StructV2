@@ -3,7 +3,6 @@ import { Group } from '../Common/group';
 import { Util } from '../Common/util';
 import { Engine } from '../engine';
 import {
-	AddressLabelOption,
 	IndexLabelOption,
 	LayoutCreator,
 	LayoutGroupOptions,
@@ -16,7 +15,7 @@ import { SV } from '../StructV';
 import { SVLink } from './SVLink';
 import { SVModel } from './SVModel';
 import { SVNode } from './SVNode';
-import { SVAddressLabel, SVFreedLabel, SVIndexLabel, SVMarker, SVNodeAppendage } from './SVNodeAppendage';
+import { SVFreedLabel, SVIndexLabel, SVMarker, SVNodeAppendage } from './SVNodeAppendage';
 
 export type LayoutGroup = {
 	name: string;
@@ -44,7 +43,7 @@ export class ModelConstructor {
 	}
 
 	/**
-	 * 构建SVNode，SVLink, SVMarker, SVAddressLabel, SVIndexLabel等
+	 * 构建SVNode，SVLink, SVMarker, SVIndexLabel等
 	 * @param sourceList
 	 */
 	public construct(sources: Sources): LayoutGroupTable {
@@ -75,15 +74,13 @@ export class ModelConstructor {
 				sourceData = layoutCreator.sourcesPreprocess(sourceGroup.data, options, group),
 				nodeOptions = options.node || options['element'] || {},
 				markerOptions = options.marker || {},
-				indexLabelOptions = options.indexLabel || {},
-				addressLabelOption = options.addressLabel || {};
+				indexLabelOptions = options.indexLabel || {};
         
       
 			// 根据sourceData，以及定义的nodeOptions创建node列表
 			nodeList = this.constructNodes(group, layout, nodeOptions, sourceData);
 			appendageList.push(...this.constructMarkers(group, layout, markerOptions, nodeList));
 			appendageList.push(...this.constructIndexLabel(group, layout, indexLabelOptions, nodeList));
-			appendageList.push(...this.constructAddressLabel(group, layout, addressLabelOption, nodeList));
 			nodeList.forEach(item => {
 				if (item.appendages.freedLabel) {
 					appendageList.push(...item.appendages.freedLabel);
@@ -261,36 +258,6 @@ export class ModelConstructor {
 		});
 
 		return indexLabelList;
-	}
-
-	/**
-	 *
-	 * @param group
-	 * @param layout
-	 * @param addressLabelOption
-	 * @param nodes
-	 */
-	private constructAddressLabel(
-		group: string,
-		layout: string,
-		addressLabelOption: AddressLabelOption,
-		nodes: SVNode[]
-	): SVAddressLabel[] {
-		let addressLabelList: SVAddressLabel[] = [];
-
-		nodes.forEach(item => {
-			const addressLabel = new SVAddressLabel(
-				`address-label(${item.id})`,
-				item.sourceType,
-				group,
-				layout,
-				item,
-				addressLabelOption
-			);
-			addressLabelList.push(addressLabel);
-		});
-
-		return addressLabelList;
 	}
 
 	/**

@@ -20,7 +20,6 @@ export class SVModel {
 	public preLayout: boolean; // 是否进入预备布局阶段
 	public discarded: boolean;
 	public freed: boolean;
-	public leaked: boolean;
 	public originStyle: Partial<Style>; // 用作保存修改前的样式
 
 	private transformMatrix: number[];
@@ -39,7 +38,6 @@ export class SVModel {
 		this.preLayout = false;
 		this.discarded = false;
 		this.freed = false;
-		this.leaked = false;
 		this.transformMatrix = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 		this.modelType = modelType;
 	}

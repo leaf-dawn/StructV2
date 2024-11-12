@@ -103,24 +103,23 @@ export interface LayoutGroupOptions {
  */
 
 export interface ViewOptions {
-    fitCenter?: boolean;
-    groupPadding?: number;
-    updateHighlight?: string;
-    leakAreaHeight?: number;
+    fitCenter?: boolean; // 是否自动将视图居中
+    groupPadding?: number; // 组间填充，可用于设置组之间的间距
+    updateHighlight?: string; // 更新时的高亮颜色
     layoutMode?: ELayoutMode;
 }
 
-
+// AnimationOptions 动画相关配置
 export interface AnimationOptions {
-    enable?: boolean;
-    duration?: number;
-    timingFunction?: string;
+    enable?: boolean; // 是否启用动画
+    duration?: number; // 动画持继时间
+    timingFunction?: string; // 动画的缓动函数
 };
 
 
 export interface BehaviorOptions {
-    drag?: boolean;
-    zoom?: boolean;
+    drag?: boolean; // 是否可拖拽
+    zoom?: boolean; // 是否可缩放
 }
 
 export interface EngineOptions {
@@ -133,7 +132,6 @@ export interface EngineOptions {
 export interface LayoutCreator {
     defineOptions(sourceData: SourceNode[]): LayoutGroupOptions;
     sourcesPreprocess?(sourceData: SourceNode[], options: LayoutGroupOptions, group: string): SourceNode[];
-    defineLeakRule?(models: SVNode[]): SVNode[];
     layout(nodes: SVNode[], layoutOptions: LayoutOptions);
     [key: string]: any;
 }

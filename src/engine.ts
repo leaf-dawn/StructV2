@@ -27,7 +27,6 @@ export class Engine {
 				fitCenter: true,
 				fitView: false,
 				groupPadding: 20,
-				leakAreaHeight: 150,
 				updateHighlight: '#fc5185',
                 layoutMode: ELayoutMode.HORIZONTAL
 			},
@@ -62,16 +61,16 @@ export class Engine {
 	 * @param sources
 	 * @param prevStep
 	 */
-	public render(source: Sources) {
+	public render(sources: Sources) {
 		let isSameSources: boolean = false,
 			layoutGroupTable: LayoutGroupTable;
 
-		if (source === undefined || source === null) {
+		if (sources === undefined || sources === null) {
 			return;
 		}
 
-		let handleUpdate: handleUpdate = source.handleUpdate,
-			stringSource = JSON.stringify(source);
+		let handleUpdate: handleUpdate = sources.handleUpdate,
+			stringSource = JSON.stringify(sources);
 
 		if (this.prevStringSource === stringSource) {
 			isSameSources = true;
@@ -84,7 +83,7 @@ export class Engine {
 			layoutGroupTable = this.modelConstructor.getLayoutGroupTable();
 		} else {
 			// 1 转换模型（data => model）
-			layoutGroupTable = this.modelConstructor.construct(source);
+			layoutGroupTable = this.modelConstructor.construct(sources);
 		}
 
   
@@ -137,9 +136,8 @@ export class Engine {
 	 */
 	public getAllModels(): SVModel[] {
 		const modelList = Util.convertGroupTable2ModelList(this.modelConstructor.getLayoutGroupTable());
-		const accumulateLeakModels = this.viewContainer.getAccumulateLeakModels();
 
-		return [...modelList, ...accumulateLeakModels];
+		return [...modelList];
 	}
 
 	/**
@@ -206,12 +204,7 @@ export class Engine {
 			return;
 		}
 
-		if (eventName === 'onFreed' || eventName === 'onLeak') {
-			EventBus.on(eventName, callback);
-			return;
-		}
-
-		if (eventName === 'onLeakAreaUpdate') {
+		if (eventName === 'onFreed') {
 			EventBus.on(eventName, callback);
 			return;
 		}

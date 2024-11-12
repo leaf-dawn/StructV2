@@ -35,7 +35,8 @@ export type LayoutGroupTable = Map<string, LayoutGroup>;
 export class ModelConstructor {
 	private engine: Engine;
 	private layoutGroupTable: LayoutGroupTable;
-	private prevSourcesStringMap: { [key: string]: string }; // 保存上一次源数据转换为字符串之后的值，用作比较该次源数据和上一次源数据是否有差异，若相同，则可跳过重复构建过程
+	// prevSourcesStringMap 保存上一次源数据转换为字符串之后的值，用作比较该次源数据和上一次源数据是否有差异，若相同，则可跳过重复构建过程
+	private prevSourcesStringMap: { [key: string]: string }; 
 
 	constructor(engine: Engine) {
 		this.engine = engine;
@@ -51,22 +52,23 @@ export class ModelConstructor {
 			layoutMap: { [key: string]: LayoutCreator } = SV.registeredLayout;
 
 		Object.keys(sources).forEach(group => {
-			let sourceGroup = sources[group],
-				layout = sourceGroup.layouter,
-				layoutCreator: LayoutCreator = layoutMap[layout];
+			let sourceGroup = sources[group];
+			let layout = sourceGroup.layouter;
+			let layoutCreator: LayoutCreator = layoutMap[layout];
 
 			if (!layout || !layoutCreator) {
 				return;
 			}
-
-			let sourceDataString: string = JSON.stringify(sourceGroup.data),
-				prevString: string = this.prevSourcesStringMap[group],
-				nodeList: SVNode[] = [],
-				appendageList: SVNodeAppendage[] = [];
-
+			
+			// 如果本次数据和上次一致，则不重复渲染
+			let sourceDataString: string = JSON.stringify(sourceGroup.data);
+			let prevString: string = this.prevSourcesStringMap[group];
 			if (prevString === sourceDataString) {
 				return;
 			}
+
+			let nodeList: SVNode[] = [];
+			let appendageList: SVNodeAppendage[] = [];
 
       
 			const options: LayoutGroupOptions = layoutCreator.defineOptions(sourceGroup.data),
@@ -76,7 +78,8 @@ export class ModelConstructor {
 				indexLabelOptions = options.indexLabel || {},
 				addressLabelOption = options.addressLabel || {};
         
-        
+      
+			// 根据sourceData，以及定义的nodeOptions创建node列表
 			nodeList = this.constructNodes(group, layout, nodeOptions, sourceData);
 			appendageList.push(...this.constructMarkers(group, layout, markerOptions, nodeList));
 			appendageList.push(...this.constructIndexLabel(group, layout, indexLabelOptions, nodeList));

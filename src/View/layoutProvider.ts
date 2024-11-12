@@ -19,8 +19,6 @@ export class LayoutProvider {
 	private engine: Engine;
 	private viewOptions: ViewOptions;
 	private viewContainer: ViewContainer;
-	private leakAreaXoffset: number = 20;
-	private leakClusterXInterval = 25;
 
 	constructor(engine: Engine, viewContainer: ViewContainer) {
 		this.engine = engine;
@@ -179,22 +177,6 @@ export class LayoutProvider {
 		});
 	}
 
-	/**
-	 * 布局泄漏区节点上面的address label
-	 * @param leakAddress
-	 */
-	private layoutAddressLabel(leakAddress: SVAddressLabel[], addressLabelOption: AddressLabelOption) {
-		const offset = addressLabelOption.offset || 16;
-
-		leakAddress.forEach(item => {
-			const nodeBound = item.target.getBound();
-
-			item.set({
-				x: nodeBound.x + nodeBound.width / 2,
-				y: nodeBound.y - offset,
-			});
-		});
-	}
 
 	/**
 	 * 对每个组内部的model进行布局
@@ -219,8 +201,7 @@ export class LayoutProvider {
 
 		layoutGroupTable.forEach(group => {
 			const markerOptions = group.options.marker || {},
-				indexLabelOptions = group.options.indexLabel || {},
-				addressLabelOption = group.options.addressLabel || {};
+				indexLabelOptions = group.options.indexLabel || {};
 
 			const indexLabel = group.appendage.filter(item => item instanceof SVIndexLabel) as SVIndexLabel[],
 				freedLabel = group.appendage.filter(item => item instanceof SVFreedLabel) as SVFreedLabel[],
@@ -229,46 +210,10 @@ export class LayoutProvider {
 
 			this.layoutIndexLabel(indexLabel, indexLabelOptions);
 			this.layoutFreedLabel(freedLabel);
-			this.layoutAddressLabel(addressLabel, addressLabelOption);
 			this.layoutMarker(marker, markerOptions); // 布局外部指针
 		});
 
 		return modelGroupList;
-	}
-
-	/**
-	 * 对泄漏区进行布局
-	 * @param accumulateLeakModels
-	 * // todo: 部分元素被抽离后的泄漏区
-	 */
-	private layoutLeakArea(accumulateLeakModels: SVModel[]) {
-		const containerHeight = this.viewContainer.getG6Instance().getHeight(),
-			leakAreaHeight = this.engine.viewOptions.leakAreaHeight,
-			leakAreaY = containerHeight - leakAreaHeight;
-
-		let prevBound: BoundingRect;
-
-		// 避免在泄漏前拖拽节点导致的位置变化，先把节点位置重置为布局后的标准位置
-		accumulateLeakModels.forEach(item => {
-			item.set({
-				x: item.layoutX,
-				y: item.layoutY,
-			});
-		});
-
-		const clusters = ModelConstructor.getClusters(accumulateLeakModels);
-
-		// 每一个簇从左往右布局就完事了，比之前的方法简单稳定很多
-		clusters.forEach(item => {
-			const bound = item.getBound(),
-				x = prevBound ? prevBound.x + prevBound.width + this.leakClusterXInterval : this.leakAreaXoffset,
-				dx = x - bound.x,
-				dy = leakAreaY - bound.y;
-
-			item.translate(dx, dy);
-			Bound.translate(bound, dx, dy);
-			prevBound = bound;
-		});
 	}
 
 	/**
@@ -333,13 +278,11 @@ export class LayoutProvider {
 	/**
 	 * 将视图调整至画布中心
 	 * @param models
-	 * @param leakAreaHeight
 	 */
 	private fitCenter(group: Group) {
 		let width = this.viewContainer.getG6Instance().getWidth(),
 			height = this.viewContainer.getG6Instance().getHeight(),
-			viewBound: BoundingRect = group.getBound(),
-			leakAreaHeight = this.engine.viewOptions.leakAreaHeight;
+			viewBound: BoundingRect = group.getBound();
 
 		const centerX = width / 2,
 			centerY = height / 2,
@@ -348,13 +291,10 @@ export class LayoutProvider {
 		let dx = centerX - boundCenterX,
 			dy = 0;
 
-		if (this.viewContainer.hasLeak) {
-			const boundBottomY = viewBound.y + viewBound.height;
-			dy = height - leakAreaHeight - 130 - boundBottomY;
-		} else {
-			const boundCenterY = viewBound.y + viewBound.height / 2;
-			dy = centerY - boundCenterY;
-		}
+
+		const boundCenterY = viewBound.y + viewBound.height / 2;
+		dy = centerY - boundCenterY;
+		
 
 		group.translate(dx, dy);
 	}
@@ -362,15 +302,12 @@ export class LayoutProvider {
 	/**
 	 * 布局
 	 * @param layoutGroupTable
-	 * @param accumulateLeakModels
 	 */
-	public layoutAll(layoutGroupTable: LayoutGroupTable, accumulateLeakModels: SVModel[], layoutMode: ELayoutMode) {
+	public layoutAll(layoutGroupTable: LayoutGroupTable, layoutMode: ELayoutMode) {
 		this.preLayoutProcess(layoutGroupTable);
 
 		const modelGroupList: Group[] = this.layoutModels(layoutGroupTable);
 		const generalGroup: Group = this.layoutGroups(modelGroupList, layoutMode);
-
-		this.layoutLeakArea(accumulateLeakModels);
 
 		this.fitCenter(generalGroup);
 		this.postLayoutProcess(layoutGroupTable);

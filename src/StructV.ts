@@ -87,12 +87,6 @@ SV.registerLayout = function(name: string, layoutCreator: LayoutCreator) {
         }
     }
 
-    if(typeof layoutCreator.defineLeakRule !== 'function') {
-        layoutCreator.defineLeakRule = function(models: SVNode[]): SVNode[] {
-            return models;
-        }
-    }
-
     if(typeof layoutCreator.defineOptions !== 'function' || typeof layoutCreator.layout !== 'function') {
         return;
     }

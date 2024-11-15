@@ -1,4 +1,4 @@
-import { EdgeConfig, GraphData, NodeConfig, registerNode } from "@antv/g6-core";
+import { EdgeConfig, GraphData, NodeConfig, registerNode, ShapeOptions } from "@antv/g6-core";
 import { LayoutGroup, LayoutGroupTable } from "../Model/modelConstructor";
 import { SVLink } from "../Model/SVLink";
 import { SVModel } from "../Model/SVModel";
@@ -144,7 +144,15 @@ export const Util = {
         return matrix;
     },
 
-    registerShape(shapeName: string, shapeDefinition, extendShapeType?: string) {
+
+    /**
+     * 注册图形
+     * @param shapeName 
+     * @param shapeDefinition 
+     * @param extendShapeType 
+     * @returns 
+     */
+    registerShape(shapeName: string, shapeDefinition: ShapeOptions, extendShapeType?: string) {
         if(!shapeDefinition.update) {
             // 因为大多数节点继承了rect，rect的update有时候会和选定高亮功能有冲突，所以打个补丁
             shapeDefinition.update = undefined;

@@ -1,6 +1,6 @@
 
 
-SV.registerLayout('LinkList', {
+SV.registerLayout('Link', {
 
     sourcesPreprocess(sources) {
         let root = sources[0];
@@ -22,7 +22,7 @@ SV.registerLayout('LinkList', {
                     size: [60, 30],
                     style: {
                         stroke: '#333',
-                        fill: '#eaffd0',
+                        fill: '#cfddfe',
                         cursor: 'pointer'
                     }
                 }
@@ -30,8 +30,8 @@ SV.registerLayout('LinkList', {
             link: {
                 next: {
                     type: 'line',
-                    sourceAnchor: 2,
-                    targetAnchor: 6,
+                    sourceAnchor: 6,
+                    targetAnchor: 4,
                     style: {
                         stroke: '#333',
                         endArrow: 'default',
@@ -41,11 +41,10 @@ SV.registerLayout('LinkList', {
                         }
                     }
                 },
-                loopNext: {
-                    type: 'quadratic',
-                    curveOffset: -100,
-                    sourceAnchor: 2,
-                    targetAnchor: 7,
+                pre: {
+                    type: 'line',
+                    sourceAnchor: 7,
+                    targetAnchor: 1,
                     style: {
                         stroke: '#333',
                         endArrow: 'default',

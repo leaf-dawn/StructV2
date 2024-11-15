@@ -17,7 +17,6 @@ import ForceNode from "./RegisteredShape/force";
 import TriTreeNode from "./RegisteredShape/triTreeNode";
 import IntendedTreeNode from "./RegisteredShape/intendedTreeNode";
 import CLenQueuePointer from "./RegisteredShape/clenQueuePointer";
-import TwoCellNode from "./RegisteredShape/twoCellNode";
 import ThreeCellNode from "./RegisteredShape/threeCellNode";
 import ArrayNode from "./RegisteredShape/arrayNode";
 import Cursor from "./RegisteredShape/cursor";
@@ -69,7 +68,6 @@ SV.registeredShape = [
     LinkListNode, 
     BinaryTreeNode, 
     TriTreeNode,
-    TwoCellNode,
     ThreeCellNode,
     Cursor,
     ArrayNode,

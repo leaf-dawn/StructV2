@@ -116,7 +116,7 @@ export default Util.registerShape(
 				});
 
 				//节点没有后续指针时，添加^符号表示结束
-				if (!cfg.next) {
+				if (!cfg.next || cfg.prev == '0x0' || cfg.prev == '0') {
 					group.addShape('text', {
 						attrs: {
 							x: width * (4 / 3),

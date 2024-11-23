@@ -44,7 +44,7 @@ export default Util.registerShape(
 
 			
 			// 双向链表
-			if(cfg.pre != undefined) {
+			if(cfg.prev != undefined) {
 				group.addShape('rect', {
 					attrs: {
 						x: width * (3 / 4),
@@ -60,7 +60,7 @@ export default Util.registerShape(
 				});
 
 				//节点没有pre或者next指针时，添加^符号表示结束
-				if (!cfg.pre) {
+				if (!cfg.prev || cfg.prev == '0x0' || cfg.prev == '0') {
 					group.addShape('text', {
 						attrs: {
 							x: width * (5 / 8),
@@ -71,7 +71,7 @@ export default Util.registerShape(
 						draggable: true,
 					});
 				}
-				if (!cfg.next) {
+				if (!cfg.next || cfg.next == '0x0' || cfg.next == '0') {
 					group.addShape('text', {
 						attrs: {
 							x: width * (11 / 8),
@@ -100,7 +100,7 @@ export default Util.registerShape(
 			}
 
 			// 单向链表
-			if(cfg.pre == undefined) {
+			if(cfg.prev == undefined) {
 				group.addShape('rect', {
 					attrs: {
 						x: width / 2,
@@ -152,7 +152,7 @@ export default Util.registerShape(
 		},
 
 		getAnchorPoints(cfg) {
-			if(cfg.pre == undefined) {
+			if(cfg.prev == undefined) {
 				// 单向链表
 				return [
 					[0.5, 0],

@@ -102,10 +102,15 @@ export class ViewContainer {
 	 * @param height
 	 */
 	resize(width: number, height: number) {
-		const globalGroup: Group = new Group();
+		const g6Instance = this.getG6Instance(),
+			prevContainerHeight = g6Instance.getHeight(),
+			globalGroup: Group = new Group();
 
 		globalGroup.add(...this.prevModelList);
 		this.renderer.changeSize(width, height);
+
+		const containerHeight = g6Instance.getHeight(),
+			dy = containerHeight - prevContainerHeight;
 
 		globalGroup.translate(0, 0);
 		this.renderer.refresh();

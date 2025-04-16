@@ -107,6 +107,7 @@ export class ViewContainer {
 		globalGroup.add(...this.prevModelList);
 		this.renderer.changeSize(width, height);
 
+		globalGroup.translate(0, 0);
 		this.renderer.refresh();
 	}
 

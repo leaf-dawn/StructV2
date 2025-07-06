@@ -43,6 +43,7 @@
     <button id="relayout">relayout</button>
     <button id="switch-mode">switch mode</button>
     <button id="brush-select">brush-select</button>
+    <button id="toggle-center">Toggle Center</button>
     <span id="pos"></span>
 
     <script src="./../dist/sv.js"></script>
@@ -80,11 +81,16 @@
         Object.keys(curData).forEach(key => {
             if(curData[key].layouter === "Force")    isForce = true;
         });
-        let cur = SV(document.getElementById('container'), {
+        
+        // 配置选项，可以控制图像是否自动居中
+        let engineOptions = {
             view: {
                 groupPadding: 40,
+                fitCenter: true, // 设置为 false 可以禁用自动居中
             },
-        }, isForce);
+        };
+        
+        let cur = SV(document.getElementById('container'), engineOptions, isForce);
 
         let enableBrushSelect = false;
 
@@ -119,6 +125,15 @@
         document.getElementById('brush-select').addEventListener('click', e => {
             enableBrushSelect = !enableBrushSelect;
             cur.switchBrushSelect(enableBrushSelect);
+        });
+
+        // 新增：切换居中功能的按钮
+        document.getElementById('toggle-center').addEventListener('click', e => {
+            // 重新创建引擎实例来应用新的配置
+            engineOptions.view.fitCenter = !engineOptions.view.fitCenter;
+            cur = SV(document.getElementById('container'), engineOptions, isForce);
+            cur.render(curData);
+            console.log('fitCenter:', engineOptions.view.fitCenter);
         });
 
         // -------------------------------------------------------------------------------------------------------

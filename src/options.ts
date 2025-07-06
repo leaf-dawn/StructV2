@@ -100,6 +100,8 @@ export interface ViewOptions {
     groupPadding?: number; // 组间填充，可用于设置组之间的间距
     updateHighlight?: string; // 更新时的高亮颜色
     layoutMode?: ELayoutMode;
+    centerOffsetXPercent?: number; // 居中时x方向偏移百分比（相对于画布宽度，正数向右，负数向左）
+    centerOffsetYPercent?: number; // 居中时y方向偏移百分比（相对于画布高度，正数向下，负数向上）
 }
 
 // AnimationOptions 动画相关配置

@@ -110,7 +110,7 @@ export class LayoutProvider {
 	}
 
 	/**
-	 * 布局节点的‘已释放’文本
+	 * 布局节点的'已释放'文本
 	 * @param freedLabels
 	 */
 	private layoutFreedLabel(freedLabels: SVFreedLabel[]) {
@@ -277,8 +277,10 @@ export class LayoutProvider {
 	/**
 	 * 将视图调整至画布中心
 	 * @param models
+	 * @param offsetXPercent x方向偏移百分比（正数向右，负数向左）
+	 * @param offsetYPercent y方向偏移百分比（正数向下，负数向上）
 	 */
-	private fitCenter(group: Group) {
+	private fitCenter(group: Group, offsetXPercent: number = 0, offsetYPercent: number = 0) {
 		let width = this.viewContainer.getG6Instance().getWidth(),
 			height = this.viewContainer.getG6Instance().getHeight(),
 			viewBound: BoundingRect = group.getBound();
@@ -290,10 +292,12 @@ export class LayoutProvider {
 		let dx = centerX - boundCenterX,
 			dy = 0;
 
-
 		const boundCenterY = viewBound.y + viewBound.height / 2;
 		dy = centerY - boundCenterY;
-		
+
+		// 增加x/y百分比偏移
+		dx += width * offsetXPercent;
+		dy += height * offsetYPercent;
 
 		group.translate(dx, dy);
 	}
@@ -308,7 +312,12 @@ export class LayoutProvider {
 		const modelGroupList: Group[] = this.layoutModels(layoutGroupTable);
 		const generalGroup: Group = this.layoutGroups(modelGroupList, layoutMode);
 
-		this.fitCenter(generalGroup);
+		// 根据配置决定是否居中
+		if (this.viewOptions.fitCenter !== false) {
+			const offsetX = this.viewOptions.centerOffsetXPercent || 0;
+			const offsetY = this.viewOptions.centerOffsetYPercent || 0;
+			this.fitCenter(generalGroup, offsetX, offsetY);
+		}
 		this.postLayoutProcess(layoutGroupTable);
 	}
 }

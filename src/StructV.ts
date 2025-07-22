@@ -19,6 +19,7 @@ import IntendedTreeNode from "./RegisteredShape/intendedTreeNode";
 import CLenQueuePointer from "./RegisteredShape/clenQueuePointer";
 import ThreeCellNode from "./RegisteredShape/threeCellNode";
 import ArrayNode from "./RegisteredShape/arrayNode";
+import BarChartNode from "./RegisteredShape/barChartNode";
 import Cursor from "./RegisteredShape/cursor";
 import { Vector } from "./Common/vector";
 import { EngineOptions, LayoutCreator } from "./options";
@@ -71,6 +72,7 @@ SV.registeredShape = [
     ThreeCellNode,
     Cursor,
     ArrayNode,
+    BarChartNode,
     CLenQueuePointer,
     ForceNode,
     IntendedTreeNode

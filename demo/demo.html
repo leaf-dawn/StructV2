@@ -4,47 +4,436 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DEMO</title>
+    <title>数据结构可视化演示</title>
     <style>
         * {
             padding: 0;
             margin: 0;
             user-select: none;
+            box-sizing: border-box;
         }
         
-        .container {
-            background-color: #fafafa;
-            border: 1px solid #ccc;
-            position: relative;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
         }
         
-        .down {
-            display: flex;
-            margin-top: 20px;
-        }
-        
-        #container {
-            width: 100%;
-            height: 500px;
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            color: #333;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             position: relative;
             overflow: hidden;
         }
         
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            background-size: 200% 100%;
+            animation: gradient-shift 3s ease-in-out infinite;
+        }
+        
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .header h1 {
+            margin-bottom: 15px;
+            font-size: 2.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            color: #666;
+            font-weight: 400;
+        }
+        
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .current-structure {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .current-structure::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+        
+        .current-structure h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        
+        .current-structure p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .structure-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .structure-btn {
+            padding: 12px 20px;
+            border: 2px solid transparent;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
+            color: #333;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .structure-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .structure-btn:hover::before {
+            left: 100%;
+        }
+        
+        .structure-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            border-color: transparent;
+        }
+        
+        .structure-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.3s;
+            transform: translate(-50%, -50%);
+        }
+        
+        .action-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+        
+        .action-btn.secondary:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            background-size: 200% 100%;
+            animation: gradient-shift 3s ease-in-out infinite;
+        }
+        
+        #container {
+            width: 100%;
+            height: 600px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #666;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .info-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .info-panel span {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .header p {
+                font-size: 1.1em;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .controls {
+                padding: 20px;
+            }
+            
+            .structure-selector {
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .structure-btn {
+                font-size: 12px;
+                padding: 10px 16px;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .action-btn {
+                font-size: 13px;
+                padding: 8px 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .structure-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .structure-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a6fd8, #6a5acd);
+        }
+        
+        /* 加载动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .controls {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .container {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        /* 按钮点击效果 */
+        .action-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .structure-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+        
+        /* 焦点样式 */
+        .action-btn:focus,
+        .structure-btn:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container" id="container">
+    <div class="header">
+        <h1>📊 数据结构可视化演示</h1>
+        <p>点击下方按钮切换不同的数据结构进行可视化展示</p>
     </div>
 
-    <button id="btn-prev">prev</button>
-    <button id="btn-next">next</button>
-    <button id="resize">resize</button>
-    <button id="relayout">relayout</button>
-    <button id="switch-mode">switch mode</button>
-    <button id="brush-select">brush-select</button>
-    <button id="toggle-center">Toggle Center</button>
-    <span id="pos"></span>
+    <div class="main-content">
+        <div class="controls">
+            <div class="current-structure">
+                <h3 id="current-structure-name">当前结构：柱状图</h3>
+                <p id="current-structure-desc">数据结构可视化展示</p>
+            </div>
+            
+            <div class="structure-selector" id="structure-selector">
+                <!-- 按钮将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn" id="btn-prev">⬅️ 上一个</button>
+                <button class="action-btn" id="btn-next">下一个 ➡️</button>
+                <button class="action-btn secondary" id="resize">📏 调整大小</button>
+                <button class="action-btn secondary" id="relayout">🔄 重新布局</button>
+                <button class="action-btn secondary" id="switch-mode">🔄 切换模式</button>
+                <button class="action-btn secondary" id="brush-select">🖱️ 框选模式</button>
+                <button class="action-btn secondary" id="toggle-center">🎯 切换居中</button>
+            </div>
+        </div>
+
+        <div class="container" id="container">
+            <div class="info-panel">
+                <div>📍 坐标: <span id="pos">0,0</span></div>
+            </div>
+        </div>
+    </div>
 
     <script src="./../dist/sv.js"></script>
     <script>
@@ -71,13 +460,14 @@
     <script src="./Layouter/PCTree.js"></script>
     <script src="./Layouter/Force.js"></script>
     <script src="./Layouter/IndentedTree.js"></script>
+    <script src="./Layouter/DirectedAdjoinMatrixGraph.js"></script>
     <script src="./data.js"></script>
 
     <script>
         let isForce = false;
-
         let dataIndex = 0;
-        curData = SOURCES_DATA[dataIndex];
+        let curData = SOURCES_DATA[dataIndex];
+        
         // 判断是否需要力导向布局
         Object.keys(curData).forEach(key => {
             if(curData[key].layouter === "Force")    isForce = true;
@@ -92,23 +482,145 @@
         };
         
         let cur = SV(document.getElementById('container'), engineOptions, isForce);
-
         let enableBrushSelect = false;
 
         const container = document.getElementById('container'),
-            pos = document.getElementById('pos');
+            pos = document.getElementById('pos'),
+            structureSelector = document.getElementById('structure-selector'),
+            currentStructureName = document.getElementById('current-structure-name'),
+            currentStructureDesc = document.getElementById('current-structure-desc');
 
+        // 生成结构选择按钮
+        function generateStructureButtons() {
+            structureSelector.innerHTML = '';
+            SOURCES_DATA.forEach((data, index) => {
+                const structureKey = Object.keys(data)[0];
+                const structureName = STRUCTURE_NAMES[structureKey] || structureKey;
+                const button = document.createElement('button');
+                button.className = 'structure-btn';
+                button.textContent = structureName;
+                button.dataset.index = index;
+                button.dataset.structure = structureKey;
+                
+                if (index === dataIndex) {
+                    button.classList.add('active');
+                }
+                
+                button.addEventListener('click', () => {
+                    console.log('点击了结构按钮:', structureName, '索引:', index);
+                    
+                    // 移除所有active类
+                    document.querySelectorAll('.structure-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // 添加active类到当前按钮
+                    button.classList.add('active');
+                    
+                    // 更新数据索引
+                    dataIndex = parseInt(button.dataset.index);
+                    curData = SOURCES_DATA[dataIndex];
+                    
+                    console.log('切换到数据结构:', curData);
+                    
+                    // 更新当前结构信息
+                    updateCurrentStructureInfo();
+                    
+                    // 重新渲染
+                    try {
+                        isForce = false;
+                        Object.keys(curData).forEach(key => {
+                            if(curData[key].layouter === "Force") isForce = true;
+                        });
+                        
+                        console.log('重新创建SV实例, isForce:', isForce);
+                        cur.render(curData);
+                        console.log('渲染完成');
+                    } catch (error) {
+                        console.error('渲染出错:', error);
+                    }
+                });
+                
+                structureSelector.appendChild(button);
+            });
+        }
+
+        // 更新当前结构信息
+        function updateCurrentStructureInfo() {
+            const structureKey = Object.keys(curData)[0];
+            const structureName = STRUCTURE_NAMES[structureKey] || structureKey;
+            currentStructureName.textContent = `当前结构：${structureName}`;
+            
+            // 根据结构类型设置描述
+            const descriptions = {
+                'LinkList': '线性链表结构，展示节点间的链接关系',
+                'BinaryTree': '二叉树结构，展示父子节点关系',
+                'TriTree': '三叉树结构，每个节点最多有三个子节点',
+                'Stack': '栈结构，后进先出(LIFO)',
+                'LinkQueue': '链队列结构，先进先出(FIFO)',
+                'LinkStack': '链栈结构，基于链表的栈实现',
+                'SqQueue': '顺序队列结构，基于数组的队列实现',
+                'Array': '数组结构，线性存储',
+                'BarChart': '柱状图，数据可视化展示',
+                'HashTable': '哈希表结构，键值对存储',
+                'ChainHashTable': '链式哈希表，处理哈希冲突',
+                'GeneralizedList': '广义表结构，可嵌套的线性表',
+                'PTree': 'P树结构，特殊的树形结构',
+                'PCTree': 'PC树结构，父子关系树',
+                'IndentedTree': '缩进树结构，层级展示',
+                'AdjoinMatrixGraph': '邻接矩阵图，无向图表示',
+                'DirectedAdjoinMatrixGraph': '有向邻接矩阵图，有向图表示',
+                'AdjoinTableGraph': '邻接表图，图的另一种表示方法',
+                'Force': '力导向图，动态布局算法'
+            };
+            
+            currentStructureDesc.textContent = descriptions[structureKey] || '数据结构可视化展示';
+        }
+
+        // 初始化
+        console.log('初始化开始');
+        generateStructureButtons();
+        updateCurrentStructureInfo();
+        console.log('渲染初始数据:', curData);
         cur.render(curData);
+        console.log('初始化完成');
 
+        // 事件监听器
         document.getElementById('btn-next').addEventListener('click', e => {
-            curData = SOURCES_DATA[++dataIndex];
-            cur.render(curData);
+            dataIndex = (dataIndex + 1) % SOURCES_DATA.length;
+            curData = SOURCES_DATA[dataIndex];
+            updateCurrentStructureInfo();
+            updateActiveButton();
+            
+            try {
+                cur.render(curData);
+            } catch (error) {
+                console.error('下一个按钮出错:', error);
+            }
         });
 
         document.getElementById('btn-prev').addEventListener('click', e => {
-            curData = SOURCES_DATA[--dataIndex];
-            cur.render(curData);
+            dataIndex = (dataIndex - 1 + SOURCES_DATA.length) % SOURCES_DATA.length;
+            curData = SOURCES_DATA[dataIndex];
+            updateCurrentStructureInfo();
+            updateActiveButton();
+            
+            try {
+                cur.render(curData);
+            } catch (error) {
+                console.error('上一个按钮出错:', error);
+            }
         });
+
+        function updateActiveButton() {
+            document.querySelectorAll('.structure-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.querySelector(`[data-index="${dataIndex}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
 
         document.getElementById('resize').addEventListener('click', e => {
             container.style.height = 800 + 'px';
@@ -128,16 +640,11 @@
             cur.switchBrushSelect(enableBrushSelect);
         });
 
-        // 新增：切换居中功能的按钮
         document.getElementById('toggle-center').addEventListener('click', e => {
-            // 重新创建引擎实例来应用新的配置
             engineOptions.view.fitCenter = !engineOptions.view.fitCenter;
-            cur = SV(document.getElementById('container'), engineOptions, isForce);
             cur.render(curData);
             console.log('fitCenter:', engineOptions.view.fitCenter);
         });
-
-        // -------------------------------------------------------------------------------------------------------
 
         container.addEventListener('mousemove', e => {
             let x = e.offsetX,

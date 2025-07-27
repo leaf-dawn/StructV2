@@ -15,15 +15,28 @@ SV.registerLayout('BarChart', {
         return {
             node: {
                 default: {
-                    type: 'bar-chart-node',
+                    type: 'array-node',
                     label: '[data]',
                     size: [40, 80], // 柱状图默认尺寸，将在layout中动态调整
                     labelOptions: {
-                        style: { fontSize: 12 }
+                        style: { 
+                            fontSize: 12,
+                            fontWeight: 400,
+                            fill: '#2c3e50'
+                        }
                     },
                     style: {
-                        stroke: '#333',
-                        fill: '#95e1d3'
+                        stroke: '#10b981',
+                        strokeWidth: 1,
+                        fill: '#d1fae5',
+                        cursor: 'pointer',
+                        radius: 4,
+                        // 悬停效果
+                        hover: {
+                            stroke: '#059669',
+                            strokeWidth: 2,
+                            fill: '#a7f3d0',
+                        }
                     }
                 }
             },
@@ -62,29 +75,9 @@ SV.registerLayout('BarChart', {
         let arr = elements;
         const dataLength = arr.length;
         
-        // 动态计算柱状图宽度和间距
-        // 基础配置
-        const minBarWidth = 30;  // 最小柱状图宽度
-        const maxBarWidth = 80;  // 最大柱状图宽度
-        const minSpacing = 8;    // 最小间距
-        const maxSpacing = 20;   // 最大间距
-        
-        // 根据数据长度计算合适的宽度和间距
-        let barWidth, spacing;
-        
-        if (dataLength <= 5) {
-            // 数据量少时，使用较宽的柱状图和间距
-            barWidth = Math.max(minBarWidth, Math.min(maxBarWidth, 120 - dataLength * 10));
-            spacing = Math.max(minSpacing, Math.min(maxSpacing, 25 - dataLength * 2));
-        } else if (dataLength <= 10) {
-            // 中等数据量
-            barWidth = Math.max(minBarWidth, Math.min(maxBarWidth, 80 - (dataLength - 5) * 5));
-            spacing = Math.max(minSpacing, Math.min(maxSpacing, 15 - (dataLength - 5)));
-        } else {
-            // 大数据量时，使用最小宽度和间距
-            barWidth = minBarWidth;
-            spacing = minSpacing;
-        }
+        // 固定柱状图宽度和间距
+        const barWidth = 40;  // 固定柱状图宽度
+        const spacing = 10;   // 固定间距
         
         // 计算所有数据的最大值，用于高度计算
         let maxValue = 0;
@@ -93,25 +86,50 @@ SV.registerLayout('BarChart', {
             maxValue = Math.max(maxValue, value);
         }
         
-        // 动态计算合适的高度
-        let chartHeight;
-        if (maxValue <= 10) {
-            chartHeight = 60;  // 小值时使用较小高度
-        } else if (maxValue <= 50) {
-            chartHeight = 80;  // 中等值时使用中等高度
-        } else if (maxValue <= 100) {
-            chartHeight = 100; // 大值时使用较大高度
-        } else {
-            chartHeight = 120; // 超大值时使用最大高度
+        // 智能高度计算逻辑 - 从节点定义中抽离出来
+        function calculateIntelligentHeight(value, maxValue, baseHeight) {
+            if (maxValue === 0) {
+                return baseHeight * 0.1; // 如果最大值为0，显示最小高度
+            }
+            
+            const ratio = value / maxValue;
+            let actualHeight;
+            
+            // 使用对数比例，让不同数值范围都有合理的视觉展示
+            if (ratio <= 0.01) {
+                // 极小值：使用对数比例，确保可见
+                actualHeight = baseHeight * (0.05 + Math.log10(ratio * 100) * 0.1);
+            } else if (ratio <= 0.1) {
+                // 小值：线性插值，从5%到15%
+                actualHeight = baseHeight * (0.05 + ratio * 1.0);
+            } else if (ratio <= 0.5) {
+                // 中等值：线性插值，从15%到60%
+                actualHeight = baseHeight * (0.15 + (ratio - 0.1) * 1.125);
+            } else {
+                // 大值：线性插值，从60%到100%
+                actualHeight = baseHeight * (0.6 + (ratio - 0.5) * 0.8);
+            }
+            
+            // 确保最小和最大高度
+            actualHeight = Math.max(actualHeight, baseHeight * 0.05); // 最小5%
+            actualHeight = Math.min(actualHeight, baseHeight * 0.95); // 最大95%
+            
+            return actualHeight;
         }
         
         // 更新每个元素的尺寸和位置
         for (let i = 0; i < arr.length; i++) {
-            // 设置动态计算的尺寸
-            arr[i].set('size', [barWidth, chartHeight]);
+            const value = Number(arr[i].get('value')) || 0;
+            const baseHeight = 80; // 基础高度
+            
+            // 计算智能高度
+            const intelligentHeight = calculateIntelligentHeight(value, maxValue, baseHeight);
             
             // 设置最大值，用于节点内部的高度计算
             arr[i].set('maxValue', maxValue);
+            
+            // 设置动态高度
+            arr[i].set('size', [barWidth, intelligentHeight]);
             
             // 计算x坐标
             if (i > 0) {
@@ -119,6 +137,8 @@ SV.registerLayout('BarChart', {
             } else {
                 arr[i].set('x', 0);
             }
+
+            arr[i].set('y',  baseHeight - intelligentHeight / 2);
         }
     }
 });

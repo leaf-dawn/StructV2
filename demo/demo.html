@@ -425,6 +425,21 @@
                 <button class="action-btn secondary" id="switch-mode">🔄 切换模式</button>
                 <button class="action-btn secondary" id="brush-select">🖱️ 框选模式</button>
                 <button class="action-btn secondary" id="toggle-center">🎯 切换居中</button>
+                <button class="action-btn secondary" id="edit-barchart" style="display: none;">📊 编辑柱状图</button>
+            </div>
+            
+            <!-- 柱状图编辑面板 -->
+            <div id="barchart-editor" style="display: none; margin-top: 20px; padding: 20px; background: rgba(255, 255, 255, 0.9); border-radius: 15px; border: 1px solid rgba(102, 126, 234, 0.2);">
+                <h4 style="margin-bottom: 15px; color: #333;">📊 柱状图数值编辑</h4>
+                <div id="barchart-inputs" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                    <!-- 输入框将动态生成 -->
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="action-btn secondary" id="add-bar">➕ 添加柱子</button>
+                    <button class="action-btn secondary" id="remove-bar">➖ 删除柱子</button>
+                    <button class="action-btn" id="apply-barchart">✅ 应用更改</button>
+                    <button class="action-btn secondary" id="random-barchart">🎲 随机生成</button>
+                </div>
             </div>
         </div>
 
@@ -575,6 +590,18 @@
             };
             
             currentStructureDesc.textContent = descriptions[structureKey] || '数据结构可视化展示';
+            
+            // 显示/隐藏柱状图编辑按钮
+            const editBtn = document.getElementById('edit-barchart');
+            const editor = document.getElementById('barchart-editor');
+            if (structureKey === 'BarChart') {
+                editBtn.style.display = 'inline-block';
+                // 初始化柱状图编辑器
+                initBarChartEditor();
+            } else {
+                editBtn.style.display = 'none';
+                editor.style.display = 'none';
+            }
         }
 
         // 初始化
@@ -622,6 +649,102 @@
             }
         }
 
+        // 柱状图编辑器相关函数
+        function initBarChartEditor() {
+            const editor = document.getElementById('barchart-editor');
+            const inputs = document.getElementById('barchart-inputs');
+            
+            // 清空现有输入框
+            inputs.innerHTML = '';
+            
+            // 获取当前柱状图数据
+            const barData = curData.BarChart.data;
+            
+            // 为每个柱子创建输入框
+            barData.forEach((bar, index) => {
+                const inputGroup = document.createElement('div');
+                inputGroup.style.display = 'flex';
+                inputGroup.style.alignItems = 'center';
+                inputGroup.style.gap = '5px';
+                
+                const label = document.createElement('label');
+                label.textContent = `柱子 ${index + 1}:`;
+                label.style.fontSize = '14px';
+                label.style.fontWeight = '500';
+                label.style.color = '#333';
+                
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.value = bar.value;
+                input.style.width = '80px';
+                input.style.padding = '8px';
+                input.style.border = '1px solid #ddd';
+                input.style.borderRadius = '6px';
+                input.style.fontSize = '14px';
+                input.dataset.index = index;
+                
+                inputGroup.appendChild(label);
+                inputGroup.appendChild(input);
+                inputs.appendChild(inputGroup);
+            });
+            
+            editor.style.display = 'block';
+        }
+
+        function updateBarChartData() {
+            const inputs = document.querySelectorAll('#barchart-inputs input');
+            const barData = curData.BarChart.data;
+            
+            inputs.forEach((input, index) => {
+                if (index < barData.length) {
+                    const value = parseInt(input.value) || 0;
+                    barData[index].value = value;
+                    barData[index].data = value.toString();
+                }
+            });
+            
+            // 重新渲染
+            cur.render(curData);
+        }
+
+        function addBar() {
+            const barData = curData.BarChart.data;
+            const newIndex = barData.length;
+            const newValue = Math.floor(Math.random() * 100) + 1;
+            
+            barData.push({
+                id: `bar${newIndex + 1}`,
+                value: newValue,
+                data: newValue.toString(),
+                index: newIndex
+            });
+            
+            initBarChartEditor();
+            cur.render(curData);
+        }
+
+        function removeBar() {
+            const barData = curData.BarChart.data;
+            if (barData.length > 1) {
+                barData.pop();
+                initBarChartEditor();
+                cur.render(curData);
+            }
+        }
+
+        function randomizeBarChart() {
+            const barData = curData.BarChart.data;
+            
+            barData.forEach((bar, index) => {
+                const value = Math.floor(Math.random() * 1000) + 1;
+                bar.value = value;
+                bar.data = value.toString();
+            });
+            
+            initBarChartEditor();
+            cur.render(curData);
+        }
+
         document.getElementById('resize').addEventListener('click', e => {
             container.style.height = 800 + 'px';
             cur.resize(container.offsetWidth, container.offsetHeight);
@@ -644,6 +767,28 @@
             engineOptions.view.fitCenter = !engineOptions.view.fitCenter;
             cur.render(curData);
             console.log('fitCenter:', engineOptions.view.fitCenter);
+        });
+
+        // 柱状图编辑相关事件监听器
+        document.getElementById('edit-barchart').addEventListener('click', e => {
+            const editor = document.getElementById('barchart-editor');
+            editor.style.display = editor.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.getElementById('apply-barchart').addEventListener('click', e => {
+            updateBarChartData();
+        });
+
+        document.getElementById('add-bar').addEventListener('click', e => {
+            addBar();
+        });
+
+        document.getElementById('remove-bar').addEventListener('click', e => {
+            removeBar();
+        });
+
+        document.getElementById('random-barchart').addEventListener('click', e => {
+            randomizeBarChart();
         });
 
         container.addEventListener('mousemove', e => {

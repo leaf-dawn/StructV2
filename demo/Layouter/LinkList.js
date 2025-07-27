@@ -20,10 +20,25 @@ SV.registerLayout('Link', {
                     type: 'link-list-node',
                     label: '[data]',
                     size: [60, 30],
+                    labelOptions: {
+                        style: { 
+                            fontSize: 14,
+                            fontWeight: 400,
+                            fill: '#2c3e50'
+                        },
+                    },
                     style: {
-                        stroke: '#333',
-                        fill: '#cfddfe',
-                        cursor: 'pointer'
+                        stroke: '#8b5cf6',
+                        strokeWidth: 1,
+                        fill: '#f3e8ff',
+                        cursor: 'pointer',
+                        radius: 4,
+                        // 悬停效果
+                        hover: {
+                            stroke: '#7c3aed',
+                            strokeWidth: 2,
+                            fill: '#ede9fe',
+                        }
                     }
                 }
             },
@@ -33,12 +48,16 @@ SV.registerLayout('Link', {
                     sourceAnchor: 6,
                     targetAnchor: 4,
                     style: {
-                        stroke: '#333',
+                        stroke: '#7f8c8d',
+                        strokeWidth: 1,
+                        lineAppendWidth: 6,
+                        cursor: 'pointer',
                         endArrow: 'default',
+                        preventOverlap: true, //防重叠
                         startArrow: {
                             path: G6.Arrow.circle(2, -1),
-                            fill: '#333'
-                        }
+                            fill: '#7f8c8d',
+                        },
                     }
                 },
                 pre: {
@@ -46,12 +65,16 @@ SV.registerLayout('Link', {
                     sourceAnchor: 7,
                     targetAnchor: 1,
                     style: {
-                        stroke: '#333',
+                        stroke: '#7f8c8d',
+                        strokeWidth: 1,
+                        lineAppendWidth: 6,
+                        cursor: 'pointer',
                         endArrow: 'default',
+                        preventOverlap: true, //防重叠
                         startArrow: {
                             path: G6.Arrow.circle(2, -1),
-                            fill: '#333'
-                        }
+                            fill: '#7f8c8d',
+                        },
                     }
                 }
             },

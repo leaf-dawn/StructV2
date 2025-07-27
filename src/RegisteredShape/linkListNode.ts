@@ -55,7 +55,6 @@ export default Util.registerShape(
 						fill: cfg.style.fill,
 						stroke: cfg.style.stroke || '#333',
 						cursor: cfg.style.cursor,
-						radius: cfg.style.radius || 0, // 添加圆角支持
 					},
 					name: 'main-rect',
 					draggable: true,
@@ -112,7 +111,7 @@ export default Util.registerShape(
 						fill: cfg.style.fill,
 						stroke: cfg.style.stroke || '#333',
 						cursor: cfg.style.cursor,
-						radius: cfg.style.radius || 0, // 添加圆角支持
+						radius: [cfg.style.radius || 0, 0, 0, cfg.style.radius || 0], // 只有左边两个角有圆角
 					},
 					name: 'main-rect',
 					draggable: true,

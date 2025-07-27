@@ -2,57 +2,67 @@ SV.registerLayout('BinaryTree', {
     defineOptions() {
         return {
             node: {
-                default: {
-                    type: 'binary-tree-node',
-                    size: [60, 30],
-                    label: '[data]',
-                    style: {
-                        fill: '#b83b5e',
-                        stroke: '#333',
-                        cursor: 'pointer',
-                    },
+              default: {
+                type: 'binary-tree-node',
+                size: [60, 30],
+                label: '[data]',
+                labelOptions: {
+                  style: { 
+                    fontSize: 14,
+                    fontWeight: 400,
+                    fill: '#2c3e50'
+                  },
                 },
+                style: {
+                  stroke: '#06b6d4',
+                  strokeWidth: 1,
+                  fill: '#cffafe',
+                  cursor: 'pointer',
+                  radius: 4,
+                  // 悬停效果
+                  hover: {
+                    stroke: '#0891b2',
+                    strokeWidth: 2,
+                    fill: '#a5f3fc',
+                  }
+                },
+              },
             },
             link: {
-                child: {
-                    type: 'line',
-                    sourceAnchor: index => (index === 0 ? 3 : 1),
-                    targetAnchor: 0,
-                    style: {
-                        stroke: '#333',
-                        lineAppendWidth: 6,
-                        cursor: 'pointer',
-                        endArrow: 'default',
-                        startArrow: {
-                            path: G6.Arrow.circle(2, -1),
-                            fill: '#333',
-                        },
-                    },
+              child: {
+                type: 'line',
+                sourceAnchor: (index) => (index === 0 ? 3 : 1),
+                targetAnchor: 0,
+                style: {
+                  stroke: '#7f8c8d',
+                  strokeWidth: 1,
+                  lineAppendWidth: 6,
+                  cursor: 'pointer',
+                  endArrow: 'default',
+                  preventOverlap: true, //防重叠
+                  startArrow: {
+                    path: G6.Arrow.circle(2, -1),
+                    fill: '#7f8c8d',
+                  },
                 },
+              },
             },
             marker: {
-                external: {
-                    type: 'pointer',
-                    anchor: 0,
-                    offset: 14,
-                    style: {
-                        fill: '#f08a5d',
-                    },
-                    labelOptions: {
-                        style: {
-                            fill: '#000099',
-                        },
-                    },
+              external: {
+                type: 'pointer',
+                anchor: 0,
+                style: {
+                  fill: '#f39c12',
+                  stroke: '#d68910',
+                  strokeWidth: 1,
                 },
+              },
             },
             layout: {
-                xInterval: 40,
-                yInterval: 40,
+              xInterval: 50,
+              yInterval: 50,
             },
-            behavior: {
-                // dragNode: false
-            },
-        };
+          }
     },
 
     /**

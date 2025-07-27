@@ -18,6 +18,7 @@ export default Util.registerShape(
 					stroke: cfg.style.stroke || '#333',
 					cursor: cfg.style.cursor,
 					fill: cfg.style.backgroundFill || '#eee',
+					radius: cfg.style.radius || 0, // 添加圆角支持
 				},
 				name: 'wrapper',
 			});

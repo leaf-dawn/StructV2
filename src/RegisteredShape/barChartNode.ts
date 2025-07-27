@@ -11,8 +11,25 @@ export default Util.registerShape('bar-chart-node', {
         const value = Number(cfg.value) || 1;
         const maxValue = Number(cfg.maxValue) || 100;
         
-        // 计算实际高度，基于value和maxValue的比例
-        const actualHeight = (value / maxValue) * height;
+        // 改进的高度计算逻辑
+        let actualHeight;
+        if (maxValue === 0) {
+            actualHeight = height * 0.1; // 如果最大值为0，显示最小高度
+        } else {
+            // 使用对数比例或线性比例，避免极端值的影响
+            const ratio = value / maxValue;
+            
+            // 对于小值，使用更敏感的比例计算
+            if (ratio < 0.1) {
+                actualHeight = height * (0.1 + ratio * 0.3); // 最小10%，最大40%
+            } else {
+                actualHeight = height * (0.4 + ratio * 0.6); // 最小40%，最大100%
+            }
+            
+            // 确保最小高度
+            actualHeight = Math.max(actualHeight, height * 0.05);
+        }
+        
         
         // 绘制柱状图矩形
         const barRect = group.addShape('rect', {
@@ -32,6 +49,8 @@ export default Util.registerShape('bar-chart-node', {
         // 绘制数值标签
         if (cfg.label !== undefined) {
             const style = (cfg.labelCfg && cfg.labelCfg.style) || {};
+            const fontSize = Math.min(style.fontSize || 12, width * 0.3); // 根据宽度调整字体大小
+            
             group.addShape('text', {
                 attrs: {
                     x: width / 2,
@@ -40,14 +59,15 @@ export default Util.registerShape('bar-chart-node', {
                     textBaseline: 'middle',
                     text: cfg.label,
                     fill: style.fill || '#000',
-                    fontSize: style.fontSize || 12,
+                    fontSize: fontSize,
                     cursor: cfg.style?.cursor,
+                    fontWeight: 'bold',
                 },
                 name: 'label',
                 draggable: true,
             });
         }
-        
+          
         return barRect;
     },
     

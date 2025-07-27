@@ -27,6 +27,7 @@ export default Util.registerShape(
 					stroke: cfg.style.stroke || '#333',
 					fill: cfg.style.backgroundFill || '#eee',
 					cursor: cfg.style.cursor,
+					radius: cfg.style.radius || 0, // 添加圆角支持
 				},
 				name: 'wrapper',
 			});
@@ -54,6 +55,7 @@ export default Util.registerShape(
 						fill: cfg.style.fill,
 						stroke: cfg.style.stroke || '#333',
 						cursor: cfg.style.cursor,
+						radius: cfg.style.radius || 0, // 添加圆角支持
 					},
 					name: 'main-rect',
 					draggable: true,
@@ -110,6 +112,7 @@ export default Util.registerShape(
 						fill: cfg.style.fill,
 						stroke: cfg.style.stroke || '#333',
 						cursor: cfg.style.cursor,
+						radius: cfg.style.radius || 0, // 添加圆角支持
 					},
 					name: 'main-rect',
 					draggable: true,

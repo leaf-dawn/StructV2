@@ -59,55 +59,96 @@ export class LayoutProvider {
 	}
 
 	/**
-	 * 布局外部指针
-	 * @param marker
-	 * @param markerOptions
-	 */
-	private layoutMarker(markers: SVMarker[], markerOptions: { [key: string]: MarkerOption }) {
-		markers.forEach(item => {
+ * 布局外部指针
+ * @param markers 指针数组
+ * @param markerOptions 指针配置选项
+ */
+private layoutMarker(markers: SVMarker[], markerOptions: { [key: string]: MarkerOption }) {
+	markers.forEach(item => {
+			// 获取指针配置选项
 			const options: MarkerOption = markerOptions[item.sourceType],
-				offset = options.offset ?? 8,
-				anchor = item.anchor ?? 0,
-				labelOffset = options.labelOffset ?? 2;
+					offset = options.offset ?? 8,        // 指针距离节点的偏移量
+					anchor = item.anchor ?? 0,           // 锚点索引（对应节点的锚点数组）
+					labelOffset = options.labelOffset ?? 2, // 标签偏移量
+					configuredRotation = options.rotation; // 配置的旋转角度（可选）
 
 			let target = item.target,
-				targetBound: BoundingRect = target.getBound(),
-				g6AnchorPosition = (<INode>item.target.shadowG6Item).getAnchorPoints()[anchor] as IPoint,
-				center: [number, number] = [
-					targetBound.x + targetBound.width / 2,
-					targetBound.y + targetBound.height / 2,
-				],
-				markerPosition: [number, number],
-				markerEndPosition: [number, number];
+					targetBound: BoundingRect = target.getBound(),
+					// 获取目标节点的锚点位置
+					g6AnchorPosition = (<INode>item.target.shadowG6Item).getAnchorPoints()[anchor] as IPoint,
+					// 计算节点中心点
+					center: [number, number] = [
+							targetBound.x + targetBound.width / 2,
+							targetBound.y + targetBound.height / 2,
+					],
+					markerPosition: [number, number],    // 指针位置
+					markerEndPosition: [number, number]; // 指针标签位置
 
+			// 锚点相对于节点中心的位置
 			let anchorPosition: [number, number] = [g6AnchorPosition.x, g6AnchorPosition.y];
 
+			// 计算从节点中心到锚点的向量
 			let anchorVector = Vector.subtract(anchorPosition, center),
-				angle = 0,
-				len = Vector.length(anchorVector) + offset;
+					angle = 0,  // 指针旋转角度
+					len = Vector.length(anchorVector) + offset; // 指针距离（包含偏移量）
 
-			if (anchorVector[0] === 0) {
-				angle = anchorVector[1] > 0 ? -Math.PI : 0;
+			// 计算指针旋转角度
+			// 如果配置了旋转角度，则使用配置的角度；否则通过计算得到
+			if (configuredRotation !== undefined) {
+					// 使用配置的旋转角度
+					angle = configuredRotation;
 			} else {
-				angle = Math.sign(anchorVector[0]) * (Math.PI / 2 - Math.atan(anchorVector[1] / anchorVector[0]));
+					// 通过计算得到旋转角度
+					// 角度计算逻辑：根据锚点相对于节点中心的位置确定指针的朝向
+					if (anchorVector[0] === 0) {
+							// 垂直方向：锚点在节点正上方或正下方
+							angle = anchorVector[1] > 0 ? -Math.PI : 0;
+					} else {
+							// 其他方向：使用反正切函数计算角度
+							// Math.sign(anchorVector[0]) 确定水平方向（左/右）
+							// Math.PI / 2 - Math.atan(anchorVector[1] / anchorVector[0]) 计算垂直角度
+							angle = Math.sign(anchorVector[0]) * (Math.PI / 2 - Math.atan(anchorVector[1] / anchorVector[0]));
+					}
 			}
 
-			const markerHeight = item.get('size')[1],
-				labelRadius = item.getLabelSizeRadius() / 2;
+			const markerHeight = item.get('size')[1],    // 指针高度
+					labelRadius = item.getLabelSizeRadius() / 2; // 标签半径
 
+			// 标准化锚点向量（单位向量）
 			anchorVector = Vector.normalize(anchorVector);
+			// 计算指针位置：从节点中心沿锚点向量方向偏移指定距离
 			markerPosition = Vector.location(center, anchorVector, len);
-			markerEndPosition = Vector.location(center, anchorVector, markerHeight + len + labelRadius + labelOffset);
-			markerEndPosition = Vector.subtract(markerEndPosition, markerPosition);
+			
+			// 计算标签位置
+			if (configuredRotation !== undefined) {
+					// 自定义旋转角度的情况：使用旋转角度创建新的方向向量
+					const pointerDirection: [number, number] = Vector.normalize([Math.sin(angle), Math.cos(angle)]);
+					const titleDistance = labelOffset + labelRadius + markerHeight;
+					
+					// 计算标签位置：从指针位置沿指针方向的反方向偏移
+					markerEndPosition = Vector.location(
+							markerPosition,
+							[pointerDirection[0], pointerDirection[1]],
+							titleDistance
+					);
+					
+					// 将标签位置转换为相对于指针位置的坐标
+					markerEndPosition = Vector.subtract(markerEndPosition, markerPosition);
+			} else {
+					// 原有逻辑：使用锚点向量计算标签位置
+					markerEndPosition = Vector.location(center, anchorVector, markerHeight + len + labelRadius + labelOffset);
+					markerEndPosition = Vector.subtract(markerEndPosition, markerPosition);
+			}
 
+			// 设置指针的位置、旋转角度和标签位置
 			item.set({
-				x: markerPosition[0],
-				y: markerPosition[1],
-				rotation: angle,
-				markerEndPosition,
+					x: markerPosition[0],
+					y: markerPosition[1],
+					rotation: angle,        // 指针旋转角度（弧度）
+					markerEndPosition,      // 标签相对位置
 			});
-		});
-	}
+	});
+}
 
 	/**
 	 * 布局节点的'已释放'文本

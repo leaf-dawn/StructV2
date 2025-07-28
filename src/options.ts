@@ -69,6 +69,7 @@ export interface MarkerOption extends NodeOption {
     anchor?: number;
     offset?: number;
     labelOffset?: number;
+    rotation?: number; // 指针旋转角度（弧度），如果设置则使用此角度，否则通过计算得到
 };
 
 

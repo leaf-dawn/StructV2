@@ -43,8 +43,9 @@ SV.registerLayout('BarChart', {
             marker: {
                 headExternal: {
                     type: 'pointer',
-                    offset: 50,
-                    anchor: 2,
+                    offset: 0,
+                    anchor: 4,
+                    rotation: -Math.PI / 2, // 水平指向（0弧度 = 0度）
                     style: {
                         fill: '#f08a5d'
                     }
